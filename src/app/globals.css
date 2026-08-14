@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* Required by Lenis (mirrors lenis/dist/lenis.css). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+@theme {
+  --color-ink: #101014;
+  --color-paper: #fafafa;
+  --color-muted: #6b6b76;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
