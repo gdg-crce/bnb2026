@@ -1,9 +1,11 @@
-import ScrollDemo from "@/components/scroll-demo";
+import HeroVideo from "@/components/hero-video";
+import AboutSection from "@/components/about-section";
 
 export default function Home() {
   return (
     <main>
-      <ScrollDemo />
+      <HeroVideo />
+      <AboutSection />
     </main>
   );
 }
