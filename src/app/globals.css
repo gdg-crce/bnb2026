@@ -212,15 +212,23 @@ body {
   background:
     radial-gradient(
       125% 85% at 50% 32%,
-      rgba(8, 7, 11, 0.3) 0%,
-      rgba(8, 7, 11, 0.9) 100%
+      rgba(8, 7, 11, 0.26) 0%,
+      rgba(8, 7, 11, 0.82) 100%
     ),
     linear-gradient(
       to bottom,
       rgba(8, 7, 11, 0.38) 0%,
       rgba(8, 7, 11, 0.52) 26%,
       rgba(8, 7, 11, 0.78) 54%,
-      rgba(8, 7, 11, 0.9) 100%
+      /* Held dark to 78%, which is as far down as the copy runs, and only
+         then allowed to lift. The last stop used to be 0.9, which multiplied
+         with the radial's own 0.9 to a composite 0.99 — the section ended in
+         dead black, the domains section began in dead black, and the join
+         between two flat blacks with a photograph starting immediately below
+         it is exactly the line that was showing. Now the mural comes back up
+         at the very bottom and has something to hand over to. */
+      rgba(8, 7, 11, 0.8) 78%,
+      rgba(8, 7, 11, 0.56) 100%
     );
 }
 
@@ -314,4 +322,313 @@ body {
 
 .scroll-cue-line {
   animation: cue 2.4s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+}
+
+/*
+ * ── Domains ──────────────────────────────────────────────────────────────
+ *
+ * This section finally has a photograph under it (domains.png), which changes
+ * what everything else in here is for. The gradient that used to *be* the
+ * ground is now only a tint riding over the picture, and the panels — which
+ * were always built translucent — have something real to be translucent
+ * against.
+ *
+ * The picture is structured: dense graffiti across the top and bottom thirds,
+ * and a wide band of bare concrete through the middle. The panels sit in that
+ * middle band, which is why the scrim is lightest there and heaviest at the
+ * two edges. It reaches solid void at 0% and 100% so the section still butts
+ * up against black above and below with no seam to hide.
+ */
+.domains-scrim {
+  background:
+    /* The two accent blooms, kept from the old bed. They now land on paint of
+       roughly their own hue — the magenta over the magenta corner of the wall,
+       the cyan over the cyan one — so they read as the light source in the
+       photograph rather than as gel laid over the top of it. */
+    radial-gradient(
+      66% 50% at 18% 15%,
+      rgba(229, 48, 140, 0.18) 0%,
+      transparent 62%
+    ),
+    radial-gradient(
+      58% 48% at 84% 30%,
+      rgba(34, 182, 214, 0.16) 0%,
+      transparent 64%
+    ),
+    /* Vignette, so the eye stays off the corners where the wall is busiest. */
+      radial-gradient(
+        130% 88% at 50% 46%,
+        transparent 0%,
+        rgba(8, 7, 11, 0.55) 100%
+      ),
+    /* The value curve. Heavy where the graffiti is, light across the calm
+       band, solid at both ends. These stops are read off the picture rather
+       than guessed: the bare concrete starts around 30% and runs to about
+       62% of its height. */
+      linear-gradient(
+        to bottom,
+        /* No longer starts solid. The section's top edge is now cut by the
+           `.domains-blend` mask instead, so painting black here would only
+           bruise the mural showing through the overlap. */
+        rgba(8, 7, 11, 0.84) 0%,
+        rgba(8, 7, 11, 0.76) 10%,
+        rgba(8, 7, 11, 0.62) 24%,
+        rgba(8, 7, 11, 0.52) 38%,
+        rgba(8, 7, 11, 0.52) 60%,
+        rgba(8, 7, 11, 0.74) 76%,
+        rgba(8, 7, 11, 0.94) 92%,
+        #08070b 100%
+      );
+}
+
+/*
+ * Each panel carries its own hue on `--accent`, set inline from the data.
+ * Everything below reads that one variable, so a panel is themed by a single
+ * declaration and nothing here has to know which domain it is drawing.
+ *
+ * No tilt any more, and no vertical stagger: the three are the same size, sit
+ * on the same lines, and the only thing separating them is their accent.
+ */
+.domain-panel {
+  --accent: var(--color-red);
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(244, 242, 238, 0.14);
+  /* The glass, and the whole reason the photograph matters: the panel is
+     mostly transparent, so the concrete and its halftone read straight
+     through it, while the blur stops the graffiti competing with the copy
+     sitting on top. Saturate puts back the colour the blur washes out. */
+  background: linear-gradient(
+    158deg,
+    rgba(244, 242, 238, 0.1) 0%,
+    rgba(244, 242, 238, 0.04) 44%,
+    rgba(8, 7, 11, 0.42) 100%
+  );
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.55s ease,
+    box-shadow 0.55s ease;
+}
+
+/* The spray bloom behind the glass, thrown from above the panel's top edge so
+   the falloff runs the same direction as the light on the wall. */
+.domain-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    122% 90% at 50% -12%,
+    color-mix(in srgb, var(--accent) 32%, transparent) 0%,
+    transparent 68%
+  );
+  opacity: 0.5;
+  transition: opacity 0.55s ease;
+}
+
+/* Accent hairline along the top edge, wiped in from the left on approach.
+   This is the panel's only hard edge of pure accent, so it is what makes the
+   hover register from across the page. */
+.domain-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* `focus-within` and not just `:hover` — the panel is reachable by keyboard,
+   and the web should string for that too. */
+.domain-panel:hover,
+.domain-panel:focus-within {
+  transform: translateY(-8px);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 26px 70px -30px color-mix(in srgb, var(--accent) 78%, transparent);
+}
+
+.domain-panel:hover::before,
+.domain-panel:focus-within::before {
+  opacity: 1;
+}
+
+.domain-panel:hover::after,
+.domain-panel:focus-within::after {
+  transform: scaleX(1);
+}
+
+/*
+ * The glyph gets a tile of its own — an accent-tinted square with an accent
+ * border. It is what gives the top of each card some weight; a bare 48px line
+ * drawing was too light to anchor a corner against a photograph.
+ */
+.domain-tile {
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
+  color: color-mix(in srgb, var(--accent) 82%, var(--color-paper));
+  transition:
+    background-color 0.55s ease,
+    border-color 0.55s ease,
+    color 0.55s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.domain-panel:hover .domain-tile,
+.domain-panel:focus-within .domain-tile {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 70%, transparent);
+  color: var(--color-paper);
+  transform: translateY(-2px);
+}
+
+/* Rule under the header row. */
+.domain-rule {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--accent) 70%, transparent),
+    transparent
+  );
+}
+
+/*
+ * Quarter web in the corner. Every strand is normalised to pathLength 1 and
+ * fully dashed out, so hovering strings it rather than fading it in — the
+ * spokes first, then the spans travelling outward. The delays are what make
+ * it read as being spun instead of switched on.
+ */
+.domain-web path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.domain-panel:hover .domain-web path,
+.domain-panel:focus-within .domain-web path {
+  stroke-dashoffset: 0;
+}
+
+.domain-web path:nth-child(n + 6) {
+  transition-delay: 0.12s;
+}
+.domain-web path:nth-child(n + 7) {
+  transition-delay: 0.2s;
+}
+.domain-web path:nth-child(n + 8) {
+  transition-delay: 0.28s;
+}
+
+/* Chromatic split on the panel title — the same misregistration the intro and
+   the About wordmark use, held back until the panel is addressed. */
+.domain-ghost {
+  opacity: 0;
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.domain-panel:hover .domain-ghost,
+.domain-panel:focus-within .domain-ghost {
+  opacity: 1;
+}
+
+.domain-panel:hover .domain-ghost-a,
+.domain-panel:focus-within .domain-ghost-a {
+  transform: translate(-0.05em, -0.02em);
+}
+
+.domain-panel:hover .domain-ghost-b,
+.domain-panel:focus-within .domain-ghost-b {
+  transform: translate(0.05em, 0.02em);
+}
+
+.domain-tag {
+  border: 1px solid rgba(244, 242, 238, 0.16);
+  background: rgba(8, 7, 11, 0.3);
+  transition:
+    border-color 0.45s ease,
+    color 0.45s ease,
+    background-color 0.45s ease;
+}
+
+.domain-panel:hover .domain-tag,
+.domain-panel:focus-within .domain-tag {
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--color-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .domain-panel,
+  .domain-panel::before,
+  .domain-panel::after,
+  .domain-web path,
+  .domain-ghost,
+  .domain-tile,
+  .domain-tag {
+    transition-duration: 0.01ms;
+  }
+
+  .domain-panel:hover,
+  .domain-panel:focus-within {
+    transform: none;
+  }
+}
+
+/*
+ * ── The About → Domains join ─────────────────────────────────────────────
+ *
+ * The same trick the hero → about seam uses, and for the same reason: two
+ * photographs cannot be butted against each other without showing the join,
+ * however carefully the two edges are matched. They have to overlap and share
+ * pixels for a while.
+ *
+ * The domains section is pulled up 42vh into the tail of About (see the
+ * negative margin on the section, with the top padding raised to match so no
+ * copy actually moves). Through that band both pictures are painted — the
+ * mural underneath, the wall on top — and this mask is what fades the wall in
+ * across it. The dissolve line then travels with the scroll instead of
+ * sitting at a fixed y, which is what stops the eye finding it.
+ *
+ * It reaches fully opaque at 54vh, a little past the 42vh overlap, so the
+ * last of the blend finishes inside the domains section proper rather than
+ * exactly on the boundary — a mask that completes on the seam puts its
+ * steepest gradient right where the join is.
+ */
+.domains-blend {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.12) 12vh,
+    rgba(0, 0, 0, 0.45) 24vh,
+    rgba(0, 0, 0, 0.78) 34vh,
+    rgba(0, 0, 0, 0.95) 44vh,
+    #000 54vh
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.12) 12vh,
+    rgba(0, 0, 0, 0.45) 24vh,
+    rgba(0, 0, 0, 0.78) 34vh,
+    rgba(0, 0, 0, 0.95) 44vh,
+    #000 54vh
+  );
+}
+
+/*
+ * Both background photographs, lifted the same amount.
+ *
+ * Applied to the images rather than taken out of the scrims on purpose: the
+ * scrims are carrying the blend and the text legibility, and those are worth
+ * keeping separate from "make the picture brighter". One number, both walls,
+ * nothing else moves.
+ */
+.about-backdrop,
+.domains-backdrop {
+  filter: brightness(1.12);
 }
