@@ -103,58 +103,15 @@ body {
 }
 
 /*
- * The intro is a tight frame — its title card bleeds to all four edges, so any
- * object-cover crop eats letters. The frame is therefore contained in full and
- * the leftover space is filled with a heavily blurred, over-scaled copy of the
- * same picture. No bars, no crop: the sunset just bleeds off the edges.
- *
- * The bed stays black through the intro (which is letterboxed on black anyway,
- * so it reads as nothing) and only lifts in once the title card is held.
+ * The preloader/hero video is contained in full with its natural aspect ratio.
+ * Background is kept pure black without cropping, zooming, or stretched ambient beds.
  */
-.film-bed {
-  position: absolute;
-  inset: 0;
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  transform: scale(1.25);
-  filter: blur(64px) brightness(0.5) saturate(1.2);
-}
-
 .film-frame {
   position: absolute;
   inset: 0;
   height: 100%;
   width: 100%;
   object-fit: contain;
-}
-
-/*
- * Fill the screen wherever the crop is affordable, which is most landscape
- * displays. Measured off the final frame: the title runs to within 1.42% of
- * the left and right edges, so a horizontal crop past 2.84% total starts
- * eating letters — but a vertical crop only costs the ledge along the bottom.
- * Cover is therefore safe exactly while the viewport is no narrower than the
- * frame's own 1.612 less that slack, i.e. 1.57.
- *
- * The 12% bias keeps the crop overwhelmingly on the bottom while lifting the
- * title just off the top edge. On a 16:9 screen that spends 9px of the title's
- * 79px of headroom; even at 21:9 it spends 39px of 106px.
- *
- * Below the threshold — 4:3, tablets, phones in portrait — cropping would
- * destroy the title, so the frame stays contained and the blurred bed fills
- * what is left. Where cover applies the bed is behind an opaque image and is
- * only costing a 64px blur, so take it out.
- */
-@media (min-aspect-ratio: 157/100) {
-  .film-frame {
-    object-fit: cover;
-    object-position: 50% 12%;
-  }
-
-  .film-bed {
-    display: none;
-  }
 }
 
 /*
