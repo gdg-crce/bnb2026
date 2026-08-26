@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 import beforeHeroImg from "../../public/images/beforehero.jpg";
+import cityBgImg from "../../public/images/city-bg.jpg";
 import logoImg from "../../public/images/logo.png";
 
 /**
@@ -11,14 +12,13 @@ import logoImg from "../../public/images/logo.png";
  * 1. Preloader video dynamically centered to viewport on pure black.
  * 2. Plays first 7 seconds, then smoothly reveals full-screen `beforehero.jpg`.
  * 3. On scroll, ultra-smooth fluid zoom directly into the center of the right eye lens (70% 48%).
- * 4. Reveals `random.mp4` fitted cleanly from the bottom.
- * 5. `logo.png` glides in from the TOP, and Spider-Verse yellow CTA box glides in from the BOTTOM (placed way below).
- * 6. Both stay proudly in place for an extended buffer before scrolling continues.
+ * 4. Reveals city background image fitted to the screen.
+ * 5. BnB logo fades in centered on screen, and Spider-Verse yellow CTA box glides in from the BOTTOM.
+ * 6. Both stay in place for an extended buffer before scrolling continues.
  */
 export default function HeroVideo() {
   const sectionRef = useRef<HTMLElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
-  const randomVideoRef = useRef<HTMLVideoElement>(null);
   const preloaderVideoRef = useRef<HTMLVideoElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
@@ -83,12 +83,6 @@ export default function HeroVideo() {
             scrub: 1.2, // Buttery smooth scroll damping
             pin: true,
             anticipatePin: 1,
-            onUpdate: (self) => {
-              // Start playing random.mp4 only once the user scrolls into the eye zoom
-              if (self.progress >= 0.12 && randomVideoRef.current?.paused) {
-                randomVideoRef.current.play().catch(() => {});
-              }
-            },
           },
         });
 
@@ -103,19 +97,7 @@ export default function HeroVideo() {
           0,
         );
 
-        // 2. Start hero video playback as the eye zoom reveals it
-        tl.call(
-          () => {
-            if (randomVideoRef.current && randomVideoRef.current.paused) {
-              randomVideoRef.current.currentTime = 0;
-              randomVideoRef.current.play().catch(() => {});
-            }
-          },
-          [],
-          0.12,
-        );
-
-        // 3. Early reveal of hero video: dissolves beforehero much earlier as zoom begins
+        // 2. Early reveal of city background: dissolves beforehero as zoom begins
         tl.to(
           heroImageRef.current,
           {
@@ -126,7 +108,7 @@ export default function HeroVideo() {
           0.12,
         );
 
-        // 4. Fade out corner chrome during initial zoom
+        // 3. Fade out corner chrome during initial zoom
         tl.to(
           ".hero-chrome",
           {
@@ -137,7 +119,7 @@ export default function HeroVideo() {
           0.04,
         );
 
-        // 5. Logo fades and glides down from the TOP
+        // 4. BnB Logo fades and glides down from the TOP into center
         tl.fromTo(
           logoRef.current,
           {
@@ -155,7 +137,7 @@ export default function HeroVideo() {
           0.3,
         );
 
-        // 6. CTA fades and glides up from the BOTTOM (placed higher up)
+        // 5. CTA fades and glides up from the BOTTOM
         tl.fromTo(
           ctaRef.current,
           {
@@ -173,7 +155,7 @@ export default function HeroVideo() {
           0.36,
         );
 
-        // 7. Long stay buffer: from 0.50 to 1.0 (50% of the entire timeline), the hero section stays completely in place
+        // 6. Long stay buffer: from 0.50 to 1.0 (50% of the entire timeline), the hero section stays completely in place
       });
     },
     { scope: sectionRef },
@@ -186,27 +168,26 @@ export default function HeroVideo() {
     >
       <h1 className="sr-only">bitNbuild</h1>
 
-      {/* Layer 0: random.mp4 (Hero video fitted from the bottom, starts playing on zoom-in) */}
+      {/* Layer 0: City Background (revealed when zoom enters the eyes) */}
       <div className="absolute inset-0 z-0 h-full w-full overflow-hidden bg-black">
-        <video
-          ref={randomVideoRef}
-          src="/images/random.mp4"
-          loop
-          muted
-          playsInline
-          preload="auto"
-          className="h-full w-full object-cover object-bottom"
+        <Image
+          src={cityBgImg}
+          alt="City Background"
+          fill
+          priority
+          sizes="100vw"
+          className="h-full w-full object-cover object-center"
         />
         {/* Subtle ambient gradient overlay to seat the logo */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/50" />
       </div>
 
-      {/* Layer 1: logo.png (Positioned high in the sky, fades in from the TOP) */}
+      {/* Layer 1: BnB Logo (Centered on screen, fades in from the TOP) */}
       <div
         ref={logoRef}
-        className="pointer-events-none absolute inset-x-0 top-6 z-10 flex justify-center opacity-0 md:top-10"
+        className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center opacity-0"
       >
-        <div className="relative flex max-h-[34vh] w-[min(82vw,560px)] items-center justify-center">
+        <div className="relative flex max-h-[50vh] w-[min(85vw,620px)] items-center justify-center">
           <Image
             src={logoImg}
             alt="Bit N Build Logo"
