@@ -149,18 +149,11 @@ export default function DomainsSection() {
     <section
       id="domains"
       ref={root}
-      /*
-       * Pulled 42vh up into the tail of About so the two photographs overlap,
-       * with the top padding raised by the same 42vh so nothing inside the
-       * section actually moves. Both layers below are masked, so through that
-       * band the mural and the wall share pixels and the wall fades in over
-       * it — the same construction as the hero → about seam.
-       */
-      className="halftone relative z-10 -mt-[42vh] overflow-hidden px-6 pt-[calc(42vh+8rem)] pb-32 md:px-10 md:pt-[calc(42vh+11rem)] md:pb-44"
+      className="halftone relative z-10 overflow-hidden px-6 pt-32 pb-32 md:px-10 md:pt-44 md:pb-44"
     >
       {/* The wall. 112% tall so the parallax has somewhere to travel without
           ever exposing an edge. */}
-      <div className="domains-blend absolute inset-0 -z-20 overflow-hidden">
+      <div className="absolute inset-0 -z-20 overflow-hidden">
         <Image
           src={domainsImage}
           alt=""
@@ -170,7 +163,7 @@ export default function DomainsSection() {
           className="domains-backdrop h-[112%] w-full object-cover"
         />
       </div>
-      <div className="domains-blend domains-scrim absolute inset-0 -z-10" />
+      <div className="domains-scrim absolute inset-0 -z-10" />
 
       <div className="mx-auto max-w-6xl">
         <p className="eyebrow">Three tracks</p>
