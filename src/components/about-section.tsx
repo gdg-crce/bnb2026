@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import bgAboutUs from "../../public/images/bg-aboutus.png";
+import bgAboutUs from "../../public/images/curved.png";
 import milesSofa from "../../public/images/milessofa.png";
 import bigTrainTightImg from "../../public/bigtrain-tight.png";
 import timelineBg from "../../public/images/timeline-bg.jpg";
@@ -216,6 +216,15 @@ export default function AboutSection() {
           },
         });
 
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 1.6,
+          },
+        });
+
         // 1. Phase 1: Train rolls in smoothly from left to center (0.04 -> 0.36)
         tl.to(
           trainRef.current,
@@ -285,7 +294,7 @@ export default function AboutSection() {
         return () => split.revert();
       });
     },
-    { scope: root },
+    { scope: sectionRef },
   );
 
   return (
@@ -508,7 +517,7 @@ export default function AboutSection() {
 
           {/* Stationary Miles on Sofa */}
           <div className="absolute inset-x-0 bottom-0 z-10 flex w-full justify-center items-end px-2 pb-0 md:pb-2">
-            <div className="relative flex max-h-[78vh] w-[min(96vw,1200px)] items-end justify-center">
+            <div className="relative flex max-h-[85vh] w-[min(100vw,1400px)] scale-110 md:scale-125 origin-bottom items-end justify-center">
               <Image
                 src={milesSofa}
                 alt="Miles Morales on Sofa"
