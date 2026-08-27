@@ -149,6 +149,7 @@ export default function AboutSection() {
   const wallRef = useRef<HTMLDivElement>(null);
   const aboutRoomRef = useRef<HTMLDivElement>(null);
   const trainRef = useRef<HTMLDivElement>(null);
+  const headlightsRef = useRef<HTMLDivElement>(null);
 
   const [activeFilter, setActiveFilter] = useState<MilestoneCategory>("ALL");
 
@@ -187,9 +188,13 @@ export default function AboutSection() {
       const media = gsap.matchMedia();
 
       media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Initialize train completely offscreen to the left
+        // Initialize train completely offscreen to the left and headlights off
         if (trainRef.current) {
           gsap.set(trainRef.current, { xPercent: -170 });
+        }
+
+        if (headlightsRef.current) {
+          gsap.set(headlightsRef.current, { opacity: 0 });
         }
 
         if (aboutRoomRef.current) {
@@ -226,6 +231,19 @@ export default function AboutSection() {
         });
 
         // 1. Phase 1: Generous hold on About Us room before train enters (0.00 -> 0.16)
+        // Headlights power on right as the pause ends
+        tl.fromTo(
+          headlightsRef.current,
+          { opacity: 0, scale: 0.8 },
+          {
+            opacity: 1,
+            scale: 1,
+            ease: "power2.out",
+            duration: 0.04,
+          },
+          0.15,
+        );
+
         // Train rolls in smoothly from left to center (0.16 -> 0.44)
         tl.to(
           trainRef.current,
@@ -548,6 +566,92 @@ export default function AboutSection() {
               priority
               className="h-full w-auto max-w-none object-contain drop-shadow-[0_50px_140px_rgba(0,0,0,0.98)]"
             />
+
+            {/* Exactly 2 Real Looking Headlights */}
+            <div
+              ref={headlightsRef}
+              className="pointer-events-none absolute inset-0 h-full w-full will-change-transform"
+            >
+              {/* --- HEADLIGHT 1 (Bottom Left / Inner Lamp: left: 87.5%, top: 59.5%) --- */}
+              <div
+                className="absolute"
+                style={{ left: "87.5%", top: "59.5%" }}
+              >
+                {/* Wide Volumetric Forward Beam Cone */}
+                <div
+                  className="absolute pointer-events-none"
+                  style={{
+                    left: "0px",
+                    top: "0px",
+                    width: "max(1500px, 95vw)",
+                    height: "min(620px, 75vh)",
+                    transformOrigin: "0% 50%",
+                    transform: "translate(0, -50%)",
+                    clipPath: "polygon(0% 49%, 100% -10%, 100% 110%, 0% 51%)",
+                    background:
+                      "linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,245,160,0.65) 6%, rgba(255,225,50,0.28) 25%, rgba(255,210,0,0.08) 55%, transparent 100%)",
+                    filter: "blur(20px)",
+                    mixBlendMode: "screen",
+                  }}
+                />
+
+                {/* Soft Bulb Glow */}
+                <div
+                  className="absolute pointer-events-none rounded-full"
+                  style={{
+                    left: "0px",
+                    top: "0px",
+                    width: "28px",
+                    height: "28px",
+                    transform: "translate(-50%, -50%)",
+                    background:
+                      "radial-gradient(circle, #ffffff 25%, #fff7a0 55%, #ffd230 80%, transparent 100%)",
+                    boxShadow:
+                      "0 0 18px 8px rgba(255,255,255,0.9), 0 0 45px 18px rgba(255,220,50,0.7), 0 0 90px 35px rgba(255,190,0,0.35)",
+                  }}
+                />
+              </div>
+
+              {/* --- HEADLIGHT 2 (Bottom Right / Outer Lamp: left: 97.2%, top: 59.0%) --- */}
+              <div
+                className="absolute"
+                style={{ left: "97.2%", top: "59.0%" }}
+              >
+                {/* Wide Volumetric Forward Beam Cone */}
+                <div
+                  className="absolute pointer-events-none"
+                  style={{
+                    left: "0px",
+                    top: "0px",
+                    width: "max(1600px, 100vw)",
+                    height: "min(680px, 80vh)",
+                    transformOrigin: "0% 50%",
+                    transform: "translate(0, -50%)",
+                    clipPath: "polygon(0% 49%, 100% -12%, 100% 112%, 0% 51%)",
+                    background:
+                      "linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,245,160,0.7) 6%, rgba(255,225,50,0.3) 25%, rgba(255,210,0,0.09) 55%, transparent 100%)",
+                    filter: "blur(20px)",
+                    mixBlendMode: "screen",
+                  }}
+                />
+
+                {/* Soft Bulb Glow */}
+                <div
+                  className="absolute pointer-events-none rounded-full"
+                  style={{
+                    left: "0px",
+                    top: "0px",
+                    width: "30px",
+                    height: "30px",
+                    transform: "translate(-50%, -50%)",
+                    background:
+                      "radial-gradient(circle, #ffffff 25%, #fff7a0 55%, #ffd230 80%, transparent 100%)",
+                    boxShadow:
+                      "0 0 20px 8px rgba(255,255,255,0.9), 0 0 50px 20px rgba(255,220,50,0.75), 0 0 100px 40px rgba(255,190,0,0.4)",
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
