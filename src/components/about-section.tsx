@@ -136,12 +136,19 @@ const CATEGORY_TABS: { key: MilestoneCategory; label: string }[] = [
   { key: "DAY2", label: "DAY 02 (PODIUM)" },
 ];
 
+/**
+ * About & Timeline Train Wipe Section:
+ * 1. Initial State: The About room with stationary Miles on sofa.
+ * 2. On Scroll: The Subway Train drives from left to right across the screen.
+ * 3. The passing train directly wipes away the About room and unveils the Timeline section underneath.
+ * 4. Once the train has completely passed to the right, the Timeline section is right there in place.
+ * 5. No awkward domain section scrolling down — the transition is seamless and direct.
+ */
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const wallRef = useRef<HTMLDivElement>(null);
   const aboutRoomRef = useRef<HTMLDivElement>(null);
   const trainRef = useRef<HTMLDivElement>(null);
-  const timelineLayerRef = useRef<HTMLDivElement>(null);
 
   const [activeFilter, setActiveFilter] = useState<MilestoneCategory>("ALL");
 
@@ -180,14 +187,9 @@ export default function AboutSection() {
       const media = gsap.matchMedia();
 
       media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Initialize massive train completely offscreen to the left
+        // Initialize train completely offscreen to the left
         if (trainRef.current) {
-          gsap.set(trainRef.current, { xPercent: -180 });
-        }
-
-        // Initialize timeline layer hidden behind the initial About room
-        if (timelineLayerRef.current) {
-          gsap.set(timelineLayerRef.current, { opacity: 0, pointerEvents: "none" });
+          gsap.set(trainRef.current, { xPercent: -170 });
         }
 
         if (aboutRoomRef.current) {
@@ -199,59 +201,55 @@ export default function AboutSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1.2,
+            scrub: 1.6,
           },
         });
 
-        // 1. Very brief initial touch (0.0 -> 0.02), then train enters immediately
-        
-        // 2. Train enters earlier & glides into center (0.02 -> 0.28)
+        // 1. Phase 1: Train rolls in smoothly from left to center (0.04 -> 0.36)
         tl.to(
           trainRef.current,
           {
             xPercent: 0,
-            ease: "power2.out",
-            duration: 0.26,
+            ease: "power1.out",
+            duration: 0.32,
           },
-          0.02,
+          0.04,
         );
 
-        // 3. As the train enters, About Room dissolves away and Timeline is pre-revealed underneath
+        // 2. Dissolve About room as train covers the scene (0.16 -> 0.46)
         tl.to(
           aboutRoomRef.current,
           {
             opacity: 0,
-            duration: 0.16,
             ease: "power1.inOut",
+            duration: 0.30,
           },
-          0.10,
+          0.16,
         );
 
-        tl.to(
-          timelineLayerRef.current,
-          {
-            opacity: 1,
-            pointerEvents: "auto",
-            duration: 0.16,
-            ease: "power1.inOut",
-          },
-          0.18,
-        );
-
-        // 4. Clean brief hold when train is fit across center (0.28 -> 0.42)
-
-        // 5. Train departs to the right, unveiling the Timeline section directly in place (0.42 -> 0.80)
+        // 3. Phase 2: Extra slow crawl/deceleration when train fits the screen wholly (0.36 -> 0.70)
         tl.to(
           trainRef.current,
           {
-            xPercent: 180,
-            ease: "power1.in",
-            duration: 0.38,
+            xPercent: 14,
+            ease: "none",
+            duration: 0.34,
           },
-          0.42,
+          0.36,
         );
 
-        // 6. Timeline Header Chromatic Split animation
+        // 4. Phase 3: Train smoothly accelerates and departs completely OUT to the right (0.70 -> 0.98)
+        tl.to(
+          trainRef.current,
+          {
+            xPercent: 170,
+            ease: "power1.in",
+            duration: 0.28,
+          },
+          0.70,
+        );
+
+        // 5. Timeline Header Chromatic Split animation
         gsap.fromTo(
           ".timeline-ghost",
           { xPercent: (i: number) => (i === 0 ? -3.5 : 3.5), opacity: 0 },
@@ -283,7 +281,7 @@ export default function AboutSection() {
     <section
       id="about"
       ref={sectionRef}
-      className="relative h-[720vh] w-full bg-black -mt-px"
+      className="relative h-[800vh] w-full bg-black -mt-px"
     >
       <h2 className="sr-only">About Us & Hackathon Timeline</h2>
 
@@ -295,58 +293,14 @@ export default function AboutSection() {
       >
         {/* 
           ══════════════════════════════════════════════════════════════
-          LAYER 0: Pristine About Us Room (bg-aboutus.png + milessofa.png)
-          - Fades out as the train wipes across the screen
-          ══════════════════════════════════════════════════════════════
-        */}
-        <div
-          ref={aboutRoomRef}
-          className="absolute inset-0 z-0 h-full w-full will-change-transform"
-        >
-          {/* Wall with subtle parallax */}
-          <div
-            ref={wallRef}
-            className="pointer-events-none absolute -inset-x-6 inset-y-0 h-full will-change-transform"
-          >
-            <div className="relative h-full w-full overflow-hidden">
-              <Image
-                src={bgAboutUs}
-                alt="About Us Room Background"
-                fill
-                priority
-                sizes="100vw"
-                className="h-full w-full object-cover object-top"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.45)_100%)]" />
-            </div>
-          </div>
-
-          {/* Stationary Miles on Sofa */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex w-full justify-center items-end px-2 pb-0 md:pb-2">
-            <div className="relative flex max-h-[78vh] w-[min(96vw,1200px)] items-end justify-center">
-              <Image
-                src={milesSofa}
-                alt="Miles Morales on Sofa"
-                priority
-                sizes="(max-width: 768px) 96vw, 1200px"
-                className="h-auto w-full object-contain drop-shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 
-          ══════════════════════════════════════════════════════════════
-          LAYER 1: The Timeline Section (Revealed Directly Behind the Train)
-          - Zero nested scrollbars (overflow-hidden)
-          - Clean responsive grid fitting viewport comfortably
+          LAYER 0 (Base): The Timeline Section
+          - Revealed in place directly as the train passes from left to right
+          - Zero extra nested scrollbars
           ══════════════════════════════════════════════════════════════
         */}
         <div
           id="timeline"
-          ref={timelineLayerRef}
-          className="halftone absolute inset-0 z-10 h-full w-full overflow-hidden bg-void px-4 py-6 sm:px-8 sm:py-8 md:px-12 md:py-10 will-change-transform flex flex-col justify-center items-center"
+          className="halftone absolute inset-0 z-0 h-full w-full overflow-hidden bg-void px-4 py-6 sm:px-8 sm:py-8 md:px-12 md:py-10 flex flex-col justify-center items-center pointer-events-auto"
         >
           {/* Spider-Verse Comic Skyline Background */}
           <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -513,10 +467,53 @@ export default function AboutSection() {
 
         {/* 
           ══════════════════════════════════════════════════════════════
-          LAYER 2: Subway Train (bigtrain-tight.png)
-          - Clean, massive framing without excessive over-zoom (h-[80vh] to h-[96vh])
-          - Natural 2.76:1 aspect ratio with max-w-none so front cab & rear are NEVER cut off
-          - Fast, punchy entry from left, brief center pause, and slow departure reveal
+          LAYER 1 (Middle): Pristine About Us Room (bg-aboutus.png + milessofa.png)
+          - Starts visible on top of Timeline
+          - Wiped away as the train moves from left to right
+          ══════════════════════════════════════════════════════════════
+        */}
+        <div
+          ref={aboutRoomRef}
+          className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform"
+        >
+          {/* Wall with subtle parallax */}
+          <div
+            ref={wallRef}
+            className="absolute -inset-x-6 inset-y-0 h-full will-change-transform"
+          >
+            <div className="relative h-full w-full overflow-hidden">
+              <Image
+                src={bgAboutUs}
+                alt="About Us Room Background"
+                fill
+                priority
+                sizes="100vw"
+                className="h-full w-full object-cover object-top"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.45)_100%)]" />
+            </div>
+          </div>
+
+          {/* Stationary Miles on Sofa */}
+          <div className="absolute inset-x-0 bottom-0 z-10 flex w-full justify-center items-end px-2 pb-0 md:pb-2">
+            <div className="relative flex max-h-[78vh] w-[min(96vw,1200px)] items-end justify-center">
+              <Image
+                src={milesSofa}
+                alt="Miles Morales on Sofa"
+                priority
+                sizes="(max-width: 768px) 96vw, 1200px"
+                className="h-auto w-full object-contain drop-shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 
+          ══════════════════════════════════════════════════════════════
+          LAYER 2 (Top): Subway Train (bigtrain-tight.png)
+          - Drives from left to right on scroll, wiping from About into Timeline
+          - Natural aspect ratio with zero cutoffs
           ══════════════════════════════════════════════════════════════
         */}
         <div
