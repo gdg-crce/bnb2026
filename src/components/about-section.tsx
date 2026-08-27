@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import bgAboutUs from "../../public/images/curved.png";
+import bgAboutUs from "../../public/aboutus.png";
 import milesSofa from "../../public/images/milessofa.png";
 import bigTrainTightImg from "../../public/bigtrain-tight.png";
 import timelineBg from "../../public/images/timeline-bg.jpg";
@@ -225,40 +225,41 @@ export default function AboutSection() {
           },
         });
 
-        // 1. Phase 1: Train rolls in smoothly from left to center (0.04 -> 0.36)
+        // 1. Phase 1: Generous hold on About Us room before train enters (0.00 -> 0.16)
+        // Train rolls in smoothly from left to center (0.16 -> 0.44)
         tl.to(
           trainRef.current,
           {
             xPercent: 0,
             ease: "power1.out",
-            duration: 0.32,
+            duration: 0.28,
           },
-          0.04,
+          0.16,
         );
 
-        // 2. Dissolve About room as train covers the scene (0.16 -> 0.46)
+        // 2. Dissolve About room as train covers the scene (0.28 -> 0.52)
         tl.to(
           aboutRoomRef.current,
           {
             opacity: 0,
             ease: "power1.inOut",
-            duration: 0.30,
+            duration: 0.24,
           },
-          0.16,
+          0.28,
         );
 
-        // 3. Phase 2: Extra slow crawl/deceleration when train fits the screen wholly (0.36 -> 0.70)
+        // 3. Phase 2: Slow crawl/deceleration when train fits the screen wholly (0.44 -> 0.70)
         tl.to(
           trainRef.current,
           {
             xPercent: 14,
             ease: "none",
-            duration: 0.34,
+            duration: 0.26,
           },
-          0.36,
+          0.44,
         );
 
-        // 4. Phase 3: Train smoothly accelerates and departs completely OUT to the right (0.70 -> 0.98)
+        // 4. Phase 3: Train smoothly departs OUT to the right (0.70 -> 0.98)
         tl.to(
           trainRef.current,
           {
@@ -499,7 +500,7 @@ export default function AboutSection() {
           {/* Wall with subtle parallax */}
           <div
             ref={wallRef}
-            className="absolute -inset-x-6 inset-y-0 h-full will-change-transform"
+            className="absolute inset-0 h-full will-change-transform"
           >
             <div className="relative h-full w-full overflow-hidden">
               <Image
@@ -508,7 +509,7 @@ export default function AboutSection() {
                 fill
                 priority
                 sizes="100vw"
-                className="h-full w-full object-cover object-top"
+                className="h-full w-full object-cover object-center"
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.45)_100%)]" />
@@ -516,13 +517,13 @@ export default function AboutSection() {
           </div>
 
           {/* Stationary Miles on Sofa */}
-          <div className="absolute inset-x-0 bottom-0 z-10 flex w-full justify-center items-end px-2 pb-0 md:pb-2">
-            <div className="relative flex max-h-[85vh] w-[min(100vw,1400px)] scale-110 md:scale-125 origin-bottom items-end justify-center">
+          <div className="absolute inset-x-0 -bottom-10 sm:-bottom-14 md:-bottom-20 z-10 flex w-full justify-center items-end px-2 pb-0">
+            <div className="relative flex max-h-[82vh] md:max-h-[88vh] w-[min(96vw,1320px)] scale-105 md:scale-115 origin-bottom items-end justify-center">
               <Image
                 src={milesSofa}
                 alt="Miles Morales on Sofa"
                 priority
-                sizes="(max-width: 768px) 96vw, 1200px"
+                sizes="(max-width: 768px) 96vw, 1320px"
                 className="h-auto w-full object-contain drop-shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
               />
             </div>
@@ -533,14 +534,14 @@ export default function AboutSection() {
           ══════════════════════════════════════════════════════════════
           LAYER 2 (Top): Subway Train (bigtrain-tight.png)
           - Drives from left to right on scroll, wiping from About into Timeline
-          - Natural aspect ratio with zero cutoffs
+          - Top roof & lights fully visible; wheels pushed cleanly below viewport
           ══════════════════════════════════════════════════════════════
         */}
         <div
           ref={trainRef}
           className="pointer-events-none absolute inset-0 z-20 flex h-full w-full items-center justify-center will-change-transform"
         >
-          <div className="relative flex h-[80vh] sm:h-[86vh] md:h-[92vh] lg:h-[96vh] w-auto max-w-none items-center justify-center scale-100 sm:scale-104 md:scale-108">
+          <div className="relative flex h-[100vh] sm:h-[104vh] md:h-[108vh] lg:h-[112vh] w-auto max-w-none items-center justify-center scale-100 sm:scale-[1.02] md:scale-[1.04] translate-y-[7vh] sm:translate-y-[8vh] md:translate-y-[9vh] lg:translate-y-[10vh]">
             <Image
               src={bigTrainTightImg}
               alt="Domains Subway Train"
