@@ -4,10 +4,9 @@ import { useRef } from "react";
 import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 
-import eventSectionImage from "../../public/images/EventSection.jpg";
-import eventAboutImage from "../../public/images/EventAbout.png";
-import eventMapImage from "../../public/images/EventMap.png";
+import eventSectionImage from "../../public/images/EventSection.png";
 import eventTextImage from "../../public/images/EventText.png";
+import eventMilesImage from "../../public/images/EventMiles.png";
 
 export default function AboutSection() {
   const root = useRef<HTMLElement>(null);
@@ -39,72 +38,103 @@ export default function AboutSection() {
           scrollTrigger: { trigger: ".event-text", start: "top 88%" },
         });
 
-        gsap.from(".event-map", {
+        // Stronger parallax (y: 80 instead of 44)
+        gsap.from(".event-miles", {
           opacity: 0,
-          x: -48,
-          duration: 1.3,
-          scrollTrigger: { trigger: ".event-map", start: "top 85%" },
+          y: 80,
+          duration: 1.2,
+          scrollTrigger: { trigger: ".event-miles", start: "top 88%" },
         });
 
-        gsap.from(".event-about", {
-          opacity: 0,
-          x: 48,
-          duration: 1.3,
-          scrollTrigger: { trigger: ".event-about", start: "top 85%" },
+        // 3D Scroll Parallax for EventText
+        gsap.to(".event-text-3d", {
+          yPercent: -20,
+          z: 50,
+          ease: "none",
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
         });
+
+        // 3D Scroll Parallax for EventMiles
+        gsap.to(".event-miles-3d", {
+          yPercent: -10,
+          z: 150,
+          ease: "none",
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+
+        // POV Mouse Interaction for the whole section
+        const rotXTo = gsap.quickTo(".about-pov-container", "rotationX", { duration: 0.8, ease: "power3.out" });
+        const rotYTo = gsap.quickTo(".about-pov-container", "rotationY", { duration: 0.8, ease: "power3.out" });
+
+        const onMouseMove = (e: MouseEvent) => {
+          const { innerWidth, innerHeight } = window;
+          const xPos = (e.clientX / innerWidth - 0.5) * 2;
+          const yPos = (e.clientY / innerHeight - 0.5) * 2;
+
+          rotXTo(-yPos * 3); // Subtle 3deg tilt
+          rotYTo(xPos * 3);
+        };
+
+        window.addEventListener("mousemove", onMouseMove);
+
+        return () => {
+          window.removeEventListener("mousemove", onMouseMove);
+        };
       });
     },
     { scope: root },
   );
 
   return (
-    <section ref={root} className="halftone relative z-10 overflow-hidden">
-      <div className="absolute inset-0 -z-20 overflow-hidden">
-        <div className="absolute inset-0 h-[112%] w-full overflow-hidden">
-          <Image
-            src={eventSectionImage}
-            alt=""
-            aria-hidden="true"
-            placeholder="blur"
-            fill
-            sizes="100vw"
-            className="about-backdrop object-cover object-center"
-          />
-        </div>
-      </div>
+    <section ref={root} className="halftone relative z-10 overflow-hidden min-h-screen" style={{ perspective: "1500px" }}>
+      <div className="about-pov-container w-full h-full min-h-screen relative origin-center scale-[1.05]" style={{ transformStyle: 'preserve-3d' }}>
 
-      {/* Top section: EventText */}
-      <div className="absolute top-[8vh] left-6 md:left-12 z-20 w-[70%] max-w-sm md:max-w-md lg:max-w-lg">
-        <div className="event-text">
-          <Image
-            src={eventTextImage}
-            alt="Event Begins In"
-            className="w-full h-auto object-contain drop-shadow-2xl"
-          />
-        </div>
-      </div>
-
-      {/* Spacer to delay map appearance until after fade transition */}
-      <div className="h-[35vh]" />
-
-      <div className="relative px-6 pb-32 md:px-10 md:pb-44 mx-auto max-w-screen-2xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 gap-x-[180px] lg:gap-x-[350px] items-center -translate-y-[40px]">
-          <div className="event-map flex justify-center md:justify-end">
+        <div className="absolute inset-0 -z-20 overflow-hidden">
+          <div className="absolute inset-0 h-[112%] w-full overflow-hidden">
             <Image
-              src={eventMapImage}
-              alt="Event Map"
-              className="h-auto w-full max-w-[90%] md:max-w-[120%] lg:max-w-[140%] object-contain drop-shadow-xl"
-            />
-          </div>
-
-          <div className="event-about flex justify-center md:justify-start">
-            <Image
-              src={eventAboutImage}
-              alt="Event About"
-              className="h-auto w-full max-w-[90%] md:max-w-lg object-contain drop-shadow-2xl"
+              src={eventSectionImage}
+              alt=""
+              aria-hidden="true"
+              placeholder="blur"
+              fill
+              sizes="100vw"
+              className="about-backdrop object-cover object-center"
             />
           </div>
         </div>
+
+        {/* Top section: EventText */}
+        <div className="absolute top-[8vh] left-6 md:left-12 z-20 w-[70%] max-w-sm md:max-w-md lg:max-w-lg" style={{ transform: "translateZ(80px)" }}>
+          <div className="event-text event-text-3d">
+            <Image
+              src={eventTextImage}
+              alt="Event Begins In"
+              className="w-full h-auto object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)]"
+            />
+          </div>
+        </div>
+
+        {/* Bottom center section: EventMiles */}
+        <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 z-20 w-[110%] max-w-sm md:max-w-md lg:max-w-lg event-miles" style={{ transform: "translateZ(150px)" }}>
+          <div className="event-miles-3d">
+            <Image
+              src={eventMilesImage}
+              alt="Miles Morales"
+              className="w-full h-auto object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.6)] scale-[3] origin-bottom"
+            />
+          </div>
+        </div>
+
       </div>
     </section>
   );
