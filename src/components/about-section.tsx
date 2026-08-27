@@ -61,8 +61,7 @@ export default function AboutSection() {
 
         // 3D Scroll Parallax for EventMiles
         gsap.to(".event-miles-3d", {
-          yPercent: -10,
-          z: 150,
+          yPercent: -40,
           ease: "none",
           scrollTrigger: {
             trigger: root.current,
@@ -114,7 +113,7 @@ export default function AboutSection() {
         </div>
 
         {/* Top section: EventText */}
-        <div className="absolute top-[8vh] left-6 md:left-12 z-20 w-[70%] max-w-sm md:max-w-md lg:max-w-lg" style={{ transform: "translateZ(80px)" }}>
+        <div className="absolute top-[8vh] left-6 md:left-20 z-20 w-[70%] max-w-sm md:max-w-md lg:max-w-lg" style={{ transform: "translateZ(80px)" }}>
           <div className="event-text event-text-3d">
             <Image
               src={eventTextImage}
