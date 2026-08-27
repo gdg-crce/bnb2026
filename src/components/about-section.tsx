@@ -5,7 +5,6 @@ import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 
 import eventSectionImage from "../../public/images/EventSection.png";
-import eventTextImage from "../../public/images/EventText.png";
 import eventMilesImage from "../../public/images/EventMiles.png";
 
 export default function AboutSection() {
@@ -31,32 +30,12 @@ export default function AboutSection() {
           },
         );
 
-        gsap.from(".event-text", {
-          opacity: 0,
-          y: 44,
-          duration: 1.2,
-          scrollTrigger: { trigger: ".event-text", start: "top 88%" },
-        });
-
         // Stronger parallax (y: 80 instead of 44)
         gsap.from(".event-miles", {
           opacity: 0,
           y: 80,
           duration: 1.2,
           scrollTrigger: { trigger: ".event-miles", start: "top 88%" },
-        });
-
-        // 3D Scroll Parallax for EventText
-        gsap.to(".event-text-3d", {
-          yPercent: -20,
-          z: 50,
-          ease: "none",
-          scrollTrigger: {
-            trigger: root.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
         });
 
         // 3D Scroll Parallax for EventMiles
@@ -108,17 +87,6 @@ export default function AboutSection() {
               fill
               sizes="100vw"
               className="about-backdrop object-cover object-center"
-            />
-          </div>
-        </div>
-
-        {/* Top section: EventText */}
-        <div className="absolute top-[8vh] left-6 md:left-20 z-20 w-[70%] max-w-sm md:max-w-md lg:max-w-lg" style={{ transform: "translateZ(80px)" }}>
-          <div className="event-text event-text-3d">
-            <Image
-              src={eventTextImage}
-              alt="Event Begins In"
-              className="w-full h-auto object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)]"
             />
           </div>
         </div>
