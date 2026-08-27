@@ -1,300 +1,378 @@
 "use client";
 
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
-import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import { CORNER_SPANS, CORNER_SPOKES, CORNER_VIEW_BOX } from "@/lib/corner-web";
-import { ChainGlyph, NeuralGlyph, WebGlyph } from "@/components/domain-glyphs";
-import domainsImage from "../../public/images/domains.png";
+import { gsap, useGSAP } from "@/lib/gsap";
+import domainImg from "../../public/images/domain.png";
+import domainsBackdrop from "../../public/images/domains.png";
 
-/*
- * The floor matters more than the ceiling. "Domains" is set nowrap, so the
- * clamp's minimum is what decides whether the last letter survives on the
- * narrowest phone: the word measures about 4.83× its font size, and 320px
- * less the 3rem of gutter leaves 272 — which a 3.5rem floor fills to within
- * a pixel. That is close enough that a different font build tips it over the
- * edge and into the section's own overflow, so the floor is 3rem and the
- * 16vw preferred size is what actually runs on anything larger.
- */
-const MARK_SIZE =
-  "text-[clamp(3rem,16vw,5.5rem)] md:text-[clamp(4rem,9vw,8rem)]";
-
-/*
- * The three tracks.
- *
- * `accent` is sampled off the wall in domains.png rather than picked from a
- * palette: the magenta of the throw-up in the top-left, the cyan of the piece
- * in the top-right, the acid lime scattered through both bands. One hue per
- * panel, used for that panel's bloom, top edge, glyph tile and ghost — enough
- * to tell three identical cards apart without turning the page into a rainbow.
- *
- * The blurbs are deliberately within a few characters of each other. The cards
- * are the same height regardless, but three paragraphs of wildly different
- * length inside three identical boxes is what makes a row look untidy even
- * when it is perfectly aligned.
- */
-const DOMAINS = [
+const DOMAIN_DETAILS = [
   {
-    index: "01",
-    title: "Web & App",
-    accent: "#e5308c",
-    Glyph: WebGlyph,
-    blurb:
-      "Something a stranger can open and understand in ten seconds. Web, mobile, or both — the interface is the product.",
-    tags: ["Next.js", "Flutter", "Realtime", "APIs"],
+    id: "web",
+    title: "Web & Mobile Dev",
+    windowLabel: ".WEB/APP DEV.",
+    accent: "#FFE600",
+    glow: "rgba(255, 230, 0, 0.4)",
+    tag: "TRACK // 01",
+    subtitle: "High-Performance Next-Gen Software",
+    desc: "Architect reactive web apps, progressive mobile tools, real-time collaboration engines, and blazing fast frontend experiences that push the boundaries of digital interfaces.",
+    tech: ["Next.js 16", "React 19", "TypeScript", "Tailwind CSS", "WebSockets", "PWA"],
   },
   {
-    index: "02",
-    title: "Blockchain",
+    id: "blockchain",
+    title: "Web3 & Blockchain",
+    windowLabel: "BLOCKCHAIN",
     accent: "#22b6d6",
-    Glyph: ChainGlyph,
-    blurb:
-      "Trust built into the thing itself. Contracts, wallets, and the plumbing that decides if anyone outside the demo uses it.",
-    tags: ["Solidity", "Contracts", "Wallets", "DeFi"],
+    glow: "rgba(34, 182, 214, 0.4)",
+    tag: "TRACK // 02",
+    subtitle: "Decentralized Trust & Smart Contracts",
+    desc: "Build next-generation decentralized applications, zero-knowledge verification systems, smart contract protocols, DeFi tools, and self-sovereign digital asset economies.",
+    tech: ["Solidity", "Polygon", "Ethereum", "Ethers.js", "ZK-SNARKs", "IPFS"],
   },
   {
-    index: "03",
-    title: "AI & ML",
-    accent: "#8fc63d",
-    Glyph: NeuralGlyph,
-    blurb:
-      "A model that earns what it costs to run. Train one, fine-tune one, or wire one into something measurably better for it.",
-    tags: ["LLMs", "Vision", "RAG", "Agents"],
+    id: "ai",
+    title: "AI & Machine Learning",
+    windowLabel: "AI/ML",
+    accent: "#e5308c",
+    glow: "rgba(229, 48, 140, 0.4)",
+    tag: "TRACK // 03",
+    subtitle: "Autonomous Agents & Neural Systems",
+    desc: "Harness foundation models, multimodal intelligence, autonomous agentic workflows, computer vision, and predictive machine learning architectures to solve complex challenges.",
+    tech: ["Gemini AI", "PyTorch", "LangChain", "HuggingFace", "Python", "Vector DBs"],
   },
 ];
 
 /**
- * Domains.
- *
- * Sits on its own photograph of a graffiti wall, scrimmed back to the middle
- * of the value range — see `.domains-scrim` in globals.css for how the stops
- * are matched to the picture's own bands. It returns to void at both ends, so
- * it follows About Us without a seam and hands the next section black.
+ * Domains Section:
+ * The Full-Screen Subway Train (domain.png) pulls into the station on scroll,
+ * covering the entire viewport smoothly.
+ * Features interactive window hotspots and track badges for deep exploration.
  */
 export default function DomainsSection() {
-  const root = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const trainRef = useRef<HTMLDivElement>(null);
+  const hudRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const [activeDomain, setActiveDomain] = useState<string | null>(null);
 
   useGSAP(
     () => {
       const media = gsap.matchMedia();
 
       media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Slow parallax on the wall — 8% of its own height across the section,
-        // the same treatment the mural gets in About. yPercent only, so it
-        // never touches layout.
-        gsap.fromTo(
-          ".domains-backdrop",
-          { yPercent: -4 },
-          {
-            yPercent: 4,
-            ease: "none",
-            scrollTrigger: {
-              trigger: root.current,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 0.9,
           },
-        );
+        });
 
-        // Same chromatic split as the About wordmark, so the two headings are
-        // recognisably the same object. The ghosts converge and stop just shy
-        // of alignment, then never move again.
-        gsap.fromTo(
-          ".domains-ghost",
-          { xPercent: (i: number) => (i === 0 ? -3.5 : 3.5), opacity: 0 },
+        // 1. Train rushes in from left and smoothly brakes to cover the entire screen (0 -> 0.35)
+        tl.fromTo(
+          trainRef.current,
           {
-            xPercent: (i: number) => (i === 0 ? -0.4 : 0.4),
+            xPercent: -105,
+            scale: 0.96,
+            opacity: 0.8,
+          },
+          {
+            xPercent: 0,
+            scale: 1,
             opacity: 1,
-            duration: 1.5,
-            ease: "power4.out",
-            scrollTrigger: { trigger: ".domains-mark", start: "top 84%" },
+            ease: "power2.out",
+            duration: 0.35,
           },
+          0,
         );
 
-        const split = new SplitText(".domains-mark-face", { type: "chars" });
-        gsap.from(split.chars, {
-          yPercent: 110,
-          stagger: 0.045,
-          duration: 1.1,
-          ease: "power4.out",
-          scrollTrigger: { trigger: ".domains-mark", start: "top 84%" },
-        });
+        // 2. HUD & Track Badges glide in (0.32 -> 0.45)
+        tl.fromTo(
+          hudRef.current,
+          { opacity: 0, y: -30 },
+          { opacity: 1, y: 0, ease: "power2.out", duration: 0.15 },
+          0.32,
+        );
 
-        gsap.from(".domains-lede", {
-          opacity: 0,
-          y: 24,
-          duration: 0.9,
-          scrollTrigger: { trigger: ".domains-mark", start: "top 84%" },
-        });
+        tl.fromTo(
+          cardsRef.current,
+          { opacity: 0, y: 40 },
+          { opacity: 1, y: 0, ease: "power2.out", duration: 0.18 },
+          0.38,
+        );
 
-        // Panels deal in like cards. Now that they are all the same size and
-        // on the same line, the stagger is the only thing left saying they are
-        // an ordered set — 01, 02, 03 — rather than three things at once.
-        gsap.from(".domain-card", {
-          opacity: 0,
-          y: 48,
-          stagger: 0.14,
-          duration: 1.1,
-          scrollTrigger: { trigger: ".domains-grid", start: "top 82%" },
-        });
+        // 3. Train holds full-screen during (0.45 -> 0.80) for reading and interaction
 
-        return () => split.revert();
+        // 4. Train smoothly accelerates out toward the right into Timeline (0.80 -> 1.0)
+        tl.to(
+          trainRef.current,
+          {
+            xPercent: 105,
+            scale: 1.04,
+            opacity: 0.6,
+            ease: "power2.in",
+            duration: 0.2,
+          },
+          0.8,
+        );
+
+        tl.to(
+          [hudRef.current, cardsRef.current],
+          { opacity: 0, y: -20, duration: 0.12 },
+          0.8,
+        );
       });
     },
-    { scope: root },
+    { scope: sectionRef },
   );
 
   return (
     <section
       id="domains"
-      ref={root}
-      /*
-       * Pulled 42vh up into the tail of About so the two photographs overlap,
-       * with the top padding raised by the same 42vh so nothing inside the
-       * section actually moves. Both layers below are masked, so through that
-       * band the mural and the wall share pixels and the wall fades in over
-       * it — the same construction as the hero → about seam.
-       */
-      className="halftone relative z-10 -mt-[42vh] overflow-hidden px-6 pt-[calc(42vh+8rem)] pb-32 md:px-10 md:pt-[calc(42vh+11rem)] md:pb-44"
+      ref={sectionRef}
+      className="relative h-[320vh] w-full bg-black"
     >
-      {/* The wall. 112% tall so the parallax has somewhere to travel without
-          ever exposing an edge. */}
-      <div className="domains-blend absolute inset-0 -z-20 overflow-hidden">
-        <Image
-          src={domainsImage}
-          alt=""
-          aria-hidden="true"
-          placeholder="blur"
-          sizes="100vw"
-          className="domains-backdrop h-[112%] w-full object-cover"
-        />
-      </div>
-      <div className="domains-blend domains-scrim absolute inset-0 -z-10" />
+      <h2 className="sr-only">Domains & Multiverse Tracks</h2>
 
-      <div className="mx-auto max-w-6xl">
-        <p className="eyebrow">Three tracks</p>
-
-        <div className="domains-mark relative mt-6">
-          {/* Decorative misregistration; only the face is read. */}
-          <span
-            aria-hidden="true"
-            className={`domains-ghost display absolute inset-0 whitespace-nowrap text-red/40 mix-blend-screen ${MARK_SIZE}`}
-          >
-            Domains
-          </span>
-          <span
-            aria-hidden="true"
-            className={`domains-ghost display absolute inset-0 whitespace-nowrap text-sand/30 mix-blend-screen ${MARK_SIZE}`}
-          >
-            Domains
-          </span>
-          <h2
-            className={`domains-mark-face display relative whitespace-nowrap text-paper ${MARK_SIZE}`}
-          >
-            Domains
-          </h2>
+      {/* Sticky Full-Screen Subway Stage */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black flex items-center justify-center">
+        {/* Subway Tunnel Background (domains.png) */}
+        <div className="pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden">
+          <Image
+            src={domainsBackdrop}
+            alt="Subway Station Graffiti Wall"
+            fill
+            sizes="100vw"
+            priority={false}
+            className="h-full w-full object-cover object-center opacity-25 brightness-90 contrast-125"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/80" />
         </div>
 
-        <p className="domains-lede mt-8 max-w-xl text-lg leading-relaxed text-paper/85 md:text-xl">
-          Pick the one your idea already belongs to. Judging happens inside the
-          track, so you are only ever measured against people who took on the
-          same kind of problem you did.
-        </p>
+        {/* 
+          The Full-Screen Train (domain.png)
+          Covers the whole screen smoothly edge-to-edge
+        */}
+        <div
+          ref={trainRef}
+          className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-center justify-center overflow-hidden"
+        >
+          {/* Full Screen Train Image */}
+          <div className="relative h-full w-full">
+            <Image
+              src={domainImg}
+              alt="Domains Subway Train"
+              fill
+              priority
+              sizes="100vw"
+              className="h-full w-full object-cover object-center drop-shadow-[0_25px_80px_rgba(0,0,0,0.95)]"
+            />
+            {/* Cinematic Subway Lighting & Vignette */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/35" />
+          </div>
 
-        {/* `items-stretch` is the grid default and is what equalises the three
-            heights; every card then runs `h-full` so the panel fills the cell
-            it was given rather than shrinking to its own copy. */}
-        <ul className="domains-grid mt-20 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-24 lg:grid-cols-3">
-          {DOMAINS.map(({ index, title, accent, Glyph, blurb, tags }) => (
-            <li key={title} className="domain-card h-full">
-              <article
-                className="domain-panel halftone flex h-full flex-col overflow-hidden p-8"
-                style={{ ["--accent" as string]: accent }}
-              >
-                {/*
-                  Quarter web, strung on hover. It sits under the content and
-                  is fully dashed out at rest, so it costs the resting state
-                  nothing and arrives only when the panel is addressed.
-                */}
-                <svg
-                  viewBox={CORNER_VIEW_BOX}
-                  aria-hidden="true"
-                  focusable="false"
-                  preserveAspectRatio="none"
-                  className="domain-web pointer-events-none absolute top-0 right-0 h-32 w-32 text-paper/40"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="0.7"
-                  strokeLinecap="round"
+          {/* Interactive Window Clickable Hotspots */}
+          <div className="pointer-events-auto absolute inset-0 z-20 grid grid-cols-3">
+            {/* Window 1: Web / App */}
+            <button
+              type="button"
+              onClick={() => setActiveDomain(activeDomain === "web" ? null : "web")}
+              className="group relative h-full w-full cursor-pointer focus:outline-none"
+              aria-label="View Web & Mobile Dev Track Details"
+            >
+              <div className="absolute top-[20%] left-[8%] right-[8%] bottom-[38%] rounded-2xl border-2 border-transparent transition-all duration-300 group-hover:border-[#FFE600] group-hover:bg-[#FFE600]/10 group-hover:shadow-[0_0_40px_rgba(255,230,0,0.4)]">
+                <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#FFE600] px-3 py-1 font-mono text-xs font-black text-black uppercase transition-opacity shadow-[3px_3px_0px_#000]">
+                  EXPLORE TRACK ➔
+                </span>
+              </div>
+            </button>
+
+            {/* Window 2: Blockchain */}
+            <button
+              type="button"
+              onClick={() => setActiveDomain(activeDomain === "blockchain" ? null : "blockchain")}
+              className="group relative h-full w-full cursor-pointer focus:outline-none"
+              aria-label="View Web3 & Blockchain Track Details"
+            >
+              <div className="absolute top-[20%] left-[8%] right-[8%] bottom-[38%] rounded-2xl border-2 border-transparent transition-all duration-300 group-hover:border-[#22b6d6] group-hover:bg-[#22b6d6]/10 group-hover:shadow-[0_0_40px_rgba(34,182,214,0.4)]">
+                <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#22b6d6] px-3 py-1 font-mono text-xs font-black text-black uppercase transition-opacity shadow-[3px_3px_0px_#000]">
+                  EXPLORE TRACK ➔
+                </span>
+              </div>
+            </button>
+
+            {/* Window 3: AI / ML */}
+            <button
+              type="button"
+              onClick={() => setActiveDomain(activeDomain === "ai" ? null : "ai")}
+              className="group relative h-full w-full cursor-pointer focus:outline-none"
+              aria-label="View AI & Machine Learning Track Details"
+            >
+              <div className="absolute top-[20%] left-[8%] right-[8%] bottom-[38%] rounded-2xl border-2 border-transparent transition-all duration-300 group-hover:border-[#e5308c] group-hover:bg-[#e5308c]/10 group-hover:shadow-[0_0_40px_rgba(229,48,140,0.4)]">
+                <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-[#e5308c] px-3 py-1 font-mono text-xs font-black text-white uppercase transition-opacity shadow-[3px_3px_0px_#000]">
+                  EXPLORE TRACK ➔
+                </span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Top HUD Overlay (Subway Station Status) */}
+        <div
+          ref={hudRef}
+          className="pointer-events-none absolute top-6 inset-x-0 z-30 flex items-center justify-between px-6 md:px-12 opacity-0"
+        >
+          <div className="flex items-center gap-3">
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-[#FFE600] animate-pulse shadow-[0_0_12px_#FFE600]" />
+            <span className="font-mono text-xs font-black uppercase tracking-widest text-[#FFE600]">
+              SUBWAY ROUTE // MULTIVERSE EXPRESS
+            </span>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-4">
+            <span className="font-mono text-xs text-muted">
+              CLICK ANY WINDOW TO INSPECT TRACK
+            </span>
+            <span className="rounded border border-paper/20 bg-paper/10 px-2 py-0.5 font-mono text-[0.625rem] text-paper">
+              PLATFORM 03
+            </span>
+          </div>
+        </div>
+
+        {/* Bottom Interactive Track Badges / Drawer */}
+        <div
+          ref={cardsRef}
+          className="pointer-events-none absolute bottom-6 inset-x-0 z-30 flex justify-center px-4 md:px-8 opacity-0"
+        >
+          <div className="pointer-events-auto flex flex-wrap items-center justify-center gap-3 md:gap-6">
+            {DOMAIN_DETAILS.map((domain) => {
+              const isActive = activeDomain === domain.id;
+              return (
+                <button
+                  key={domain.id}
+                  type="button"
+                  onClick={() =>
+                    setActiveDomain(isActive ? null : domain.id)
+                  }
+                  className={`group relative flex items-center gap-3 rounded-lg border-2 bg-ink/90 px-4 py-2.5 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 md:px-6 md:py-3 ${
+                    isActive
+                      ? "border-paper scale-105 shadow-[0_10px_30px_rgba(0,0,0,0.9)]"
+                      : "border-paper/20 hover:border-paper/60"
+                  }`}
+                  style={{
+                    borderLeftColor: domain.accent,
+                    borderLeftWidth: "4px",
+                  }}
                 >
-                  {CORNER_SPOKES.map((d) => (
-                    <path key={d} d={d} pathLength={1} />
-                  ))}
-                  {CORNER_SPANS.map((d) => (
-                    <path key={d} d={d} pathLength={1} />
-                  ))}
-                </svg>
+                  <div className="text-left">
+                    <span
+                      className="font-mono text-[0.5625rem] font-bold uppercase tracking-widest md:text-[0.625rem]"
+                      style={{ color: domain.accent }}
+                    >
+                      {domain.tag}
+                    </span>
+                    <h3 className="font-mono text-xs font-black text-paper transition-colors group-hover:text-white md:text-sm">
+                      {domain.title}
+                    </h3>
+                  </div>
 
-                {/* Header row: tile left, index right, both on one baseline
-                    across all three cards because the tile is a fixed size. */}
-                <div className="relative flex items-center justify-between">
-                  <span className="domain-tile flex h-16 w-16 shrink-0 items-center justify-center rounded-sm">
-                    <Glyph />
-                  </span>
                   <span
-                    className="font-mono text-2xl leading-none"
-                    style={{ color: accent }}
+                    className="flex h-6 w-6 items-center justify-center rounded border border-black font-mono text-xs font-black transition-transform"
+                    style={{
+                      backgroundColor: domain.accent,
+                      color: domain.id === "ai" ? "#fff" : "#000",
+                    }}
                   >
-                    {index}
+                    {isActive ? "✕" : "➔"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Modal / Detailed Track Popup Drawer */}
+        {activeDomain && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
+            {DOMAIN_DETAILS.filter((d) => d.id === activeDomain).map((domain) => (
+              <div
+                key={domain.id}
+                className="relative max-w-xl w-full rounded-xl border-2 bg-ink p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.95)]"
+                style={{
+                  borderColor: domain.accent,
+                  boxShadow: `0 0 45px ${domain.glow}`,
+                }}
+              >
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setActiveDomain(null)}
+                  className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded border border-black bg-[#FFE600] font-mono text-sm font-black text-black shadow-[2px_2px_0px_#000] hover:bg-[#FFF033]"
+                  aria-label="Close track overview"
+                >
+                  ✕
+                </button>
+
+                <div className="flex items-center gap-3">
+                  <span
+                    className="border border-black px-2.5 py-0.5 font-mono text-xs font-black uppercase text-black"
+                    style={{ backgroundColor: domain.accent }}
+                  >
+                    {domain.tag}
+                  </span>
+                  <span className="font-mono text-xs text-muted">
+                    SUBWAY WINDOW: {domain.windowLabel}
                   </span>
                 </div>
 
-                <div className="domain-rule relative mt-7" />
-
-                {/* Three stacked copies again — the panel's own small echo of
-                    the heading, so hovering a card does in miniature what the
-                    section did on the way in. */}
-                <div className="relative mt-6">
-                  <span
-                    aria-hidden="true"
-                    className="domain-ghost domain-ghost-a display absolute inset-0 text-2xl whitespace-nowrap text-red/70 mix-blend-screen"
-                  >
-                    {title}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className="domain-ghost domain-ghost-b display absolute inset-0 text-2xl whitespace-nowrap mix-blend-screen"
-                    style={{ color: accent }}
-                  >
-                    {title}
-                  </span>
-                  <h3 className="display relative text-2xl whitespace-nowrap text-paper">
-                    {title}
-                  </h3>
-                </div>
-
-                <p className="relative mt-4 leading-relaxed text-paper/75">
-                  {blurb}
+                <h3 className="mt-3 font-mono text-2xl font-black text-paper md:text-3xl">
+                  {domain.title}
+                </h3>
+                <p
+                  className="mt-1 font-mono text-xs font-bold uppercase tracking-wider"
+                  style={{ color: domain.accent }}
+                >
+                  {domain.subtitle}
                 </p>
 
-                {/* mt-auto: the tag rows sit on one baseline across the three
-                    panels however the blurbs happen to wrap. */}
-                <ul className="relative mt-auto flex flex-wrap gap-2 pt-8">
-                  {tags.map((tag) => (
-                    <li
-                      key={tag}
-                      className="domain-tag rounded-full px-3 py-1.5 font-mono text-[0.6875rem] tracking-wider text-muted uppercase"
-                    >
-                      {tag}
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            </li>
-          ))}
-        </ul>
+                <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">
+                  {domain.desc}
+                </p>
+
+                {/* Tech Badges */}
+                <div className="mt-6 border-t border-paper/10 pt-4">
+                  <span className="font-mono text-[0.625rem] font-bold uppercase tracking-widest text-muted">
+                    // Recommended Tech Stacks & Frameworks
+                  </span>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {domain.tech.map((t) => (
+                      <span
+                        key={t}
+                        className="rounded border border-paper/15 bg-paper/5 px-2.5 py-1 font-mono text-xs font-medium text-paper"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-8 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setActiveDomain(null)}
+                    className="border-[2px] border-black bg-[#FFE600] px-5 py-2 font-mono text-xs font-black uppercase text-black shadow-[3px_3px_0px_#000] hover:bg-[#FFF033]"
+                  >
+                    BACK TO SUBWAY TRAIN ➔
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 }
+
