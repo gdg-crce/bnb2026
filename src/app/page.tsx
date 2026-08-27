@@ -1,7 +1,6 @@
 import HeroVideo from "@/components/hero-video";
 import PipesSection from "@/components/pipes-section";
 import AboutSection from "@/components/about-section";
-import TimelineSection from "@/components/timeline-section";
 import PrizesSection from "@/components/prizes-section";
 import SponsorsSection from "@/components/sponsors-section";
 import FAQSection from "@/components/faq-section";
@@ -13,7 +12,6 @@ export default function Home() {
       <HeroVideo />
       <PipesSection />
       <AboutSection />
-      <TimelineSection />
       <PrizesSection />
       <SponsorsSection />
       <FAQSection />
