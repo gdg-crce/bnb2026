@@ -5,14 +5,15 @@ import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 import bgAboutUs from "../../public/images/bg-aboutus.png";
 import milesSofa from "../../public/images/milessofa.png";
-import bigTrainImg from "../../public/bigtrain-tight.png";
+import bigTrainImg from "../../public/bigtrain.jpg";
 
 /**
  * About & Domains Section:
- * 1. Single pristine background room with smooth mouse parallax on the room (Zero duplicate overlays or seams).
+ * 1. Single pristine background room with smooth mouse parallax on the room.
  * 2. Stationary Miles Morales on sofa anchored firmly to the floor.
- * 3. On scroll, the massive train (pure transparent background) rolls across in huge scale,
- *    holds in full view, and drives completely OUT to the right.
+ * 3. On scroll, the full bigtrain.jpg subway train slowly rolls across in full view,
+ *    showing the entire train (roof, wheels, Domains graffiti, front cab),
+ *    and exits completely to the right to reveal the Timeline section.
  */
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -52,7 +53,7 @@ export default function AboutSection() {
       media.add("(prefers-reduced-motion: no-preference)", () => {
         // Initialize big train completely offscreen to the left
         if (trainRef.current) {
-          gsap.set(trainRef.current, { xPercent: -145 });
+          gsap.set(trainRef.current, { xPercent: -150 });
         }
 
         const tl = gsap.timeline({
@@ -60,33 +61,33 @@ export default function AboutSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.8,
+            scrub: 1.2,
           },
         });
 
-        // 1. Hold on About room during first 18% of scroll (0.0 -> 0.18)
-        // 2. Massive transparent train rolls in from left to center (0.18 -> 0.48)
+        // 1. Hold on About room during first 12% of scroll (0.0 -> 0.12)
+        // 2. Full bigtrain.jpg slowly rolls in from left to center (0.12 -> 0.50)
         tl.to(
           trainRef.current,
           {
-            xPercent: -6,
+            xPercent: 0,
             ease: "power1.out",
-            duration: 0.30,
+            duration: 0.38,
           },
-          0.18,
+          0.12,
         );
 
-        // 3. Train holds / cruises in massive uncropped view (0.48 -> 0.65)
+        // 3. Train cruises/holds in full uncropped view (0.50 -> 0.64)
 
-        // 4. Train accelerates and drives completely OUT to the right (0.65 -> 0.98)
+        // 4. Train slowly accelerates and drives completely OUT to the right (0.64 -> 0.98)
         tl.to(
           trainRef.current,
           {
-            xPercent: 145,
+            xPercent: 150,
             ease: "power1.in",
-            duration: 0.33,
+            duration: 0.34,
           },
-          0.65,
+          0.64,
         );
       });
     },
@@ -97,7 +98,7 @@ export default function AboutSection() {
     <section
       id="about"
       ref={sectionRef}
-      className="relative h-[360vh] w-full bg-black -mt-px"
+      className="relative h-[680vh] w-full bg-black -mt-px"
     >
       <h2 className="sr-only">About Us & Domains</h2>
 
@@ -149,22 +150,21 @@ export default function AboutSection() {
         </div>
 
         {/* 
-          Layer 2: Massive Big Subway Train Overlay (Transparent Background)
-          - Pure transparent background layered directly on top of About
-          - Scaled up to massive proportion across the screen
-          - Rolls across the screen and exits completely to the right
+          Layer 2: Full Subway Train (bigtrain.jpg)
+          - 100% complete train visible (roof, wheels, Domains graffiti, front cab)
+          - Rolls across slowly and exits completely to the right to reveal the Timeline
         */}
         <div
           ref={trainRef}
-          className="pointer-events-none absolute inset-0 z-30 h-full w-full overflow-hidden will-change-transform flex items-center justify-center"
+          className="pointer-events-none absolute inset-0 z-30 flex h-full w-full items-center justify-center overflow-visible will-change-transform"
         >
-          <div className="relative flex w-[124vw] min-w-[1200px] max-w-none items-center justify-center scale-110 md:scale-120 lg:scale-125">
+          <div className="relative flex h-full w-full max-h-[92vh] max-w-[96vw] items-center justify-center sm:max-h-[95vh] sm:max-w-[98vw] md:max-w-[1600px] lg:max-w-[1850px]">
             <Image
               src={bigTrainImg}
-              alt="Domains Massive Subway Train"
+              alt="Domains Subway Train"
               priority
-              sizes="130vw"
-              className="h-auto w-full max-h-[96vh] object-contain drop-shadow-[0_35px_100px_rgba(0,0,0,0.99)]"
+              sizes="100vw"
+              className="h-auto w-full max-h-[90vh] object-contain drop-shadow-[0_45px_120px_rgba(0,0,0,0.98)]"
             />
           </div>
         </div>

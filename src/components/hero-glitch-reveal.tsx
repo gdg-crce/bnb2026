@@ -12,17 +12,19 @@ interface HeroGlitchRevealProps {
 }
 
 const NUM_POINTS = 8;
+const IMG_ASPECT = 1920 / 1080;
 
 /**
  * Spider-Verse Authentic Fluid Dimension Tear Reveal
  *
- * Architecture:
- *  - 100% Smooth Organic Liquid Spline: Computes an 8-point quadratic Bezier
- *    closed spline in real time with liquid surface tension and velocity teardrop stretch.
- *  - SVG ClipPath: Clips the full-resolution layer with zero subpixel blur or raster scaling.
- *  - Spider-Verse Alternate Dimension Styling: Gritty noir comic grading (deep ink shadows,
- *    rich midtones, no blown-out white flash), cyan & magenta misregistered fluid boundary strokes,
- *    and comic halftone print overlay.
+ * Features:
+ *  - 100% Smooth Organic Liquid Spline: 8-point quadratic Bezier closed spline with
+ *    lively surface tension waves and zero-lag direct cursor tracking.
+ *  - Dynamic 1:1 Aspect-Locked Billboard Illumination: Matches the exact `object-cover`
+ *    crop and bounding box of `herobg.png` across all screen resolutions.
+ *  - High-Intensity Animated Billboard Lighting: Authentic neon tube flickers, holographic sweeps,
+ *    and marquee pulses matched directly to every sign across Times Square (Zero red lights).
+ *  - Gritty Noir Spider-Verse Dimension Styling inside the liquid tear.
  */
 export default function HeroGlitchReveal({
   src,
@@ -37,6 +39,9 @@ export default function HeroGlitchReveal({
   const magentaPathRef = useRef<SVGPathElement>(null);
   const rafRef = useRef<number | null>(null);
 
+  // Dynamic Image Cover Rect (guarantees pixel-perfect billboard alignment across all screen sizes)
+  const [coverRect, setCoverRect] = useState({ width: 0, height: 0, left: 0, top: 0 });
+
   // Liquid spring & physics state
   const target = useRef({ x: -500, y: -500 });
   const current = useRef({ x: -500, y: -500 });
@@ -50,6 +55,49 @@ export default function HeroGlitchReveal({
 
   const baseRadius = revealSize / 2;
 
+  /* ── Measure exact object-cover image coordinates ── */
+  useEffect(() => {
+    const updateRect = () => {
+      const el = containerRef.current;
+      if (!el) return;
+      const cw = el.offsetWidth;
+      const ch = el.offsetHeight;
+      if (cw === 0 || ch === 0) return;
+
+      const containerAspect = cw / ch;
+      let w = cw;
+      let h = ch;
+      let l = 0;
+      let t = 0;
+
+      if (containerAspect > IMG_ASPECT) {
+        // Wider than 16:9 — fit width, crop top/bottom
+        w = cw;
+        h = cw / IMG_ASPECT;
+        t = (ch - h) / 2;
+        l = 0;
+      } else {
+        // Taller than 16:9 — fit height, crop left/right
+        h = ch;
+        w = ch * IMG_ASPECT;
+        l = (cw - w) / 2;
+        t = 0;
+      }
+
+      setCoverRect({ width: w, height: h, left: l, top: t });
+    };
+
+    updateRect();
+    window.addEventListener("resize", updateRect);
+    const ro = new ResizeObserver(updateRect);
+    if (containerRef.current) ro.observe(containerRef.current);
+
+    return () => {
+      window.removeEventListener("resize", updateRect);
+      ro.disconnect();
+    };
+  }, []);
+
   // Build quadratic smooth spline string from N points
   const computeSpline = useCallback(
     (cx: number, cy: number, scale: number, time: number, vx: number, vy: number, offsetX = 0, offsetY = 0) => {
@@ -60,13 +108,13 @@ export default function HeroGlitchReveal({
       for (let i = 0; i < NUM_POINTS; i++) {
         const angle = (i * 2 * Math.PI) / NUM_POINTS;
 
-        // Organic undulating liquid surface harmonic waves
+        // Lively undulating liquid surface harmonic waves (fluid motion, stable center)
         const wave =
-          Math.sin(time * 2.2 + i * 1.5) * 14 +
-          Math.cos(time * 1.8 + i * 2.4) * 10 +
-          Math.sin(time * 3.1 + i * 3.1) * 6;
+          Math.sin(time * 3.2 + i * 1.8) * 20 +
+          Math.cos(time * 2.5 + i * 2.6) * 15 +
+          Math.sin(time * 4.0 + i * 3.2) * 8;
 
-        // Fluid teardrop stretch along velocity vector (trailing points extend, leading points round)
+        // Fluid teardrop stretch along velocity vector
         const dot = Math.cos(angle - moveAngle);
         const velocityStretch = -dot * Math.min(speed * 0.45, 45);
 
@@ -99,23 +147,23 @@ export default function HeroGlitchReveal({
     [baseRadius],
   );
 
-  /* ── Liquid Physics & RAF Animation Loop ── */
+  /* ── Liquid Physics & RAF Animation Loop (Buttery Smooth Organic Motion) ── */
   const tick = useCallback(() => {
-    timeRef.current += 0.025;
+    timeRef.current += 0.024;
 
-    // Spring lerp cursor tracking
-    const k = 0.14;
+    // High-responsiveness smooth liquid lerp (buttery smooth with zero jitter)
+    const k = 0.32;
     const dx = target.current.x - current.current.x;
     const dy = target.current.y - current.current.y;
     current.current.x += dx * k;
     current.current.y += dy * k;
 
-    // Velocity tracking for fluid stretch
-    velocity.current.vx = velocity.current.vx * 0.8 + dx * 0.2;
-    velocity.current.vy = velocity.current.vy * 0.8 + dy * 0.2;
+    // Fluid surface tension velocity damping
+    velocity.current.vx = velocity.current.vx * 0.78 + dx * 0.22;
+    velocity.current.vy = velocity.current.vy * 0.78 + dy * 0.22;
 
     // Smooth expansion & collapse
-    const scaleK = 0.12;
+    const scaleK = 0.14;
     currentScale.current += (targetScale.current - currentScale.current) * scaleK;
 
     const scale = currentScale.current;
@@ -143,7 +191,7 @@ export default function HeroGlitchReveal({
       magentaPathRef.current.setAttribute("d", dMagenta);
     }
 
-    const isIdle = !isHovered.current && currentScale.current < 0.01;
+    const isIdle = !isHovered.current && currentScale.current < 0.005;
 
     if (!isIdle) {
       rafRef.current = requestAnimationFrame(tick);
@@ -171,10 +219,9 @@ export default function HeroGlitchReveal({
         isHovered.current = true;
         targetScale.current = 1;
         setIsActive(true);
-        if (currentScale.current < 0.05) {
-          current.current = { x, y };
-        }
+        current.current = { x, y };
       }
+
       startLoop();
     },
     [startLoop],
@@ -215,7 +262,7 @@ export default function HeroGlitchReveal({
       onPointerMove={onMove}
       onPointerEnter={onEnter}
       onPointerLeave={onLeave}
-      className={`relative h-full w-full select-none overflow-hidden ${className}`}
+      className={`relative h-full w-full select-none overflow-hidden cursor-none ${className}`}
     >
       {/* ── Hidden SVG Liquid Spline ClipPath Definition ── */}
       <svg className="pointer-events-none absolute h-0 w-0" aria-hidden="true">
@@ -227,14 +274,173 @@ export default function HeroGlitchReveal({
       </svg>
 
       {/* ── Base Color Times Square Visual ── */}
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        priority={priority}
-        sizes="100vw"
-        className="pointer-events-none h-full w-full object-cover object-center"
-      />
+      <div className="absolute inset-0 h-full w-full overflow-hidden">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          priority={priority}
+          sizes="100vw"
+          className="pointer-events-none h-full w-full object-cover object-center"
+          style={{
+            filter: "brightness(1.18) contrast(1.15) saturate(1.32)",
+          }}
+        />
+
+        {/* ── Dynamically Scaled & Pixel-Aligned Billboard Lighting Container ── */}
+        <div
+          className="pointer-events-none absolute"
+          style={{
+            width: `${coverRect.width || 1920}px`,
+            height: `${coverRect.height || 1080}px`,
+            left: `${coverRect.left}px`,
+            top: `${coverRect.top}px`,
+          }}
+        >
+          {/* 1. Left "WANTED" Billboard High-Intensity Bloom */}
+          <div
+            className="billboard-wanted absolute rounded-sm blur-md"
+            style={{ left: "2.2%", top: "7%", width: "9.2%", height: "33%" }}
+          />
+
+          {/* 2. Left Magenta "SOPTI..." Vertical Sign (Animated Tube Pulse) */}
+          <div
+            className="billboard-magenta-neon absolute rounded-sm blur-md"
+            style={{ left: "11.2%", top: "17%", width: "9.8%", height: "25.5%" }}
+          />
+
+          {/* 3. Left Green Glitch / Spider-Man Billboard (Animated Cyber Pulse) */}
+          <div
+            className="billboard-green-spidey absolute rounded-sm blur-md"
+            style={{ left: "20.6%", top: "4.5%", width: "7.2%", height: "22%" }}
+          />
+
+          {/* 4. Left Lower Cyan Shop Marquee ("LABOR...") */}
+          <div
+            className="billboard-cyan-shop absolute rounded-sm blur-md"
+            style={{ left: "19.2%", top: "27.5%", width: "8.2%", height: "17%" }}
+          />
+
+          {/* 5. Left Lower Storefront "DUE..." */}
+          <div
+            className="absolute rounded-sm blur-lg"
+            style={{
+              left: "8.2%",
+              top: "53.5%",
+              width: "9.8%",
+              height: "13%",
+              background:
+                "radial-gradient(ellipse at 50% 50%, rgba(255, 0, 187, 0.55) 0%, rgba(0, 240, 255, 0.38) 50%, transparent 75%)",
+              mixBlendMode: "screen",
+            }}
+          />
+
+          {/* 6. Center Top Spire Beacon Beam */}
+          <div
+            className="absolute rounded-full blur-xl"
+            style={{
+              left: "47.8%",
+              top: "0%",
+              width: "4.4%",
+              height: "15%",
+              background: "radial-gradient(ellipse at 50% 10%, rgba(0, 240, 255, 0.6) 0%, transparent 80%)",
+              mixBlendMode: "screen",
+            }}
+          />
+
+          {/* 7. Center Top Daily Bugle Marquee Sign (Animated Golden Pulse) */}
+          <div
+            className="billboard-daily-bugle absolute rounded-sm blur-md"
+            style={{ left: "44.1%", top: "18.2%", width: "6%", height: "6.8%" }}
+          />
+
+          {/* 8. Center Blue Spidey Hologram Billboard (Animated Scanline Sweep) */}
+          <div
+            className="billboard-blue-hologram absolute rounded-sm blur-md"
+            style={{ left: "45.2%", top: "37.8%", width: "5.6%", height: "16.5%" }}
+          />
+
+          {/* 9. Center-Right Character Portrait Billboard */}
+          <div
+            className="billboard-right-portrait absolute rounded-sm blur-md"
+            style={{ left: "70.5%", top: "11%", width: "8.8%", height: "18.5%" }}
+          />
+
+          {/* 10. Center-Right Lower "VOL 7..." Neon Billboard */}
+          <div
+            className="absolute rounded-sm blur-md"
+            style={{
+              left: "70.8%",
+              top: "33.5%",
+              width: "8.5%",
+              height: "17%",
+              background:
+                "radial-gradient(ellipse at 50% 50%, rgba(0, 240, 255, 0.5) 0%, rgba(229, 48, 140, 0.4) 50%, transparent 75%)",
+              mixBlendMode: "screen",
+            }}
+          />
+
+          {/* 11. Right Tall Yellow Billboard (Animated Sunburst) */}
+          <div
+            className="billboard-yellow-tower absolute rounded-sm blur-lg"
+            style={{ left: "79.2%", top: "0%", width: "7.6%", height: "56%" }}
+          />
+
+          {/* 12. Right "SMASH HIT! Hulu" Comic Burst Billboard (Animated Flash) */}
+          <div
+            className="billboard-smash-hit absolute rounded-sm blur-md"
+            style={{ left: "86.8%", top: "3.5%", width: "12.2%", height: "36%" }}
+          />
+
+          {/* 13. Right Lower Storefront Neon Marquees */}
+          <div
+            className="absolute rounded-sm blur-lg"
+            style={{
+              left: "74%",
+              top: "53%",
+              width: "24%",
+              height: "12%",
+              background:
+                "radial-gradient(ellipse at 50% 50%, rgba(255, 230, 0, 0.55) 0%, rgba(255, 0, 119, 0.45) 48%, transparent 75%)",
+              mixBlendMode: "screen",
+            }}
+          />
+
+          {/* 14. Wet Rainy Asphalt Street Reflections */}
+          <div
+            className="times-square-rain-reflections absolute inset-x-0 bottom-0 blur-xl"
+            style={{
+              top: "66%",
+              height: "34%",
+              background:
+                "radial-gradient(ellipse at 50% 50%, rgba(0, 240, 255, 0.38) 0%, rgba(255, 0, 180, 0.32) 38%, rgba(255, 220, 0, 0.24) 65%, transparent 92%)",
+              mixBlendMode: "screen",
+            }}
+          />
+
+          {/* 15. Subtle Horizontal Anamorphic Neon Glints */}
+          <div
+            className="absolute h-[2px] rounded-full blur-[2px]"
+            style={{
+              left: "10%",
+              top: "22%",
+              width: "32%",
+              background: "linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.95), transparent)",
+              mixBlendMode: "screen",
+            }}
+          />
+          <div
+            className="absolute h-[2px] rounded-full blur-[2px]"
+            style={{
+              left: "76%",
+              top: "14%",
+              width: "20%",
+              background: "linear-gradient(90deg, transparent, rgba(255, 230, 0, 1), transparent)",
+              mixBlendMode: "screen",
+            }}
+          />
+        </div>
+      </div>
 
       {/* ── Spider-Verse Alternate Dimension Liquid Reveal Layer ── */}
       <div

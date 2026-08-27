@@ -77,7 +77,7 @@ export default function HeroVideo() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1.2,
+            scrub: 0.6,
           },
         });
 
@@ -87,7 +87,7 @@ export default function HeroVideo() {
           {
             scale: 36,
             ease: "power1.inOut",
-            duration: 0.22,
+            duration: 0.28,
           },
           0,
         );
@@ -98,9 +98,9 @@ export default function HeroVideo() {
           {
             opacity: 0,
             ease: "power1.inOut",
-            duration: 0.11,
+            duration: 0.14,
           },
-          0.09,
+          0.12,
         );
 
         // 3. Fade out corner chrome during initial zoom
@@ -109,9 +109,9 @@ export default function HeroVideo() {
           {
             opacity: 0,
             ease: "power1.out",
-            duration: 0.08,
+            duration: 0.10,
           },
-          0.02,
+          0.04,
         );
 
         // 4. Logo fades and glides down from the TOP
@@ -127,9 +127,9 @@ export default function HeroVideo() {
             y: 0,
             scale: 1,
             ease: "power2.out",
-            duration: 0.1,
+            duration: 0.16,
           },
-          0.2,
+          0.26,
         );
 
         // 5. CTA fades and glides up from the BOTTOM
@@ -145,13 +145,13 @@ export default function HeroVideo() {
             y: 0,
             scale: 1,
             ease: "power2.out",
-            duration: 0.1,
+            duration: 0.16,
           },
-          0.24,
+          0.30,
         );
 
-        // 6. Extended Hold: Keeps the Times Square hero pinned and held for a long scroll distance
-        tl.to({}, { duration: 0.66 }, 0.34);
+        // 6. Snappy Hold: brief pause on hero before quickly scrolling to next section
+        tl.to({}, { duration: 0.40 }, 0.46);
       });
     },
     { scope: sectionRef },
@@ -160,12 +160,12 @@ export default function HeroVideo() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[680vh] w-full bg-black"
+      className="relative h-[280vh] w-full bg-black"
     >
       <h1 className="sr-only">bitNbuild</h1>
 
       {/* Sticky Stage Container */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black halftone">
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black halftone cursor-none">
         {/* Layer 0: herobg.png (with Spider-Verse B&W Glitch Hover Reveal) */}
         <div className="absolute inset-0 z-0 h-full w-full overflow-hidden bg-black">
           <HeroGlitchReveal
@@ -174,7 +174,7 @@ export default function HeroVideo() {
             priority
             revealSize={300}
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(0,0,0,0.38)_100%)]" />
         </div>
 
         {/* Layer 1: logo.png (Fades in from top, positioned lower into hero focal area) */}
@@ -199,7 +199,9 @@ export default function HeroVideo() {
         >
           <div className="pointer-events-auto">
             <a
-              href="#about"
+              href="https://unstop.com/hackathons/bit-n-build-around-the-world-2026-fr-conceicao-rodrigues-college-of-engineering-frcrce-bandra-1743581"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group relative inline-flex items-center gap-3 -rotate-1 border-[2.5px] border-black bg-[#FFE600] px-7 py-3 font-mono text-sm font-black uppercase tracking-wider text-black shadow-[5px_5px_0px_#000000] transition-all duration-200 hover:-translate-y-1 hover:translate-x-1 hover:rotate-0 hover:bg-[#FFF033] hover:shadow-[7px_7px_0px_#000000] active:translate-x-1 active:translate-y-1 active:shadow-[2px_2px_0px_#000000] md:px-9 md:py-3.5 md:text-base"
             >
               <span className="relative z-10 flex items-center gap-2">
