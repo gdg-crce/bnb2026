@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
+import HeroGlitchReveal from "@/components/hero-glitch-reveal";
 import beforeHeroImg from "../../public/images/beforehero.jpg";
 import heroBgImg from "../../public/images/herobg.png";
 import logoImg from "../../public/images/logo.png";
@@ -86,7 +87,7 @@ export default function HeroVideo() {
           {
             scale: 36,
             ease: "power1.inOut",
-            duration: 0.32,
+            duration: 0.22,
           },
           0,
         );
@@ -97,9 +98,9 @@ export default function HeroVideo() {
           {
             opacity: 0,
             ease: "power1.inOut",
-            duration: 0.16,
+            duration: 0.11,
           },
-          0.12,
+          0.09,
         );
 
         // 3. Fade out corner chrome during initial zoom
@@ -108,9 +109,9 @@ export default function HeroVideo() {
           {
             opacity: 0,
             ease: "power1.out",
-            duration: 0.1,
+            duration: 0.08,
           },
-          0.04,
+          0.02,
         );
 
         // 4. Logo fades and glides down from the TOP
@@ -118,7 +119,7 @@ export default function HeroVideo() {
           logoRef.current,
           {
             opacity: 0,
-            y: -120,
+            y: -100,
             scale: 0.92,
           },
           {
@@ -126,9 +127,9 @@ export default function HeroVideo() {
             y: 0,
             scale: 1,
             ease: "power2.out",
-            duration: 0.14,
+            duration: 0.1,
           },
-          0.3,
+          0.2,
         );
 
         // 5. CTA fades and glides up from the BOTTOM
@@ -136,7 +137,7 @@ export default function HeroVideo() {
           ctaRef.current,
           {
             opacity: 0,
-            y: 100,
+            y: 80,
             scale: 0.9,
           },
           {
@@ -144,10 +145,13 @@ export default function HeroVideo() {
             y: 0,
             scale: 1,
             ease: "power2.out",
-            duration: 0.14,
+            duration: 0.1,
           },
-          0.36,
+          0.24,
         );
+
+        // 6. Extended Hold: Keeps the Times Square hero pinned and held for a long scroll distance
+        tl.to({}, { duration: 0.66 }, 0.34);
       });
     },
     { scope: sectionRef },
@@ -156,44 +160,42 @@ export default function HeroVideo() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[520vh] w-full bg-black"
+      className="relative h-[680vh] w-full bg-black"
     >
       <h1 className="sr-only">bitNbuild</h1>
 
       {/* Sticky Stage Container */}
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-black halftone">
-        {/* Layer 0: herobg.png (Hero visual background) */}
+        {/* Layer 0: herobg.png (with Spider-Verse B&W Glitch Hover Reveal) */}
         <div className="absolute inset-0 z-0 h-full w-full overflow-hidden bg-black">
-          <Image
+          <HeroGlitchReveal
             src={heroBgImg}
             alt="Hero Background Visual"
-            fill
             priority
-            sizes="100vw"
-            className="h-full w-full object-cover object-center"
+            revealSize={300}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
         </div>
 
-        {/* Layer 1: logo.png (Fades in from top) */}
+        {/* Layer 1: logo.png (Fades in from top, positioned lower into hero focal area) */}
         <div
           ref={logoRef}
-          className="pointer-events-none absolute inset-x-0 top-6 z-10 flex justify-center opacity-0 md:top-10"
+          className="pointer-events-none absolute inset-x-0 top-[18vh] z-10 flex justify-center opacity-0 sm:top-[22vh] md:top-[25vh]"
         >
-          <div className="relative flex max-h-[34vh] w-[min(82vw,560px)] items-center justify-center">
+          <div className="relative flex max-h-[46vh] w-[min(92vw,780px)] items-center justify-center">
             <Image
               src={logoImg}
               alt="Bit N Build Logo"
               priority
-              className="h-auto w-full object-contain drop-shadow-[0_16px_50px_rgba(0,0,0,0.95)]"
+              className="h-auto w-full object-contain drop-shadow-[0_20px_60px_rgba(0,0,0,0.95)]"
             />
           </div>
         </div>
 
-        {/* Layer 2: Spider-Verse Yellow Dialogue Box CTA (Fades in from bottom) */}
+        {/* Layer 2: Spider-Verse Yellow Dialogue Box CTA (Moved higher upwards) */}
         <div
           ref={ctaRef}
-          className="pointer-events-none absolute inset-x-0 bottom-16 z-10 flex justify-center opacity-0 md:bottom-24"
+          className="pointer-events-none absolute inset-x-0 bottom-[18vh] z-10 flex justify-center opacity-0 sm:bottom-[22vh] md:bottom-[25vh] lg:bottom-[26vh]"
         >
           <div className="pointer-events-auto">
             <a
@@ -214,7 +216,7 @@ export default function HeroVideo() {
         {/* Layer 3: beforehero.jpg (Zooms directly into eye) */}
         <div
           ref={heroImageRef}
-          className="absolute inset-0 z-20 h-full w-full origin-[70%_48%]"
+          className="pointer-events-none absolute inset-0 z-20 h-full w-full origin-[70%_48%]"
         >
           <Image
             src={beforeHeroImg}
