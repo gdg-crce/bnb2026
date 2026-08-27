@@ -94,8 +94,10 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(var(--color-paper) 0.5px,
-      transparent 0.6px);
+  background-image: radial-gradient(
+    var(--color-paper) 0.5px,
+    transparent 0.6px
+  );
   background-size: 4px 4px;
   opacity: 0.04;
 }
@@ -120,18 +122,22 @@ body {
  * scroll — one image becoming the other, not a colour bar between two of them.
  */
 .blend-mask {
-  -webkit-mask-image: linear-gradient(to bottom,
-      transparent 0,
-      rgba(0, 0, 0, 0.18) 24vh,
-      rgba(0, 0, 0, 0.55) 48vh,
-      rgba(0, 0, 0, 0.88) 74vh,
-      #000 95vh);
-  mask-image: linear-gradient(to bottom,
-      transparent 0,
-      rgba(0, 0, 0, 0.18) 24vh,
-      rgba(0, 0, 0, 0.55) 48vh,
-      rgba(0, 0, 0, 0.88) 74vh,
-      #000 95vh);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.18) 24vh,
+    rgba(0, 0, 0, 0.55) 48vh,
+    rgba(0, 0, 0, 0.88) 74vh,
+    #000 95vh
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.18) 24vh,
+    rgba(0, 0, 0, 0.55) 48vh,
+    rgba(0, 0, 0, 0.88) 74vh,
+    #000 95vh
+  );
 }
 
 /*
@@ -141,14 +147,16 @@ body {
  * rather than two competing ones.
  */
 .blend-wash {
-  background: linear-gradient(to bottom,
-      rgba(33, 16, 24, 0) 0%,
-      rgba(33, 16, 24, 0.35) 28%,
-      rgba(16, 11, 28, 0.6) 55%,
-      rgba(4, 15, 40, 0.6) 78%,
-      /* Must land on fully transparent: the wash is a finite block, and any
+  background: linear-gradient(
+    to bottom,
+    rgba(33, 16, 24, 0) 0%,
+    rgba(33, 16, 24, 0.35) 28%,
+    rgba(16, 11, 28, 0.6) 55%,
+    rgba(4, 15, 40, 0.6) 78%,
+    /* Must land on fully transparent: the wash is a finite block, and any
        residual alpha at its last stop draws a hard horizontal edge. */
-      rgba(8, 7, 11, 0) 100%);
+      rgba(8, 7, 11, 0) 100%
+  );
 }
 
 /*
@@ -159,10 +167,13 @@ body {
  */
 .about-scrim {
   background:
-    radial-gradient(125% 85% at 50% 32%,
+    radial-gradient(
+      125% 85% at 50% 32%,
       rgba(8, 7, 11, 0.26) 0%,
-      rgba(8, 7, 11, 0.82) 100%),
-    linear-gradient(to bottom,
+      rgba(8, 7, 11, 0.82) 100%
+    ),
+    linear-gradient(
+      to bottom,
       rgba(8, 7, 11, 0.38) 0%,
       rgba(8, 7, 11, 0.52) 26%,
       rgba(8, 7, 11, 0.78) 54%,
@@ -174,7 +185,8 @@ body {
          it is exactly the line that was showing. Now the mural comes back up
          at the very bottom and has something to hand over to. */
       rgba(8, 7, 11, 0.8) 78%,
-      rgba(8, 7, 11, 0.56) 100%);
+      rgba(8, 7, 11, 0.56) 100%
+    );
 }
 
 /*
@@ -193,17 +205,21 @@ body {
    * alpha where the box ends draws a hard line across the page.
    */
   background:
-    radial-gradient(52% 40% at 50% 50%,
+    radial-gradient(
+      52% 40% at 50% 50%,
       rgba(8, 7, 11, 0.55) 0%,
       rgba(8, 7, 11, 0.22) 55%,
-      rgba(8, 7, 11, 0) 100%),
-    linear-gradient(to bottom,
+      rgba(8, 7, 11, 0) 100%
+    ),
+    linear-gradient(
+      to bottom,
       rgba(8, 7, 11, 0) 0%,
       rgba(8, 7, 11, 0.42) 20%,
       rgba(8, 7, 11, 0.72) 38%,
       rgba(8, 7, 11, 0.78) 58%,
       rgba(8, 7, 11, 0.4) 80%,
-      rgba(8, 7, 11, 0) 100%);
+      rgba(8, 7, 11, 0) 100%
+    );
 }
 
 /*
@@ -211,23 +227,29 @@ body {
  * light rather than a graphic pasted onto the page with a visible boundary.
  */
 .web-dial {
-  -webkit-mask-image: radial-gradient(closest-side,
-      #000 42%,
-      rgba(0, 0, 0, 0.55) 76%,
-      transparent 100%);
-  mask-image: radial-gradient(closest-side,
-      #000 42%,
-      rgba(0, 0, 0, 0.55) 76%,
-      transparent 100%);
+  -webkit-mask-image: radial-gradient(
+    closest-side,
+    #000 42%,
+    rgba(0, 0, 0, 0.55) 76%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    closest-side,
+    #000 42%,
+    rgba(0, 0, 0, 0.55) 76%,
+    transparent 100%
+  );
 }
 
 .hairline {
   height: 1px;
-  background: linear-gradient(to right,
-      transparent,
-      rgba(214, 7, 12, 0.55) 18%,
-      rgba(214, 7, 12, 0.55) 82%,
-      transparent);
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(214, 7, 12, 0.55) 18%,
+    rgba(214, 7, 12, 0.55) 82%,
+    transparent
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -241,17 +263,14 @@ body {
     transform: scaleY(0);
     transform-origin: top;
   }
-
   45% {
     transform: scaleY(1);
     transform-origin: top;
   }
-
   55% {
     transform: scaleY(1);
     transform-origin: bottom;
   }
-
   100% {
     transform: scaleY(0);
     transform-origin: bottom;
@@ -283,32 +302,40 @@ body {
        roughly their own hue — the magenta over the magenta corner of the wall,
        the cyan over the cyan one — so they read as the light source in the
        photograph rather than as gel laid over the top of it. */
-    radial-gradient(66% 50% at 18% 15%,
+    radial-gradient(
+      66% 50% at 18% 15%,
       rgba(229, 48, 140, 0.18) 0%,
-      transparent 62%),
-    radial-gradient(58% 48% at 84% 30%,
+      transparent 62%
+    ),
+    radial-gradient(
+      58% 48% at 84% 30%,
       rgba(34, 182, 214, 0.16) 0%,
-      transparent 64%),
+      transparent 64%
+    ),
     /* Vignette, so the eye stays off the corners where the wall is busiest. */
-    radial-gradient(130% 88% at 50% 46%,
-      transparent 0%,
-      rgba(8, 7, 11, 0.55) 100%),
+      radial-gradient(
+        130% 88% at 50% 46%,
+        transparent 0%,
+        rgba(8, 7, 11, 0.55) 100%
+      ),
     /* The value curve. Heavy where the graffiti is, light across the calm
        band, solid at both ends. These stops are read off the picture rather
        than guessed: the bare concrete starts around 30% and runs to about
        62% of its height. */
-    linear-gradient(to bottom,
-      /* No longer starts solid. The section's top edge is now cut by the
+      linear-gradient(
+        to bottom,
+        /* No longer starts solid. The section's top edge is now cut by the
            `.domains-blend` mask instead, so painting black here would only
            bruise the mural showing through the overlap. */
-      rgba(8, 7, 11, 0.84) 0%,
-      rgba(8, 7, 11, 0.76) 10%,
-      rgba(8, 7, 11, 0.62) 24%,
-      rgba(8, 7, 11, 0.52) 38%,
-      rgba(8, 7, 11, 0.52) 60%,
-      rgba(8, 7, 11, 0.74) 76%,
-      rgba(8, 7, 11, 0.94) 92%,
-      #08070b 100%);
+        rgba(8, 7, 11, 0.84) 0%,
+        rgba(8, 7, 11, 0.76) 10%,
+        rgba(8, 7, 11, 0.62) 24%,
+        rgba(8, 7, 11, 0.52) 38%,
+        rgba(8, 7, 11, 0.52) 60%,
+        rgba(8, 7, 11, 0.74) 76%,
+        rgba(8, 7, 11, 0.94) 92%,
+        #08070b 100%
+      );
 }
 
 /*
@@ -328,10 +355,12 @@ body {
      mostly transparent, so the concrete and its halftone read straight
      through it, while the blur stops the graffiti competing with the copy
      sitting on top. Saturate puts back the colour the blur washes out. */
-  background: linear-gradient(158deg,
-      rgba(244, 242, 238, 0.1) 0%,
-      rgba(244, 242, 238, 0.04) 44%,
-      rgba(8, 7, 11, 0.42) 100%);
+  background: linear-gradient(
+    158deg,
+    rgba(244, 242, 238, 0.1) 0%,
+    rgba(244, 242, 238, 0.04) 44%,
+    rgba(8, 7, 11, 0.42) 100%
+  );
   -webkit-backdrop-filter: blur(16px) saturate(1.2);
   backdrop-filter: blur(16px) saturate(1.2);
   transition:
@@ -347,9 +376,11 @@ body {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(122% 90% at 50% -12%,
-      color-mix(in srgb, var(--accent) 32%, transparent) 0%,
-      transparent 68%);
+  background: radial-gradient(
+    122% 90% at 50% -12%,
+    color-mix(in srgb, var(--accent) 32%, transparent) 0%,
+    transparent 68%
+  );
   opacity: 0.5;
   transition: opacity 0.55s ease;
 }
@@ -414,9 +445,11 @@ body {
 /* Rule under the header row. */
 .domain-rule {
   height: 1px;
-  background: linear-gradient(to right,
-      color-mix(in srgb, var(--accent) 70%, transparent),
-      transparent);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--accent) 70%, transparent),
+    transparent
+  );
 }
 
 /*
@@ -439,11 +472,9 @@ body {
 .domain-web path:nth-child(n + 6) {
   transition-delay: 0.12s;
 }
-
 .domain-web path:nth-child(n + 7) {
   transition-delay: 0.2s;
 }
-
 .domain-web path:nth-child(n + 8) {
   transition-delay: 0.28s;
 }
@@ -489,7 +520,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .domain-panel,
   .domain-panel::before,
   .domain-panel::after,
@@ -527,20 +557,24 @@ body {
  * steepest gradient right where the join is.
  */
 .domains-blend {
-  -webkit-mask-image: linear-gradient(to bottom,
-      transparent 0,
-      rgba(0, 0, 0, 0.12) 12vh,
-      rgba(0, 0, 0, 0.45) 24vh,
-      rgba(0, 0, 0, 0.78) 34vh,
-      rgba(0, 0, 0, 0.95) 44vh,
-      #000 54vh);
-  mask-image: linear-gradient(to bottom,
-      transparent 0,
-      rgba(0, 0, 0, 0.12) 12vh,
-      rgba(0, 0, 0, 0.45) 24vh,
-      rgba(0, 0, 0, 0.78) 34vh,
-      rgba(0, 0, 0, 0.95) 44vh,
-      #000 54vh);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.12) 12vh,
+    rgba(0, 0, 0, 0.45) 24vh,
+    rgba(0, 0, 0, 0.78) 34vh,
+    rgba(0, 0, 0, 0.95) 44vh,
+    #000 54vh
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.12) 12vh,
+    rgba(0, 0, 0, 0.45) 24vh,
+    rgba(0, 0, 0, 0.78) 34vh,
+    rgba(0, 0, 0, 0.95) 44vh,
+    #000 54vh
+  );
 }
 
 /*
@@ -555,3 +589,279 @@ body {
 .domains-backdrop {
   filter: brightness(1.12);
 }
+
+/*
+ * ── Spider-Verse Fluid Dimension Reveal ─────────────────────────────────
+ *
+ * Gritty noir comic tone, Ben-Day halftone shading, ink line print texture,
+ * and stepped "animated on twos" chromatic channel jitter.
+ */
+
+/* Stepped Chromatic Aberration Twitch (Animated on Twos) */
+.sv-glitch-cyan {
+  animation: sv-twitch-cyan 0.4s steps(2) infinite;
+  will-change: transform;
+}
+
+.sv-glitch-magenta {
+  animation: sv-twitch-magenta 0.45s steps(2) infinite;
+  will-change: transform;
+}
+
+@keyframes sv-twitch-cyan {
+  0%, 100% { transform: translate3d(-3.5px, 0.5px, 0); }
+  50%      { transform: translate3d(-7px, -1px, 0); }
+}
+
+@keyframes sv-twitch-magenta {
+  0%, 100% { transform: translate3d(3.5px, -0.5px, 0); }
+  50%      { transform: translate3d(7px, 1px, 0); }
+}
+
+/* Ben-Day Comic Print Halftone Shading */
+.sv-comic-halftone {
+  background-image: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0.45) 1.2px,
+    transparent 1.4px
+  );
+  background-size: 4px 4px;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* Comic Newspaper Ink Hatch Lines */
+.sv-ink-lines {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.22) 0px,
+    rgba(0, 0, 0, 0.22) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sv-glitch-cyan,
+  .sv-glitch-magenta {
+    animation: none !important;
+  }
+}
+
+/*
+ * ── Times Square Billboard Neon Illumination & Animations ─────────────────
+ *
+ * Specific neon pulses, holographic sweeps, and marquee animations matched
+ * directly to each billboard in herobg.png (No red blinking lights).
+ */
+
+/* 1. Left "WANTED" Billboard High-Intensity Bloom */
+.billboard-wanted {
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(0, 240, 255, 0.55) 0%,
+    rgba(229, 48, 140, 0.38) 50%,
+    transparent 75%
+  );
+  animation: wanted-pulse 4.6s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes wanted-pulse {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50%      { opacity: 0.98; transform: scale(1.02); }
+}
+
+/* 2. Left Magenta "SOPTI" Neon Tube Blink */
+.billboard-magenta-neon {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(255, 0, 187, 0.65) 0%,
+    rgba(229, 48, 140, 0.45) 45%,
+    transparent 75%
+  );
+  animation: neon-tube-blink 4.2s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes neon-tube-blink {
+  0%, 100% { opacity: 0.85; }
+  22%      { opacity: 0.95; }
+  23%      { opacity: 0.25; }
+  24%      { opacity: 0.98; }
+  25%      { opacity: 0.35; }
+  26%      { opacity: 1; }
+  55%      { opacity: 0.88; }
+  88%      { opacity: 0.78; }
+  89%      { opacity: 0.2; }
+  90%      { opacity: 1; }
+}
+
+/* 3. Left Green Spider-Man Billboard Pulse */
+.billboard-green-spidey {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(0, 255, 170, 0.6) 0%,
+    rgba(0, 240, 255, 0.38) 50%,
+    transparent 75%
+  );
+  animation: green-cyber-pulse 3.4s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes green-cyber-pulse {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  35%      { opacity: 1; transform: scale(1.04); }
+  37%      { opacity: 0.45; }
+  39%      { opacity: 0.98; }
+  70%      { opacity: 0.8; transform: scale(0.98); }
+}
+
+/* 4. Left Lower Cyan Shop Marquee */
+.billboard-cyan-shop {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(0, 240, 255, 0.62) 0%,
+    rgba(0, 180, 255, 0.38) 50%,
+    transparent 75%
+  );
+  animation: cyan-shop-pulse 4.8s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes cyan-shop-pulse {
+  0%, 100% { opacity: 0.78; }
+  45%      { opacity: 0.98; }
+  47%      { opacity: 0.55; }
+  49%      { opacity: 0.95; }
+}
+
+/* 5. Center Daily Bugle Gold/White Marquee Pulse */
+.billboard-daily-bugle {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(255, 240, 100, 0.75) 0%,
+    rgba(255, 230, 0, 0.48) 45%,
+    transparent 78%
+  );
+  animation: marquee-chase 3.6s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes marquee-chase {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.06); }
+  65%      { opacity: 0.55; }
+  67%      { opacity: 0.95; }
+}
+
+/* 6. Center Blue Hologram Spidey Scanline Sweep */
+.billboard-blue-hologram {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(0, 240, 255, 0.72) 0%,
+    rgba(0, 170, 255, 0.45) 48%,
+    transparent 75%
+  );
+  animation: hologram-scan 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes hologram-scan {
+  0%, 100% { opacity: 0.75; filter: brightness(1); }
+  45%      { opacity: 1; filter: brightness(1.35); }
+  47%      { opacity: 0.4; }
+  49%      { opacity: 1; filter: brightness(1.45); }
+  75%      { opacity: 0.8; }
+}
+
+/* 7. Center-Right Character Portrait Spotlight */
+.billboard-right-portrait {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(255, 210, 100, 0.55) 0%,
+    rgba(212, 136, 255, 0.35) 50%,
+    transparent 75%
+  );
+  animation: portrait-spotlight 5s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes portrait-spotlight {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 0.95; }
+}
+
+/* 8. Right Tall Yellow Billboard Sunburst */
+.billboard-yellow-tower {
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(255, 230, 0, 0.62) 0%,
+    rgba(255, 170, 0, 0.42) 45%,
+    transparent 75%
+  );
+  animation: yellow-sunburst 4.2s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes yellow-sunburst {
+  0%, 100% { opacity: 0.82; }
+  48%      { opacity: 1; }
+  50%      { opacity: 0.6; }
+  52%      { opacity: 0.98; }
+}
+
+/* 9. Right "SMASH HIT! Hulu" Comic Burst Energy Flash */
+.billboard-smash-hit {
+  background: radial-gradient(
+    ellipse at 60% 45%,
+    rgba(0, 240, 255, 0.62) 0%,
+    rgba(255, 0, 119, 0.55) 42%,
+    transparent 75%
+  );
+  animation: comic-burst-flash 3.8s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes comic-burst-flash {
+  0%, 100% { opacity: 0.82; transform: scale(1); }
+  15%      { opacity: 1; transform: scale(1.05); }
+  18%      { opacity: 0.5; }
+  20%      { opacity: 0.98; }
+  60%      { opacity: 0.78; }
+  85%      { opacity: 0.95; }
+}
+
+/* 10. Wet Rainy Asphalt Shimmer */
+.times-square-rain-reflections {
+  animation: rain-puddle-shimmer 5.5s ease-in-out infinite;
+}
+
+@keyframes rain-puddle-shimmer {
+  0%, 100% { opacity: 0.72; transform: scaleY(1); }
+  50%      { opacity: 0.92; transform: scaleY(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .billboard-wanted,
+  .billboard-green-spidey,
+  .billboard-magenta-neon,
+  .billboard-cyan-shop,
+  .billboard-daily-bugle,
+  .billboard-blue-hologram,
+  .billboard-right-portrait,
+  .billboard-smash-hit,
+  .billboard-yellow-tower,
+  .times-square-rain-reflections {
+    animation: none !important;
+  }
+}
+
+
+
+
+
+
+

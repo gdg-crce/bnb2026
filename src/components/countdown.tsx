@@ -92,7 +92,7 @@ export default function Countdown() {
     <div className="countdown relative flex w-full flex-col items-center">
       <div
         aria-hidden="true"
-        className="countdown-halo pointer-events-none absolute -inset-x-[50%] -inset-y-[95%] -z-10"
+        className="countdown-halo pointer-events-none absolute -inset-x-[20%] -inset-y-[35%] -z-10 opacity-40"
       />
 
       <span className="eyebrow">{EVENT.DURATION_HOURS} hours of building</span>
