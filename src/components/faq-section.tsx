@@ -12,52 +12,46 @@ const bangers = Bangers({
 
 const FAQS = [
   {
-    question: "Who is eligible to participate?",
-    answer: "Open to all enrolled college students, recent graduates, developers, and designers globally.",
-    accent: "#f4f2ee", // paper
+    question: "How many members can be in a team?",
+    answer: "Teams can range anywhere from 2 to 4 members, allowing for flexibility in group size while ensuring effective collaboration and balanced participation from all members.",
+    accent: "#f4f2ee",
     rotate: "-rotate-2",
   },
   {
-    question: "What is the team size?",
-    answer: "Teams can consist of 2 to 4 members. You can also register individually and find teammates.",
-    accent: "#FFE600", // yellow
+    question: "Will there be food?",
+    answer: "Yes! We will provide delicious meals, and snacks throughout the event to keep everyone energized.",
+    accent: "#FFE600",
     rotate: "rotate-3",
   },
   {
-    question: "What are the important dates?",
-    answer: "Round 1 is online. Top 50 advance to the 36-hour physical hackathon.",
-    accent: "#e5308c", // magenta
+    question: "What does it cost?",
+    answer: "Registration for Bit N Build costs just ₹200. Your participation includes access to tools, swag, and exciting prizes.",
+    accent: "#e5308c",
     rotate: "-rotate-3",
   },
   {
-    question: "Is there any registration fee?",
-    answer: "Zero. Bit N Build is 100% free of cost for all participants.",
+    question: "Who can participate? Are there any required skills?",
+    answer: "Anyone is welcome to participate in this event. While experience in coding and programming is a huge plus, teams will also need people with strong presentation skills and brilliant ideas.",
     accent: "#f4f2ee",
     rotate: "rotate-2",
   },
   {
-    question: "What do we get if we win?",
-    answer: "Massive cash prizes, swag kits, and bragging rights across the multiverse!",
-    accent: "#22b6d6", // cyan
+    question: "What is a hackathon?",
+    answer: "A hackathon is an event where individuals come together to collaborate on software projects, typically over a short period of time (like 24 hours). Participants can work in teams to create innovative solutions, learn new skills, and showcase their work.",
+    accent: "#22b6d6",
     rotate: "-rotate-2",
   },
   {
-    question: "Is food and accommodation provided?",
-    answer: "For the shortlisted offline grand finale, all meals and energy snacks are sponsored.",
+    question: "When and where?",
+    answer: "October 11th-12th, 2025 in Mumbai! 24 hours of non-stop coding, learning, and fun. Check our website for exact venue details and schedule.",
     accent: "#FFE600",
     rotate: "rotate-4",
   },
   {
-    question: "Can we work on an existing project?",
-    answer: "All code must be authored during the official 36-hour hackathon period.",
+    question: "Who will be judging?",
+    answer: "Judges will be announced closer to the date of the hackathon.",
     accent: "#e5308c",
     rotate: "-rotate-1",
-  },
-  {
-    question: "Whom can we contact for queries?",
-    answer: "Reach out to us on Discord or email us at support@bitnbuild.com.",
-    accent: "#22b6d6",
-    rotate: "rotate-1",
   },
 ];
 
