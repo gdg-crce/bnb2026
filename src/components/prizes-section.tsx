@@ -10,6 +10,10 @@ const bangers = Bangers({
   variable: "--font-bangers",
 });
 
+/**
+ * Prizes Section:
+ * Note: Temporary representation / mobile version layout for current milestone.
+ */
 export default function PrizesSection() {
   return (
     <section
@@ -77,7 +81,7 @@ export default function PrizesSection() {
                 1ST RUNNER UP
               </h3>
 
-              
+
             </div>
           </motion.div>
 
@@ -146,7 +150,7 @@ export default function PrizesSection() {
               <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#0a0a10]/70 block">
                 INNOVATION VANGUARD
               </span>
-              <div className="amount text-[#0a0a10]">₹30,000</div>
+              <div className="amount text-[#0a0a10]">₹20,000</div>
               <h3 className="font-mono text-xs font-black uppercase text-[#0a0a10] tracking-wide mt-0.5">
                 2ND RUNNER UP
               </h3>
