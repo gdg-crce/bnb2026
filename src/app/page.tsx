@@ -5,6 +5,7 @@ import PrizesSection from "@/components/prizes-section";
 import SponsorsSection from "@/components/sponsors-section";
 import FAQSection from "@/components/faq-section";
 import ContactSection from "@/components/contact-section";
+import Footer from "@/components/footer";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
       <SponsorsSection />
       <FAQSection />
       <ContactSection />
+      <Footer />
     </main>
   );
 }
