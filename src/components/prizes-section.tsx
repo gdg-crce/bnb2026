@@ -1,166 +1,629 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Bangers } from "next/font/google";
-import Image from "next/image";
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import { gsap, SplitText, useGSAP } from "@/lib/gsap";
 
-const bangers = Bangers({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-bangers",
-});
+const MARK_SIZE =
+  "text-[clamp(2.8rem,7vw,5.5rem)] md:text-[clamp(3.2rem,6vw,6.5rem)]";
 
-/**
- * Prizes Section:
- * Note: Temporary representation / mobile version layout for current milestone.
- */
+// WebGL Shaders for Cursor-Guided Organic Blob Mutation
+const VERTEX_SHADER_SOURCE = `
+  attribute vec2 position;
+  varying vec2 vUv;
+  void main() {
+    vUv = (position + 1.0) * 0.5;
+    vUv.y = 1.0 - vUv.y; // Flip Y for WebGL texture orientation
+    gl_Position = vec4(position, 0.0, 1.0);
+  }
+`;
+
+const FRAGMENT_SHADER_SOURCE = `
+  precision highp float;
+  
+  uniform sampler2D u_texture;
+  uniform vec2 u_resolution;
+  uniform vec2 u_mouse;
+  uniform float u_intensity;
+  uniform float u_time;
+  uniform vec2 u_velocity;
+  
+  varying vec2 vUv;
+  
+  void main() {
+    vec2 uv = vUv;
+    
+    // Complete static lock when idle/no cursor interaction
+    if (u_intensity <= 0.0001) {
+      gl_FragColor = texture2D(u_texture, uv);
+      return;
+    }
+    
+    float aspect = u_resolution.x / u_resolution.y;
+    
+    // Aspect ratio corrected coordinates
+    vec2 mouseAspect = vec2(u_mouse.x * aspect, u_mouse.y);
+    vec2 uvAspect = vec2(uv.x * aspect, uv.y);
+    vec2 diff = uvAspect - mouseAspect;
+    float dist = length(diff);
+    
+    // Localized interaction radius
+    float radius = 0.25;
+    
+    // Center protection: ensure central void/trophy area stays completely stable
+    vec2 centerAspect = vec2(0.5 * aspect, 0.5);
+    float distFromCenter = length(uvAspect - centerAspect);
+    float centerProtection = smoothstep(0.20, 0.36, distFromCenter);
+    
+    // Sample texture to identify edge blob regions
+    vec4 baseSample = texture2D(u_texture, uv);
+    float maxC = max(baseSample.r, max(baseSample.g, baseSample.b));
+    float minC = min(baseSample.r, min(baseSample.g, baseSample.b));
+    float sat = maxC > 0.01 ? (maxC - minC) / maxC : 0.0;
+    float luma = dot(baseSample.rgb, vec3(0.299, 0.587, 0.114));
+    float blobFactor = smoothstep(0.03, 0.22, sat * 0.7 + luma * 0.5);
+    
+    // Localized falloff
+    float falloff = smoothstep(radius, 0.0, dist);
+    float effectStrength = falloff * u_intensity * centerProtection * (0.25 + 0.75 * blobFactor);
+    
+    if (effectStrength > 0.0005) {
+      // Stepped time for Spider-Verse "animated on twos" subtle frame cadence
+      float steppedTime = floor(u_time * 12.0) / 12.0;
+      
+      vec2 normDiff = normalize(diff + vec2(0.0001));
+      float angle = atan(diff.y, diff.x);
+      
+      // Multi-harmonic organic ripple
+      float wave1 = sin(dist * 36.0 - u_time * 3.2 + sin(angle * 3.0));
+      float wave2 = cos(dist * 18.0 + steppedTime * 2.0 + cos(angle * 4.0));
+      float organicWave = wave1 * 0.65 + wave2 * 0.35;
+      
+      // Subtle cursor momentum nudge
+      vec2 velPush = u_velocity * 0.03;
+      
+      // Micro displacement (extremely subtle, constrained organic warping)
+      vec2 disp = (normDiff * (organicWave * 0.011) + velPush * 0.006) * effectStrength;
+      
+      // Subtle chromatic micro-dispersion on deformed edge (Spider-Verse signature)
+      float split = 0.0028 * effectStrength;
+      vec2 uvR = clamp(uv + disp + normDiff * split, 0.0, 1.0);
+      vec2 uvG = clamp(uv + disp, 0.0, 1.0);
+      vec2 uvB = clamp(uv + disp - normDiff * split, 0.0, 1.0);
+      
+      float r = texture2D(u_texture, uvR).r;
+      float g = texture2D(u_texture, uvG).g;
+      float b = texture2D(u_texture, uvB).b;
+      float a = texture2D(u_texture, uvG).a;
+      
+      gl_FragColor = vec4(r, g, b, a);
+    } else {
+      gl_FragColor = baseSample;
+    }
+  }
+`;
+
+interface TrophyState {
+  isHovered: boolean;
+  relX: number; // -0.5 to 0.5
+  relY: number; // -0.5 to 0.5
+}
+
 export default function PrizesSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Trophy independent hover states
+  const [leftTrophy, setLeftTrophy] = useState<TrophyState>({ isHovered: false, relX: 0, relY: 0 });
+  const [centerTrophy, setCenterTrophy] = useState<TrophyState>({ isHovered: false, relX: 0, relY: 0 });
+  const [rightTrophy, setRightTrophy] = useState<TrophyState>({ isHovered: false, relX: 0, relY: 0 });
+
+  // GSAP Animation: Matching sponsors section — chromatic ghost split + SplitText char drop-in
+  useGSAP(
+    () => {
+      const media = gsap.matchMedia();
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.fromTo(
+          ".prizes-ghost",
+          { xPercent: (i: number) => (i === 0 ? -3.5 : 3.5), opacity: 0 },
+          {
+            xPercent: (i: number) => (i === 0 ? -0.4 : 0.4),
+            opacity: 1,
+            duration: 1.5,
+            ease: "power4.out",
+            scrollTrigger: { trigger: ".prizes-mark", start: "top 84%" },
+          }
+        );
+
+        const split = new SplitText(".prizes-mark-face", { type: "chars" });
+        gsap.from(split.chars, {
+          yPercent: 110,
+          stagger: 0.04,
+          duration: 1.1,
+          ease: "power4.out",
+          scrollTrigger: { trigger: ".prizes-mark", start: "top 84%" },
+        });
+
+        gsap.from(".prizes-lede", {
+          opacity: 0,
+          y: 24,
+          duration: 0.9,
+          scrollTrigger: { trigger: ".prizes-mark", start: "top 84%" },
+        });
+
+        return () => split.revert();
+      });
+    },
+    { scope: sectionRef }
+  );
+
+  // WebGL Shader Animation Loop & Mouse tracking
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const gl = canvas.getContext("webgl", {
+      alpha: false,
+      antialias: true,
+      powerPreference: "high-performance",
+      preserveDrawingBuffer: false,
+    });
+    if (!gl) return;
+
+    // Compile Helper
+    const createShader = (type: number, source: string) => {
+      const shader = gl.createShader(type);
+      if (!shader) return null;
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error(gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    };
+
+    const vertShader = createShader(gl.VERTEX_SHADER, VERTEX_SHADER_SOURCE);
+    const fragShader = createShader(gl.FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+    if (!vertShader || !fragShader) return;
+
+    const program = gl.createProgram();
+    if (!program) return;
+    gl.attachShader(program, vertShader);
+    gl.attachShader(program, fragShader);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error(gl.getProgramInfoLog(program));
+      return;
+    }
+    gl.useProgram(program);
+
+    // Full screen quad geometry
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+        -1.0, -1.0,
+         1.0, -1.0,
+        -1.0,  1.0,
+        -1.0,  1.0,
+         1.0, -1.0,
+         1.0,  1.0,
+      ]),
+      gl.STATIC_DRAW
+    );
+
+    const positionLocation = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(positionLocation);
+    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+    // Uniform locations
+    const uResolutionLoc = gl.getUniformLocation(program, "u_resolution");
+    const uMouseLoc = gl.getUniformLocation(program, "u_mouse");
+    const uIntensityLoc = gl.getUniformLocation(program, "u_intensity");
+    const uTimeLoc = gl.getUniformLocation(program, "u_time");
+    const uVelocityLoc = gl.getUniformLocation(program, "u_velocity");
+    const uTextureLoc = gl.getUniformLocation(program, "u_texture");
+
+    // Load master background texture
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    // Initial placeholder 1x1 black pixel
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      1,
+      1,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array([0, 0, 0, 255])
+    );
+
+    let isTextureLoaded = false;
+    const bgImage = new window.Image();
+    bgImage.crossOrigin = "anonymous";
+    bgImage.src = "/images/Prizes/01_MASTER_BACKGROUND.png";
+    bgImage.onload = () => {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bgImage);
+      isTextureLoaded = true;
+    };
+
+    // Tracking state
+    let targetMouseX = 0.5;
+    let targetMouseY = 0.5;
+    let currentMouseX = 0.5;
+    let currentMouseY = 0.5;
+    let prevMouseX = 0.5;
+    let prevMouseY = 0.5;
+    let targetIntensity = 0.0;
+    let currentIntensity = 0.0;
+    let velX = 0;
+    let velY = 0;
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+
+      targetMouseX = Math.max(0, Math.min(1, x));
+      targetMouseY = Math.max(0, Math.min(1, y));
+      targetIntensity = 1.0;
+
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        targetIntensity = 0.0;
+      }, 250);
+    };
+
+    const handleMouseLeave = () => {
+      targetIntensity = 0.0;
+      if (idleTimer) clearTimeout(idleTimer);
+    };
+
+    container.addEventListener("mousemove", handleMouseMove);
+    container.addEventListener("mouseleave", handleMouseLeave);
+
+    // Resize handler
+    const updateSize = () => {
+      const rect = container.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.round(rect.width * dpr);
+      const h = Math.round(rect.height * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    };
+    updateSize();
+    window.addEventListener("resize", updateSize);
+
+    // Render Loop
+    let animationFrameId: number;
+    let startTime = performance.now();
+
+    const render = () => {
+      const now = performance.now();
+      const elapsed = (now - startTime) / 1000.0;
+
+      // Smooth lerp for mouse and intensity
+      const lerpFactor = 0.12;
+      currentMouseX += (targetMouseX - currentMouseX) * lerpFactor;
+      currentMouseY += (targetMouseY - currentMouseY) * lerpFactor;
+      currentIntensity += (targetIntensity - currentIntensity) * 0.08;
+
+      velX = currentMouseX - prevMouseX;
+      velY = currentMouseY - prevMouseY;
+      prevMouseX = currentMouseX;
+      prevMouseY = currentMouseY;
+
+      if (isTextureLoaded) {
+        gl.useProgram(program);
+        gl.uniform2f(uResolutionLoc, canvas.width, canvas.height);
+        gl.uniform2f(uMouseLoc, currentMouseX, currentMouseY);
+        gl.uniform1f(uIntensityLoc, currentIntensity);
+        gl.uniform1f(uTimeLoc, elapsed);
+        gl.uniform2f(uVelocityLoc, velX, velY);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.uniform1i(uTextureLoc, 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", updateSize);
+      container.removeEventListener("mousemove", handleMouseMove);
+      container.removeEventListener("mouseleave", handleMouseLeave);
+      if (idleTimer) clearTimeout(idleTimer);
+      cancelAnimationFrame(animationFrameId);
+      gl.deleteProgram(program);
+      gl.deleteShader(vertShader);
+      gl.deleteShader(fragShader);
+      gl.deleteBuffer(positionBuffer);
+      gl.deleteTexture(texture);
+    };
+  }, []);
+
+  // Trophy Mouse Move Handler Generator
+  const createTrophyMoveHandler = useCallback(
+    (setter: React.Dispatch<React.SetStateAction<TrophyState>>) => (e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width - 0.5;
+      const relY = (e.clientY - rect.top) / rect.height - 0.5;
+      setter({ isHovered: true, relX, relY });
+    },
+    []
+  );
+
   return (
     <section
       id="prizes"
-      className={`${bangers.variable} s-prizes relative z-10 overflow-hidden px-4 py-16 sm:py-24 md:px-8 md:py-32`}
+      ref={sectionRef}
+      className="relative w-full h-screen bg-[#000000] overflow-hidden flex items-center justify-center select-none"
     >
-      <div className="mx-auto max-w-6xl">
-        {/* Header Ribbon */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col items-start"
-        >
+      {/* 16:9 Desktop Viewport Stage Container */}
+      <div
+        ref={containerRef}
+        className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] aspect-[16/9] overflow-hidden bg-black flex items-center justify-center"
+        style={{ aspectRatio: "16 / 9" }}
+      >
+        {/* Layer 1: Master Background WebGL Canvas (with locked artwork & subtle cursor-guided blob mutation) */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none z-0"
+        />
 
+        {/* Fallback Static Master Background Image if WebGL initializes */}
+        <img
+          src="/images/Prizes/01_MASTER_BACKGROUND.png"
+          alt="Master Background"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none -z-10 opacity-0"
+        />
 
-          <div className="relative mt-3 sm:mt-4 flex flex-wrap items-baseline gap-4">
-            <h2
-              className="font-mono text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight text-[#f4f2ee] drop-shadow-[4px_4px_0px_#000]"
-              style={{ fontFamily: "var(--font-bangers), cursive" }}
+        {/* Layer 2: PRIZES Header — Matches Sponsors typography & GSAP animation */}
+        <div className="prizes-mark absolute top-[3%] sm:top-[4%] inset-x-0 z-30 flex flex-col items-center pointer-events-none text-center">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-block h-2 w-2 rounded-full bg-[#22b6d6] shadow-[0_0_10px_#22b6d6]" />
+            <span className="prizes-lede eyebrow text-[#22b6d6]">Spider-Society // Bounties &amp; Awards</span>
+          </div>
+
+          <div className="relative mt-0.5 overflow-hidden">
+            {/* Red Ghost */}
+            <span
+              aria-hidden="true"
+              className={`prizes-ghost display absolute inset-0 text-red opacity-0 select-none ${MARK_SIZE}`}
             >
-              PRIZES
+              Prizes
+            </span>
+            {/* Cyan Ghost */}
+            <span
+              aria-hidden="true"
+              className={`prizes-ghost display absolute inset-0 text-[#22b6d6] opacity-0 select-none ${MARK_SIZE}`}
+            >
+              Prizes
+            </span>
+            {/* Front Face */}
+            <h2 className={`prizes-mark-face display relative text-paper ${MARK_SIZE}`}>
+              Prizes
             </h2>
-            <div className="inline-flex items-center gap-2 border-[2.5px] border-[#0a0a10] bg-[#f7d117] px-3.5 py-1.5 font-mono text-xs sm:text-sm font-black uppercase text-[#0a0a10] shadow-[4px_4px_0px_#000] -rotate-1">
-              <span>TOTAL POOL: ₹1,00,000+ CASH</span>
+          </div>
+
+          <div className="prizes-lede mt-1.5 inline-flex items-center gap-2 border border-red/40 bg-black/75 backdrop-blur-md px-3.5 py-0.5 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider text-sand shadow-[0_0_15px_rgba(214,7,12,0.3)]">
+            <span className="text-red font-mono">⚡</span>
+            <span>TOTAL POOL: ₹1,00,000+ CASH</span>
+          </div>
+        </div>
+
+        {/* Layer 3-A: Trophies inside scale wrapper (glow + images + hitboxes) */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none z-10 origin-[50%_50%] scale-[0.72] sm:scale-[0.74] translate-y-[2%]">
+
+          {/* ── LEFT GLOW ── */}
+          <div
+            className={`absolute pointer-events-none transition-all duration-500 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl ${
+              leftTrophy.isHovered ? "opacity-95 scale-135" : "opacity-35 scale-95"
+            }`}
+            style={{
+              left: "24.23%", top: "52%", width: "32%", height: "70%",
+              background: "radial-gradient(ellipse at 50% 50%, rgba(229,48,140,0.7) 0%, rgba(214,7,12,0.35) 50%, transparent 75%)",
+            }}
+          />
+          {/* ── LEFT TROPHY IMAGE ── */}
+          <div
+            className="absolute inset-0 w-full h-full pointer-events-none will-change-transform z-10"
+            style={{
+              transformOrigin: "24.23% 60%",
+              transform: leftTrophy.isHovered
+                ? `translate3d(${leftTrophy.relX * 8}px, ${-22 + leftTrophy.relY * 6}px, 0) rotate(${-0.8 + leftTrophy.relX * 0.5}deg) scale(1.10)`
+                : "translate3d(0,0,0) rotate(0deg) scale(1)",
+              filter: leftTrophy.isHovered
+                ? "drop-shadow(0 0 35px rgba(229,48,140,0.75)) brightness(1.12)"
+                : "drop-shadow(0 15px 30px rgba(0,0,0,0.8))",
+              transition: "transform 0.45s cubic-bezier(0.22,1,0.36,1), filter 0.45s ease",
+            }}
+          >
+            <img src="/images/Prizes/03_LEFT_TROPHY.png" alt="2nd Place Award" className="w-full h-full object-contain" draggable={false} />
+          </div>
+          {/* ── LEFT HITBOX ── */}
+          <div
+            className="absolute cursor-pointer pointer-events-auto z-20"
+            style={{ left: "17%", top: "18%", width: "15%", height: "72%" }}
+            onMouseEnter={() => setLeftTrophy(prev => ({ ...prev, isHovered: true }))}
+            onMouseMove={createTrophyMoveHandler(setLeftTrophy)}
+            onMouseLeave={() => setLeftTrophy({ isHovered: false, relX: 0, relY: 0 })}
+            aria-label="2nd Prize Trophy Award"
+          />
+
+          {/* ── CENTER GLOW ── */}
+          <div
+            className={`absolute pointer-events-none transition-all duration-500 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl ${
+              centerTrophy.isHovered ? "opacity-100 scale-145" : "opacity-45 scale-95"
+            }`}
+            style={{
+              left: "49.16%", top: "46%", width: "32%", height: "75%",
+              background: "radial-gradient(ellipse at 50% 50%, rgba(255,230,0,0.75) 0%, rgba(255,170,0,0.4) 48%, transparent 75%)",
+            }}
+          />
+          {/* ── CENTER TROPHY IMAGE ── */}
+          <div
+            className="absolute inset-0 w-full h-full pointer-events-none will-change-transform z-10"
+            style={{
+              transformOrigin: "49.16% 55%",
+              transform: centerTrophy.isHovered
+                ? `translate3d(${centerTrophy.relX * 7}px, ${-26 + centerTrophy.relY * 5}px, 0) scale(1.12)`
+                : "translate3d(0,0,0) scale(1)",
+              filter: centerTrophy.isHovered
+                ? "drop-shadow(0 0 45px rgba(255,230,0,0.85)) brightness(1.15)"
+                : "drop-shadow(0 18px 35px rgba(0,0,0,0.85))",
+              transition: "transform 0.45s cubic-bezier(0.22,1,0.36,1), filter 0.45s ease",
+            }}
+          >
+            <img src="/images/Prizes/04_CENTER_TROPHY.png" alt="1st Place Champion Award" className="w-full h-full object-contain" draggable={false} />
+          </div>
+          {/* ── CENTER HITBOX ── */}
+          <div
+            className="absolute cursor-pointer pointer-events-auto z-20"
+            style={{ left: "42%", top: "16%", width: "15%", height: "72%" }}
+            onMouseEnter={() => setCenterTrophy(prev => ({ ...prev, isHovered: true }))}
+            onMouseMove={createTrophyMoveHandler(setCenterTrophy)}
+            onMouseLeave={() => setCenterTrophy({ isHovered: false, relX: 0, relY: 0 })}
+            aria-label="1st Prize Grand Champion Trophy Award"
+          />
+
+          {/* ── RIGHT GLOW ── */}
+          <div
+            className={`absolute pointer-events-none transition-all duration-500 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl ${
+              rightTrophy.isHovered ? "opacity-95 scale-135" : "opacity-35 scale-95"
+            }`}
+            style={{
+              left: "68.01%", top: "52%", width: "32%", height: "70%",
+              background: "radial-gradient(ellipse at 50% 50%, rgba(34,182,214,0.7) 0%, rgba(4,30,63,0.4) 50%, transparent 75%)",
+            }}
+          />
+          {/* ── RIGHT TROPHY IMAGE ── */}
+          <div
+            className="absolute inset-0 w-full h-full pointer-events-none will-change-transform z-10"
+            style={{
+              transformOrigin: "68.01% 60%",
+              transform: rightTrophy.isHovered
+                ? `translate3d(${rightTrophy.relX * 8}px, ${-22 + rightTrophy.relY * 6}px, 0) rotate(${0.8 + rightTrophy.relX * 0.5}deg) scale(1.10)`
+                : "translate3d(0,0,0) rotate(0deg) scale(1)",
+              filter: rightTrophy.isHovered
+                ? "drop-shadow(0 0 35px rgba(34,182,214,0.75)) brightness(1.12)"
+                : "drop-shadow(0 15px 30px rgba(0,0,0,0.8))",
+              transition: "transform 0.45s cubic-bezier(0.22,1,0.36,1), filter 0.45s ease",
+            }}
+          >
+            <img src="/images/Prizes/05_RIGHT_TROPHY.png" alt="3rd Place Award" className="w-full h-full object-contain" draggable={false} />
+          </div>
+          {/* ── RIGHT HITBOX ── */}
+          <div
+            className="absolute cursor-pointer pointer-events-auto z-20"
+            style={{ left: "60%", top: "18%", width: "15%", height: "72%" }}
+            onMouseEnter={() => setRightTrophy(prev => ({ ...prev, isHovered: true }))}
+            onMouseMove={createTrophyMoveHandler(setRightTrophy)}
+            onMouseLeave={() => setRightTrophy({ isHovered: false, relX: 0, relY: 0 })}
+            aria-label="3rd Prize Trophy Award"
+          />
+        </div>
+
+        {/* Layer 3-B: Prize cards — OUTSIDE the scale wrapper so they live in true container coords.
+            The trophy stage is scale(0.72) centred at 50%/50% with translate-y(2%).
+            The pedestal bases in the raw PNGs sit at ~85-90% of the image height.
+            After scale(0.72) + translate-y(2%): effective base ≈ 50% + (0.85-0.5)*0.72 + 2% ≈ 77-79% of container.
+            We pin cards at top:76% for side trophies, top:78% for the taller centre one. */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none z-30">
+
+          {/* ── 2ND PRIZE CARD (left, 24.23%) ── */}
+          <div
+            className="absolute pointer-events-auto"
+            style={{
+              left: "24.23%",
+              top: "76%",
+              transform: `translateX(-50%) translateY(${leftTrophy.isHovered ? "-8px" : "0px"})`,
+              transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
+            }}
+            onMouseEnter={() => setLeftTrophy(prev => ({ ...prev, isHovered: true }))}
+            onMouseLeave={() => setLeftTrophy({ isHovered: false, relX: 0, relY: 0 })}
+          >
+            <div className={`px-5 sm:px-6 py-2.5 rounded-2xl border-2 flex flex-col items-center min-w-[140px] sm:min-w-[170px] transition-all duration-300 ${
+              leftTrophy.isHovered
+                ? "bg-black/95 border-[#22b6d6] shadow-[0_0_35px_rgba(34,182,214,0.6)] scale-105"
+                : "bg-black/80 border-[#22b6d6]/40 backdrop-blur-md shadow-[0_6px_20px_rgba(0,0,0,0.8)]"
+            }`}>
+              <span className="font-mono text-[10px] sm:text-xs font-black tracking-widest text-[#22b6d6] uppercase">2ND PRIZE</span>
+              <span className="display text-2xl sm:text-3xl text-paper tracking-tight mt-0.5 leading-none">₹30,000</span>
             </div>
           </div>
 
-
-        </motion.div>
-
-        {/* Punk Spider-Verse Comic Cover Prize Grid */}
-        <div className="prize-grid">
-          {/* Cover P2: 1ST RUNNER UP (Cyan Tone) */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="cover p2 order-2 md:order-1"
+          {/* ── 1ST PRIZE CARD (centre, 49.16%) ── */}
+          <div
+            className="absolute pointer-events-auto"
+            style={{
+              left: "49.16%",
+              top: "78%",
+              transform: `translateX(-50%) translateY(${centerTrophy.isHovered ? "-10px" : "0px"})`,
+              transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
+            }}
+            onMouseEnter={() => setCenterTrophy(prev => ({ ...prev, isHovered: true }))}
+            onMouseLeave={() => setCenterTrophy({ isHovered: false, relX: 0, relY: 0 })}
           >
-            <div className="mast">
-              <span>ISSUE #02</span>
-              <span>EARTH-65 // GWEN</span>
+            <div className={`px-6 sm:px-8 py-2.5 rounded-2xl border-2 flex flex-col items-center min-w-[160px] sm:min-w-[195px] transition-all duration-300 ${
+              centerTrophy.isHovered
+                ? "bg-black/95 border-[#f7d117] shadow-[0_0_45px_rgba(247,209,23,0.7)] scale-105"
+                : "bg-black/85 border-[#f7d117]/60 backdrop-blur-md shadow-[0_6px_25px_rgba(0,0,0,0.85)]"
+            }`}>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px]">👑</span>
+                <span className="font-mono text-[10px] sm:text-xs font-black tracking-widest text-[#f7d117] uppercase">1ST PRIZE</span>
+                <span className="text-[10px]">👑</span>
+              </div>
+              <span className="display text-3xl sm:text-4xl text-[#f7d117] tracking-tight mt-0.5 leading-none drop-shadow-[0_2px_12px_rgba(247,209,23,0.5)]">₹50,000</span>
             </div>
+          </div>
 
-            <div className="rank">
-              <span>2ND<br />PLACE</span>
-            </div>
-
-            <div className="cover-img">
-              <img
-                src="/images/Prizes/second_prize.jpg"
-                alt="1st Runner Up Cover Art"
-              />
-            </div>
-
-            <div className="body">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#0a0a10]/70 block">
-                DIMENSIONAL FINALIST
-              </span>
-              <div className="amount text-[#0a0a10]">₹30,000</div>
-              <h3 className="font-mono text-xs font-black uppercase text-[#0a0a10] tracking-wide mt-0.5">
-                1ST RUNNER UP
-              </h3>
-
-
-            </div>
-          </motion.div>
-
-          {/* Cover P1: GRAND CHAMPION (Pink Tone with Yellow Starburst Rank) */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.5, delay: 0.0 }}
-            className="cover p1 order-1 md:order-2"
+          {/* ── 3RD PRIZE CARD (right, 68.01%) ── */}
+          <div
+            className="absolute pointer-events-auto"
+            style={{
+              left: "68.01%",
+              top: "76%",
+              transform: `translateX(-50%) translateY(${rightTrophy.isHovered ? "-8px" : "0px"})`,
+              transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
+            }}
+            onMouseEnter={() => setRightTrophy(prev => ({ ...prev, isHovered: true }))}
+            onMouseLeave={() => setRightTrophy({ isHovered: false, relX: 0, relY: 0 })}
           >
-            <div className="mast">
-              <span>ISSUE #01</span>
-              <span>EARTH-1610 // MILES</span>
+            <div className={`px-5 sm:px-6 py-2.5 rounded-2xl border-2 flex flex-col items-center min-w-[140px] sm:min-w-[170px] transition-all duration-300 ${
+              rightTrophy.isHovered
+                ? "bg-black/95 border-[#fcd49b] shadow-[0_0_35px_rgba(252,212,155,0.6)] scale-105"
+                : "bg-black/80 border-[#fcd49b]/40 backdrop-blur-md shadow-[0_6px_20px_rgba(0,0,0,0.8)]"
+            }`}>
+              <span className="font-mono text-[10px] sm:text-xs font-black tracking-widest text-[#fcd49b] uppercase">3RD PRIZE</span>
+              <span className="display text-2xl sm:text-3xl text-paper tracking-tight mt-0.5 leading-none">₹20,000</span>
             </div>
+          </div>
 
-            <div className="rank">
-              <span>1ST<br />PLACE</span>
-            </div>
-
-            <div className="cover-img">
-              <img
-                src="/images/Prizes/first_prize.jpg"
-                alt="Grand Champion Cover Art"
-              />
-            </div>
-
-            <div className="body">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#0a0a10]/70 block">
-                SPIDERVERSE CONQUEROR
-              </span>
-              <div className="amount text-[#ff2e88]">₹50,000</div>
-              <h3 className="font-mono text-xs font-black uppercase text-[#0a0a10] tracking-wide mt-0.5">
-                GRAND CHAMPION
-              </h3>
-
-
-            </div>
-          </motion.div>
-
-          {/* Cover P3: 2ND RUNNER UP (Sepia Tone) */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="cover p3 order-3 md:order-3"
-          >
-            <div className="mast">
-              <span>ISSUE #03</span>
-              <span>EARTH-50101 // PAVITR</span>
-            </div>
-
-            <div className="rank">
-              <span>3RD<br />PLACE</span>
-            </div>
-
-            <div className="cover-img">
-              <img
-                src="/images/Prizes/third_prize.jpg"
-                alt="2nd Runner Up Cover Art"
-              />
-            </div>
-
-            <div className="body">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#0a0a10]/70 block">
-                INNOVATION VANGUARD
-              </span>
-              <div className="amount text-[#0a0a10]">₹20,000</div>
-              <h3 className="font-mono text-xs font-black uppercase text-[#0a0a10] tracking-wide mt-0.5">
-                2ND RUNNER UP
-              </h3>
-
-
-            </div>
-          </motion.div>
         </div>
-
-
       </div>
     </section>
   );
