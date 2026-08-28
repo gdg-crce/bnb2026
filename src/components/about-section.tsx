@@ -212,7 +212,7 @@ export default function AboutSection() {
             ref={withCutRef}
             className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-start justify-center"
           >
-            <div className="relative h-[114%] w-full -top-[7%] flex items-start justify-center">
+            <div className="relative h-[114%] w-full -top-[2%] sm:-top-[1%] md:top-0 flex items-start justify-center translate-y-[2vh] sm:translate-y-[3vh] md:translate-y-[4vh]">
               <Image
                 src={withCutImg}
                 alt="About Us Subway Station Wall"
@@ -231,7 +231,7 @@ export default function AboutSection() {
           {/* Platform Foreground: miles.png (Stable, placed right below / platform foreground) */}
           <div
             ref={milesRef}
-            className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[4vh] sm:translate-y-[5vh] md:translate-y-[6vh]"
+            className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[12vh] sm:translate-y-[14vh] md:translate-y-[16vh]"
           >
             <div className="relative h-full w-full">
               <Image
