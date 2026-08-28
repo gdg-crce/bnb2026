@@ -56,7 +56,7 @@ export default function TimelineSection() {
             initial={{ height: "0%" }}
             whileInView={{ height: "100%" }}
             viewport={{ once: true }}
-            transition={{ duration: 2, ease: "easeOut" }}
+            transition={{ duration: 10, ease: "easeOut" }}
             className="w-full flex flex-col items-center overflow-hidden"
             style={{ 
               mixBlendMode: "screen",

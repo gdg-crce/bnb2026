@@ -4,9 +4,9 @@ import { useRef } from "react";
 import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 
-const SponsorCard = ({ sponsor, className = "h-32 sm:h-36", tileClass = "sponsor-tile" }: any) => (
+const SponsorCard = ({ sponsor, className = "aspect-[3/2]", tileClass = "sponsor-tile" }: any) => (
   <div className={`${tileClass} group relative p-1 bg-white/5 backdrop-blur-md rounded-2xl border-2 border-red-500/30 hover:border-[#22b6d6] transform-gpu transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,182,214,0.35)] hover:-translate-y-1.5 opacity-0 translate-y-8`}>
-    <div className={`relative w-full ${className} bg-black/40 rounded-xl overflow-hidden flex items-center justify-center p-4 transform-gpu`}>
+    <div className={`relative w-full ${className} bg-black/40 rounded-xl overflow-hidden flex items-center justify-center p-3 transform-gpu`}>
       <Image
         src={sponsor.image}
         alt={sponsor.name}
@@ -203,7 +203,7 @@ export default function SponsorsSection() {
             <div className="max-w-md mx-auto">
               <SponsorCard
                 sponsor={titleSponsors}
-                className="h-40 sm:h-48"
+                className="aspect-[21/9]"
               />
             </div>
           </div>
@@ -217,7 +217,7 @@ export default function SponsorsSection() {
             <div className="max-w-md mx-auto">
               <SponsorCard
                 sponsor={poweredBySponsor}
-                className="h-40 sm:h-48"
+                className="aspect-[21/9]"
               />
             </div>
           </div>
