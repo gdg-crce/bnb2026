@@ -19,6 +19,7 @@ export default function AboutSection() {
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const timelineScrollRef = useRef<HTMLDivElement>(null);
   const prizesContainerRef = useRef<HTMLDivElement>(null);
+  const transitionOverlayRef = useRef<HTMLDivElement>(null);
   const clipPathRef = useRef<SVGPathElement>(null);
   const strokePathRef = useRef<SVGPathElement>(null);
 
@@ -150,7 +151,7 @@ export default function AboutSection() {
 
         // 6. Locked hold on end of timeline from 0.46 -> 0.51 (user sees all rounds stationary)
 
-        // 7. Morphing Curve Transition - Phase 1: Master Artwork dome sweeps UP from bottom (0.51 -> 0.635)
+        // 7. Morphing Curve Transition: Master Artwork dome sweeps UP from bottom to cover the screen (0.51 -> 0.635)
         tl.to(
           curve,
           {
@@ -179,30 +180,27 @@ export default function AboutSection() {
           tl.set(prizesContainerRef.current, { opacity: 1, pointerEvents: "auto" }, 0.635);
         }
 
-        // 9. Morphing Curve Transition - Phase 2: Artwork dome rolls back DOWN to unveil full interactive Prizes (0.645 -> 0.76)
-        tl.to(
-          curve,
-          {
-            y: 50,
-            cpY: 0,
-            ease: "power2.in",
-            duration: 0.055,
-          },
-          0.645
+        // Hide transition overlay curtain at full cover so underlying interactive canvas takes over
+        if (transitionOverlayRef.current) {
+          tl.set(transitionOverlayRef.current, { opacity: 0 }, 0.635);
+        }
+
+        // 9. Prizes Section Elements Morph & Fade In organically on scroll (0.64 -> 0.74)
+        tl.fromTo(
+          ".prizes-mark",
+          { opacity: 0, y: -30 },
+          { opacity: 1, y: 0, ease: "power2.out", duration: 0.07 },
+          0.64
         );
 
-        tl.to(
-          curve,
-          {
-            y: 100,
-            cpY: 100,
-            ease: "power2.out",
-            duration: 0.06,
-          },
-          0.70
+        tl.fromTo(
+          ".prizes-trophies-wrap",
+          { opacity: 0, y: 35 },
+          { opacity: 1, y: 0, ease: "power2.out", duration: 0.08 },
+          0.65
         );
 
-        // 10. Prizes Section remains pinned, open & fully interactive from 0.76 -> 1.00 (Comfortable locked hold)
+        // 10. Prizes Section remains pinned, fully visible & interactive from 0.74 -> 1.00 (Comfortable locked hold)
       });
     },
     { scope: sectionRef },
@@ -392,45 +390,48 @@ export default function AboutSection() {
           <PrizesSection />
         </div>
 
-        {/* LAYER 4: Clipped Artwork Container inside the Rising Dome */}
+        {/* LAYER 4: Morphing Background Dome Overlay (100% pixel-aligned with Prizes 16:9 stage) */}
         <div
-          className="pointer-events-none absolute inset-0 z-40 h-full w-full select-none overflow-hidden bg-black"
-          style={{ clipPath: "url(#dome-clip)", WebkitClipPath: "url(#dome-clip)" }}
+          ref={transitionOverlayRef}
+          className="pointer-events-none absolute inset-0 z-40 h-full w-full select-none flex items-center justify-center overflow-hidden"
         >
-          {/* Master Background Artwork inside the Dome */}
-          <img
-            src="/images/Prizes/01_MASTER_BACKGROUND.png"
-            alt="Prizes Visual"
-            className="absolute inset-0 h-full w-full object-cover select-none pointer-events-none"
-          />
-          <div className="absolute inset-0 bg-black/20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/60" />
-        </div>
+          <div
+            className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] aspect-[16/9] overflow-hidden bg-black flex items-center justify-center"
+            style={{ clipPath: "url(#dome-clip)", WebkitClipPath: "url(#dome-clip)", aspectRatio: "16 / 9" }}
+          >
+            <img
+              src="/images/Prizes/01_MASTER_BACKGROUND.png"
+              alt="Prizes Visual"
+              className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
+            />
+          </div>
 
-        {/* SVG Definition for ClipPath and Cyan Rim Stroke */}
-        <svg
-          className="pointer-events-none absolute inset-0 z-42 h-full w-full select-none"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <defs>
-            <clipPath id="dome-clip" clipPathUnits="objectBoundingBox" transform="scale(0.01, 0.01)">
+          <div className="absolute inset-0 max-w-[177.78vh] max-h-[56.25vw] aspect-[16/9] pointer-events-none flex items-center justify-center mx-auto my-auto">
+            <svg
+              className="pointer-events-none w-full h-full select-none"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <clipPath id="dome-clip" clipPathUnits="objectBoundingBox" transform="scale(0.01, 0.01)">
+                  <path
+                    ref={clipPathRef}
+                    d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
+                  />
+                </clipPath>
+              </defs>
               <path
-                ref={clipPathRef}
+                ref={strokePathRef}
+                stroke="#22b6d6"
+                fill="none"
+                strokeWidth="1.5px"
+                vectorEffect="non-scaling-stroke"
                 d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
               />
-            </clipPath>
-          </defs>
-          <path
-            ref={strokePathRef}
-            stroke="#22b6d6"
-            fill="none"
-            strokeWidth="1.5px"
-            vectorEffect="non-scaling-stroke"
-            d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
-          />
-        </svg>
+            </svg>
+          </div>
+        </div>
 
       </div>
     </section>

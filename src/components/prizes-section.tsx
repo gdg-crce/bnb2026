@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
 
 const MARK_SIZE =
-  "text-[clamp(2.8rem,7vw,5.5rem)] md:text-[clamp(3.2rem,6vw,6.5rem)]";
+  "text-[clamp(3rem,14vw,5.5rem)] md:text-[clamp(3.5rem,8vw,7rem)]";
 
 // WebGL Shaders for Cursor-Guided Organic Blob Mutation
 const VERTEX_SHADER_SOURCE = `
@@ -307,6 +307,35 @@ export default function PrizesSection() {
     };
   }, []);
 
+  useGSAP(
+    () => {
+      const media = gsap.matchMedia();
+
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        // Chromatic split on header matching sponsors section
+        gsap.fromTo(
+          ".prizes-ghost",
+          { xPercent: (i: number) => (i === 0 ? -3.5 : 3.5), opacity: 0 },
+          {
+            xPercent: (i: number) => (i === 0 ? -0.4 : 0.4),
+            opacity: 1,
+            duration: 1.5,
+            ease: "power4.out",
+          },
+        );
+
+        const split = new SplitText(".prizes-mark-face", { type: "chars" });
+        gsap.from(split.chars, {
+          yPercent: 110,
+          stagger: 0.04,
+          duration: 1.1,
+          ease: "power4.out",
+        });
+      });
+    },
+    { scope: sectionRef },
+  );
+
   const createTrophyMoveHandler = useCallback(
     (setter: React.Dispatch<React.SetStateAction<TrophyState>>) => (e: React.MouseEvent<HTMLDivElement>) => {
       const rect = e.currentTarget.getBoundingClientRect();
@@ -342,14 +371,14 @@ export default function PrizesSection() {
           className="absolute inset-0 w-full h-full object-contain pointer-events-none -z-10 opacity-0"
         />
 
-        {/* Layer 2: PRIZES Header */}
-        <div className="prizes-mark absolute top-[3%] sm:top-[4%] inset-x-0 z-30 flex flex-col items-center pointer-events-none text-center">
-          <div className="flex items-center gap-2 mb-1">
+        {/* Layer 2: PRIZES Header matching Sponsors Typography */}
+        <div className="prizes-mark absolute top-[2.5%] sm:top-[3.5%] inset-x-0 z-30 flex flex-col items-center pointer-events-none text-center">
+          <div className="flex items-center gap-3">
             <span className="inline-block h-2 w-2 rounded-full bg-[#22b6d6] shadow-[0_0_10px_#22b6d6]" />
-            <span className="prizes-lede eyebrow text-[#22b6d6]">Spider-Society // Bounties &amp; Awards</span>
+            <span className="eyebrow text-[#22b6d6]">Spider-Society // Bounties &amp; Awards</span>
           </div>
 
-          <div className="relative mt-0.5 overflow-hidden">
+          <div className="relative mt-1 sm:mt-2 overflow-hidden">
             {/* Red Ghost */}
             <span
               aria-hidden="true"
@@ -370,18 +399,18 @@ export default function PrizesSection() {
             </h2>
           </div>
 
-          <div className="prizes-lede mt-1.5 inline-flex items-center gap-2 border border-red/40 bg-black/75 backdrop-blur-md px-3.5 py-0.5 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider text-sand shadow-[0_0_15px_rgba(214,7,12,0.3)]">
+          <div className="prizes-lede mt-1 sm:mt-2 inline-flex items-center gap-2 border border-red/40 bg-black/75 backdrop-blur-md px-4 py-1 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider text-sand shadow-[0_0_15px_rgba(214,7,12,0.3)]">
             <span className="text-red font-mono">⚡</span>
             <span>TOTAL POOL: ₹1,00,000+ CASH</span>
           </div>
         </div>
 
-        {/* Layer 3-A: Trophies inside scale wrapper */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none z-10 origin-[50%_50%] scale-[0.72] sm:scale-[0.74] translate-y-[2%]">
+        {/* Layer 3: Scaled Trophies & Prize Cards Stage */}
+        <div className="prizes-trophies-wrap absolute inset-0 w-full h-full pointer-events-none z-10 origin-[50%_50%] scale-[0.66] sm:scale-[0.68] md:scale-[0.70] translate-y-[6%] sm:translate-y-[7%]">
           {/* ── LEFT GLOW ── */}
           <div
             className={`absolute pointer-events-none transition-all duration-500 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl ${
-              leftTrophy.isHovered ? "opacity-95 scale-135" : "opacity-35 scale-95"
+              leftTrophy.isHovered ? "opacity-95 scale-135" : "opacity-0 scale-95 pointer-events-none"
             }`}
             style={{
               left: "24.23%", top: "52%", width: "32%", height: "70%",
@@ -417,7 +446,7 @@ export default function PrizesSection() {
           {/* ── CENTER GLOW ── */}
           <div
             className={`absolute pointer-events-none transition-all duration-500 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl ${
-              centerTrophy.isHovered ? "opacity-100 scale-145" : "opacity-45 scale-95"
+              centerTrophy.isHovered ? "opacity-100 scale-145" : "opacity-0 scale-95 pointer-events-none"
             }`}
             style={{
               left: "49.16%", top: "46%", width: "32%", height: "75%",
@@ -453,7 +482,7 @@ export default function PrizesSection() {
           {/* ── RIGHT GLOW ── */}
           <div
             className={`absolute pointer-events-none transition-all duration-500 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl ${
-              rightTrophy.isHovered ? "opacity-95 scale-135" : "opacity-35 scale-95"
+              rightTrophy.isHovered ? "opacity-95 scale-135" : "opacity-0 scale-95 pointer-events-none"
             }`}
             style={{
               left: "68.01%", top: "52%", width: "32%", height: "70%",
@@ -485,16 +514,13 @@ export default function PrizesSection() {
             onMouseLeave={() => setRightTrophy({ isHovered: false, relX: 0, relY: 0 })}
             aria-label="3rd Prize Trophy Award"
           />
-        </div>
 
-        {/* Layer 3-B: Prize cards */}
-        <div className="absolute inset-0 w-full h-full pointer-events-none z-30">
           {/* ── 2ND PRIZE CARD ── */}
           <div
-            className="absolute pointer-events-auto"
+            className="absolute pointer-events-auto z-30"
             style={{
               left: "24.23%",
-              top: "76%",
+              top: "73%",
               transform: `translateX(-50%) translateY(${leftTrophy.isHovered ? "-8px" : "0px"})`,
               transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
             }}
@@ -513,10 +539,10 @@ export default function PrizesSection() {
 
           {/* ── 1ST PRIZE CARD ── */}
           <div
-            className="absolute pointer-events-auto"
+            className="absolute pointer-events-auto z-30"
             style={{
               left: "49.16%",
-              top: "78%",
+              top: "76%",
               transform: `translateX(-50%) translateY(${centerTrophy.isHovered ? "-10px" : "0px"})`,
               transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
             }}
@@ -539,10 +565,10 @@ export default function PrizesSection() {
 
           {/* ── 3RD PRIZE CARD ── */}
           <div
-            className="absolute pointer-events-auto"
+            className="absolute pointer-events-auto z-30"
             style={{
               left: "68.01%",
-              top: "76%",
+              top: "73%",
               transform: `translateX(-50%) translateY(${rightTrophy.isHovered ? "-8px" : "0px"})`,
               transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
             }}
