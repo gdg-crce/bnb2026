@@ -175,6 +175,8 @@ export default function HeroVideo() {
             revealSize={300}
           />
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(0,0,0,0.38)_100%)]" />
+          {/* Feather the bottom edge to blend seamlessly into the black pipes section below */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
         </div>
 
         {/* Layer 1: logo.png (Fades in from top, positioned lower into hero focal area) */}

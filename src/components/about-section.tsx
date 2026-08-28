@@ -404,11 +404,10 @@ export default function AboutSection() {
                       key={tab.key}
                       type="button"
                       onClick={() => setActiveFilter(tab.key)}
-                      className={`border-2 px-3 py-1 font-mono text-[10px] sm:text-[11px] font-black tracking-wider uppercase transition-all duration-200 cursor-pointer ${
-                        isActive
+                      className={`border-2 px-3 py-1 font-mono text-[10px] sm:text-[11px] font-black tracking-wider uppercase transition-all duration-200 cursor-pointer ${isActive
                           ? "border-[#FFE600] bg-[#FFE600] text-black shadow-[2px_2px_0px_#000]"
                           : "border-paper/20 bg-ink/70 text-paper/80 hover:border-paper/40 hover:text-paper"
-                      }`}
+                        }`}
                     >
                       {tab.label}
                     </button>
@@ -450,13 +449,12 @@ export default function AboutSection() {
                         </div>
 
                         <span
-                          className={`font-mono text-[8.5px] font-bold px-1.5 py-0.5 uppercase border ${
-                            event.status === "COMPLETED"
+                          className={`font-mono text-[8.5px] font-bold px-1.5 py-0.5 uppercase border ${event.status === "COMPLETED"
                               ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
                               : event.status === "LIVE"
-                              ? "border-amber-400/60 bg-amber-400/20 text-amber-300 animate-pulse"
-                              : "border-paper/20 bg-void/60 text-muted"
-                          }`}
+                                ? "border-amber-400/60 bg-amber-400/20 text-amber-300 animate-pulse"
+                                : "border-paper/20 bg-void/60 text-muted"
+                            }`}
                         >
                           {event.status}
                         </span>
@@ -536,7 +534,7 @@ export default function AboutSection() {
 
           {/* Stationary Miles on Sofa */}
           <div className="absolute inset-x-0 -bottom-10 sm:-bottom-14 md:-bottom-20 z-10 flex w-full justify-center items-end px-2 pb-0">
-            <div className="relative flex max-h-[82vh] md:max-h-[88vh] w-[min(96vw,1320px)] scale-105 md:scale-115 origin-bottom items-end justify-center">
+            <div className="relative flex max-h-[82vh] md:max-h-[88vh] w-[min(96vw,1320px)] scale-95 md:scale-105 origin-bottom items-end justify-center">
               <Image
                 src={milesSofa}
                 alt="Miles Morales on Sofa"

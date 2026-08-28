@@ -8,6 +8,7 @@ import pipesImg from "../../public/images/pipes.png";
  * Pipes Transition Section:
  * Full-vibrant undimmed pipes.png connecting Hero to About,
  * with the bitNbuild countdown timer centered cleanly on top.
+ * Features a feathered mask gradient to blend smoothly into adjacent black sections.
  */
 export default function PipesSection() {
   return (
@@ -15,7 +16,13 @@ export default function PipesSection() {
       <h2 className="sr-only">Countdown & Conduit Transition</h2>
 
       {/* Vibrant High-Brightness Conduit Pipes Background */}
-      <div className="absolute inset-0 z-0 h-full w-full">
+      <div 
+        className="absolute inset-0 z-0 h-full w-full"
+        style={{
+          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)"
+        }}
+      >
         <Image
           src={pipesImg}
           alt="Multiverse Conduit Pipes Transition"
