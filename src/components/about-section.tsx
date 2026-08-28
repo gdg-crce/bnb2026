@@ -3,8 +3,8 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import bgAboutUs from "../../public/aboutus.png";
-import milesSofa from "../../public/images/milessofa.png";
+import withCutImg from "../../public/about/withcut.png";
+import milesImg from "../../public/about/miles.png";
 import bigTrainTightImg from "../../public/bigtrain-tight.png";
 import timelineBg from "../../public/images/timeline-bg.jpg";
 import { motion } from "framer-motion";
@@ -12,15 +12,17 @@ import TimelineSection from "./timeline-section";
 
 /**
  * About & Timeline Train Wipe Section:
- * 1. Initial State: The About room with stationary Miles on sofa.
+ * 1. Initial State: The About room with withcut.png (wall/graffiti with parallax) from the top,
+ *    and miles.png (Miles on sofa on the subway platform) stably right below it.
  * 2. On Scroll: The Subway Train drives from left to right across the screen.
  * 3. The passing train directly wipes away the About room and unveils the Timeline section underneath.
  * 4. Once the train has completely passed to the right, the Timeline section is right there in place.
- * 5. No awkward domain section scrolling down — the transition is seamless and direct.
  */
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const aboutRoomRef = useRef<HTMLDivElement>(null);
+  const withCutRef = useRef<HTMLDivElement>(null);
+  const milesRef = useRef<HTMLDivElement>(null);
   const trainRef = useRef<HTMLDivElement>(null);
   const headlightsRef = useRef<HTMLDivElement>(null);
   const timelineScrollRef = useRef<HTMLDivElement>(null);
@@ -41,6 +43,25 @@ export default function AboutSection() {
 
         if (aboutRoomRef.current) {
           gsap.set(aboutRoomRef.current, { opacity: 1 });
+        }
+
+        // Parallax effect on withcut.png background wall while miles.png stays stable
+        if (withCutRef.current) {
+          gsap.fromTo(
+            withCutRef.current,
+            { yPercent: -4, scale: 1.03 },
+            {
+              yPercent: 4,
+              scale: 1.01,
+              ease: "none",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1.2,
+              },
+            }
+          );
         }
 
         const tl = gsap.timeline({
@@ -120,10 +141,40 @@ export default function AboutSection() {
     { scope: sectionRef },
   );
 
+  // Subtle interactive mouse parallax for withcut.png (desktop depth)
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!withCutRef.current) return;
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    const xOffset = ((clientX / innerWidth) - 0.5) * -20;
+    const yOffset = ((clientY / innerHeight) - 0.5) * -12;
+
+    gsap.to(withCutRef.current, {
+      x: xOffset,
+      y: yOffset,
+      duration: 0.7,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    if (!withCutRef.current) return;
+    gsap.to(withCutRef.current, {
+      x: 0,
+      y: 0,
+      duration: 0.9,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
   return (
     <section
       id="about"
       ref={sectionRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className="relative h-[700vh] w-full bg-black -mt-px -mb-[100vh]"
     >
       <h2 className="sr-only">About Us & Hackathon Timeline</h2>
@@ -146,42 +197,50 @@ export default function AboutSection() {
 
         {/* 
           ══════════════════════════════════════════════════════════════
-          LAYER 1 (Middle): Pristine About Us Room (bg-aboutus.png + milessofa.png)
-          - Starts visible on top of Timeline
+          LAYER 1 (Middle): About Us Room (withcut.png + miles.png)
+          - withcut.png: Placed from top of section with parallax depth effect
+          - miles.png: Placed right below it, stable on the subway platform
           - Wiped away as the train moves from left to right
           ══════════════════════════════════════════════════════════════
         */}
         <div
           ref={aboutRoomRef}
-          className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform"
+          className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform overflow-hidden"
         >
-          {/* Wall with subtle parallax */}
+          {/* Wall Background: withcut.png (Top-anchored with parallax motion) */}
           <div
-            className="absolute inset-0 h-full will-change-transform"
+            ref={withCutRef}
+            className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-start justify-center"
           >
-            <div className="relative h-full w-full overflow-hidden">
+            <div className="relative h-[114%] w-full -top-[7%] flex items-start justify-center">
               <Image
-                src={bgAboutUs}
-                alt="About Us Room Background"
+                src={withCutImg}
+                alt="About Us Subway Station Wall"
                 fill
                 priority
                 sizes="100vw"
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full object-cover object-top select-none"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.45)_100%)]" />
+              {/* Atmospheric lighting & contrast enhancement */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-black/45" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.5)_100%)]" />
             </div>
           </div>
 
-          {/* Stationary Miles on Sofa */}
-          <div className="absolute inset-x-0 -bottom-10 sm:-bottom-14 md:-bottom-20 z-10 flex w-full justify-center items-end px-2 pb-0">
-            <div className="relative flex max-h-[82vh] md:max-h-[88vh] w-[min(96vw,1320px)] scale-95 md:scale-105 origin-bottom items-end justify-center">
+          {/* Platform Foreground: miles.png (Stable, placed right below / platform foreground) */}
+          <div
+            ref={milesRef}
+            className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[4vh] sm:translate-y-[5vh] md:translate-y-[6vh]"
+          >
+            <div className="relative h-full w-full">
               <Image
-                src={milesSofa}
-                alt="Miles Morales on Sofa"
+                src={milesImg}
+                alt="Miles Morales on Subway Platform Sofa"
+                fill
                 priority
-                sizes="(max-width: 768px) 96vw, 1320px"
-                className="h-auto w-full object-contain drop-shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
+                sizes="100vw"
+                className="h-full w-full object-cover object-bottom select-none drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
               />
             </div>
           </div>
