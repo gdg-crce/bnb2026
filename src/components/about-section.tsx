@@ -9,44 +9,6 @@ import bigTrainTightImg from "../../public/bigtrain-tight.png";
 import TimelineSection from "./timeline-section";
 import PrizesSection from "./prizes-section";
 
-const NUM_OVERLAY_POINTS = 10;
-const NUM_OVERLAY_PATHS = 3;
-const OVERLAY_POINT_OFFSETS = [0.0, 0.04, 0.015, 0.06, 0.02, 0.05, 0.01, 0.045, 0.03, 0.015];
-
-/**
- * Builds a continuous closed polygon path with cubic bezier curves for both top and bottom edges.
- * - topY = 0, bottomY = 0       -> 0 height at top (invisible)
- * - topY = 0, bottomY = 100     -> Full screen coverage (100% filled)
- * - topY = 100, bottomY = 100   -> 0 height at bottom (invisible)
- */
-function buildLiquidPathD(topY: number[], bottomY: number[]): string {
-  const n = NUM_OVERLAY_POINTS;
-  let d = `M 0 ${topY[0]}`;
-
-  // Top edge (left to right: x: 0 -> 100)
-  for (let j = 0; j < n - 1; j++) {
-    const p1 = (j / (n - 1)) * 100;
-    const p2 = ((j + 1) / (n - 1)) * 100;
-    const cp1 = p1 + (p2 - p1) / 2;
-    d += ` C ${cp1} ${topY[j]} ${cp1} ${topY[j + 1]} ${p2} ${topY[j + 1]}`;
-  }
-
-  // Right vertical segment to bottom edge
-  d += ` L 100 ${bottomY[n - 1]}`;
-
-  // Bottom edge (right to left: x: 100 -> 0)
-  for (let j = n - 1; j > 0; j--) {
-    const p1 = (j / (n - 1)) * 100;
-    const p2 = ((j - 1) / (n - 1)) * 100;
-    const cp1 = p1 + (p2 - p1) / 2;
-    d += ` C ${cp1} ${bottomY[j]} ${cp1} ${bottomY[j - 1]} ${p2} ${bottomY[j - 1]}`;
-  }
-
-  // Close back to top-left
-  d += ` Z`;
-  return d;
-}
-
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const aboutRoomRef = useRef<HTMLDivElement>(null);
@@ -57,7 +19,8 @@ export default function AboutSection() {
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const timelineScrollRef = useRef<HTMLDivElement>(null);
   const prizesContainerRef = useRef<HTMLDivElement>(null);
-  const svgOverlayRef = useRef<SVGSVGElement>(null);
+  const clipPathRef = useRef<SVGPathElement>(null);
+  const strokePathRef = useRef<SVGPathElement>(null);
 
   useGSAP(
     () => {
@@ -98,85 +61,78 @@ export default function AboutSection() {
                 trigger: sectionRef.current,
                 start: "top bottom",
                 end: "bottom top",
-                scrub: 1.2,
+                scrub: 0.8,
               },
             }
           );
         }
 
-        // Dynamic Morphing SVG setup
-        const svg = svgOverlayRef.current;
-        const pathEls = svg
-          ? Array.from(svg.querySelectorAll<SVGPathElement>(".shape-overlays__path"))
-          : [];
+        // Curve Animation State for Quadratic Bezier Morphing
+        const curve = {
+          y: 100,
+          cpY: 100,
+        };
 
-        const allTopY: number[][] = [];
-        const allBottomY: number[][] = [];
-
-        for (let i = 0; i < NUM_OVERLAY_PATHS; i++) {
-          allTopY.push(Array(NUM_OVERLAY_POINTS).fill(0));
-          allBottomY.push(Array(NUM_OVERLAY_POINTS).fill(0));
-        }
-
-        function renderOverlay() {
-          if (pathEls.length < NUM_OVERLAY_PATHS) return;
-          for (let i = 0; i < NUM_OVERLAY_PATHS; i++) {
-            const path = pathEls[i];
-            if (!path) continue;
-            path.setAttribute("d", buildLiquidPathD(allTopY[i], allBottomY[i]));
+        const updatePath = () => {
+          const d = `M 0 100 V ${curve.y} Q 50 ${curve.cpY} 100 ${curve.y} V 100 z`;
+          if (clipPathRef.current) {
+            clipPathRef.current.setAttribute("d", d);
           }
-        }
+          if (strokePathRef.current) {
+            strokePathRef.current.setAttribute("d", d);
+          }
+        };
 
-        // Initial state: 0 height at top (invisible)
-        renderOverlay();
+        // Initial state: Flat at bottom (invisible)
+        updatePath();
 
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1.4,
+            scrub: 0.8,
           },
-          onUpdate: renderOverlay,
+          onUpdate: updatePath,
         });
 
-        // 1. Phase 1: Generous hold on About Us room before train enters (0.00 -> 0.03)
+        // 1. Phase 1: Hold on About Us room before train enters (0.00 -> 0.02)
         tl.fromTo(
           headlightsRef.current,
           { opacity: 0, scale: 0.8 },
           { opacity: 1, scale: 1, ease: "power2.out", duration: 0.02 },
-          0.03
+          0.02
         );
 
-        // Train rolls in smoothly from left to center (0.03 -> 0.10)
+        // Train rolls in smoothly from left to center (0.02 -> 0.08)
         tl.to(
           trainRef.current,
-          { xPercent: 0, ease: "power1.out", duration: 0.07 },
-          0.03
+          { xPercent: 0, ease: "power1.out", duration: 0.06 },
+          0.02
         );
 
-        // 2. Dissolve About room as train covers the scene (0.06 -> 0.10)
+        // 2. Dissolve About room as train covers the scene (0.04 -> 0.08)
         tl.to(
           aboutRoomRef.current,
           { opacity: 0, ease: "power1.inOut", duration: 0.04 },
-          0.06
+          0.04
         );
 
-        // 3. Phase 2: Slow crawl/deceleration when train fits the screen wholly (0.10 -> 0.15)
+        // 3. Phase 2: Slow crawl when train fits the screen (0.08 -> 0.11)
         tl.to(
           trainRef.current,
-          { xPercent: 14, ease: "none", duration: 0.05 },
-          0.10
+          { xPercent: 14, ease: "none", duration: 0.03 },
+          0.08
         );
 
-        // 4. Phase 3: Train smoothly departs OUT to the right (0.15 -> 0.22)
+        // 4. Phase 3: Train smoothly departs OUT to the right (0.11 -> 0.16)
         tl.to(
           trainRef.current,
-          { xPercent: 170, ease: "power1.in", duration: 0.07 },
-          0.15
+          { xPercent: 170, ease: "power1.in", duration: 0.05 },
+          0.11
         );
 
-        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.22 -> 0.46)
+        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.16 -> 0.46)
         tl.to(
           timelineScrollRef.current,
           {
@@ -187,32 +143,35 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.24,
+            duration: 0.30,
           },
-          0.22
+          0.16
         );
 
         // 6. Locked hold on end of timeline from 0.46 -> 0.51 (user sees all rounds stationary)
 
-        // 7. Dynamic Morphing SVG wave sweeps down from top to cover locked timeline (0.51 -> 0.63)
-        for (let i = 0; i < NUM_OVERLAY_PATHS; i++) {
-          const bottomPts = allBottomY[i];
-          const pathDelay = i * 0.02;
-          for (let j = 0; j < NUM_OVERLAY_POINTS; j++) {
-            const ptDelay = OVERLAY_POINT_OFFSETS[j] * 0.03;
-            const start = 0.51 + ptDelay + pathDelay;
-            const dur = 0.63 - start;
-            tl.to(
-              bottomPts,
-              {
-                [j]: 100,
-                ease: "power2.inOut",
-                duration: Math.max(dur, 0.06),
-              },
-              start
-            );
-          }
-        }
+        // 7. Morphing Curve Transition - Phase 1: Master Artwork dome sweeps UP from bottom (0.51 -> 0.635)
+        tl.to(
+          curve,
+          {
+            y: 50,
+            cpY: 0,
+            ease: "power2.in",
+            duration: 0.06,
+          },
+          0.51
+        );
+
+        tl.to(
+          curve,
+          {
+            y: 0,
+            cpY: 0,
+            ease: "power2.out",
+            duration: 0.065,
+          },
+          0.57
+        );
 
         // 8. Under-Curtain Switch at Full Cover (0.635): Switch view from Timeline to Prizes
         if (timelineContainerRef.current && prizesContainerRef.current) {
@@ -220,27 +179,30 @@ export default function AboutSection() {
           tl.set(prizesContainerRef.current, { opacity: 1, pointerEvents: "auto" }, 0.635);
         }
 
-        // 9. Dynamic Morphing SVG wave pulls down to bottom, revealing Prizes stage (0.64 -> 0.75)
-        for (let i = 0; i < NUM_OVERLAY_PATHS; i++) {
-          const topPts = allTopY[i];
-          const pathDelay = (NUM_OVERLAY_PATHS - i - 1) * 0.02;
-          for (let j = 0; j < NUM_OVERLAY_POINTS; j++) {
-            const ptDelay = OVERLAY_POINT_OFFSETS[j] * 0.03;
-            const start = 0.64 + ptDelay + pathDelay;
-            const dur = 0.75 - start;
-            tl.to(
-              topPts,
-              {
-                [j]: 100,
-                ease: "power2.inOut",
-                duration: Math.max(dur, 0.06),
-              },
-              start
-            );
-          }
-        }
+        // 9. Morphing Curve Transition - Phase 2: Artwork dome rolls back DOWN to unveil full interactive Prizes (0.645 -> 0.76)
+        tl.to(
+          curve,
+          {
+            y: 50,
+            cpY: 0,
+            ease: "power2.in",
+            duration: 0.055,
+          },
+          0.645
+        );
 
-        // 10. Prizes Section remains pinned, open & fully interactive from 0.75 -> 1.00 (Comfortable locked hold)
+        tl.to(
+          curve,
+          {
+            y: 100,
+            cpY: 100,
+            ease: "power2.out",
+            duration: 0.06,
+          },
+          0.70
+        );
+
+        // 10. Prizes Section remains pinned, open & fully interactive from 0.76 -> 1.00 (Comfortable locked hold)
       });
     },
     { scope: sectionRef },
@@ -280,7 +242,7 @@ export default function AboutSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative h-[950vh] w-full bg-black -mt-px -mb-px"
+      className="relative h-[650vh] w-full bg-black -mt-px -mb-px"
     >
       <h2 className="sr-only">About Us, Timeline & Prizes</h2>
 
@@ -430,40 +392,44 @@ export default function AboutSection() {
           <PrizesSection />
         </div>
 
-        {/* LAYER 4: Dynamic Morphing SVG Overlay */}
+        {/* LAYER 4: Clipped Artwork Container inside the Rising Dome */}
+        <div
+          className="pointer-events-none absolute inset-0 z-40 h-full w-full select-none overflow-hidden bg-black"
+          style={{ clipPath: "url(#dome-clip)", WebkitClipPath: "url(#dome-clip)" }}
+        >
+          {/* Master Background Artwork inside the Dome */}
+          <img
+            src="/images/Prizes/01_MASTER_BACKGROUND.png"
+            alt="Prizes Visual"
+            className="absolute inset-0 h-full w-full object-cover select-none pointer-events-none"
+          />
+          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/60" />
+        </div>
+
+        {/* SVG Definition for ClipPath and Cyan Rim Stroke */}
         <svg
-          ref={svgOverlayRef}
-          className="shape-overlays pointer-events-none absolute inset-0 z-40 h-full w-full select-none"
+          className="pointer-events-none absolute inset-0 z-42 h-full w-full select-none"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
           aria-hidden="true"
         >
           <defs>
-            {/* Layer 1: Crimson Red to Gwen Magenta */}
-            <linearGradient id="about-trans-grad-1" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#d6070c" />
-              <stop offset="60%" stopColor="#e5308c" />
-              <stop offset="100%" stopColor="#7a0016" />
-            </linearGradient>
-
-            {/* Layer 2: Electric Cyan to Midnight Navy */}
-            <linearGradient id="about-trans-grad-2" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#22b6d6" />
-              <stop offset="50%" stopColor="#0a4b6e" />
-              <stop offset="100%" stopColor="#041e3f" />
-            </linearGradient>
-
-            {/* Layer 3: Deep Void with Crimson Rim */}
-            <linearGradient id="about-trans-grad-3" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#0e100f" />
-              <stop offset="80%" stopColor="#1a0408" />
-              <stop offset="100%" stopColor="#d6070c" />
-            </linearGradient>
+            <clipPath id="dome-clip" clipPathUnits="objectBoundingBox" transform="scale(0.01, 0.01)">
+              <path
+                ref={clipPathRef}
+                d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
+              />
+            </clipPath>
           </defs>
-
-          <path className="shape-overlays__path" fill="url(#about-trans-grad-1)" />
-          <path className="shape-overlays__path" fill="url(#about-trans-grad-2)" />
-          <path className="shape-overlays__path" fill="url(#about-trans-grad-3)" />
+          <path
+            ref={strokePathRef}
+            stroke="#22b6d6"
+            fill="none"
+            strokeWidth="1.5px"
+            vectorEffect="non-scaling-stroke"
+            d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
+          />
         </svg>
 
       </div>
