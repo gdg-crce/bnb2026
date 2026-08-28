@@ -1,19 +1,25 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
+
+import { Squada_One } from "next/font/google";
+
+const squada = Squada_One({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 export default function TimelineSection() {
   const events = [
-    "/images/Timeline/20.png",
-    "/images/Timeline/21.png",
-    "/images/Timeline/22.png",
-    "/images/Timeline/23.png",
-    "/images/Timeline/24.png",
-    "/images/Timeline/25.png",
-    "/images/Timeline/26.png",
-    "/images/Timeline/27.png",
-    "/images/Timeline/28.png",
+    "REGISTRATIONS",
+    "INTERNAL STATE ROUNDS",
+    "MAHARASHTRA STATE ROUND",
+    "FINAL ROUND",
+    "HACKATHON BEGINS",
+    "MENTORING SESSION",
+    "JUDGING ROUNDS 1 & 2",
+    "HACKATHON ENDS",
+    "RESULT DECLARATION",
   ];
 
   return (
@@ -57,21 +63,37 @@ export default function TimelineSection() {
         </div>
 
         {/* Timeline Events Container - NOW RELATIVE to push the section height naturally */}
-        <div className="relative left-[30%] md:left-[25%] lg:left-[20%] w-[65%] md:w-[60%] lg:w-[50%] flex flex-col gap-2 sm:gap-2 md:gap-3 lg:gap-4 pointer-events-auto z-20">
-          {events.map((src, index) => (
+        <div className="relative mt-12 sm:mt-16 md:mt-20 lg:mt-28 left-[30%] md:left-[25%] lg:left-[20%] w-[65%] md:w-[60%] lg:w-[50%] flex flex-col gap-8 sm:gap-10 md:gap-12 lg:gap-20 pointer-events-auto z-20">
+          {events.map((event, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, x: 50, filter: "blur(10px)" }}
               whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-              className="w-full flex justify-start"
+              className="w-full flex justify-start py-1"
             >
-              <img
-                src={src}
-                alt={`Timeline Event ${index + 1}`}
-                className="h-14 sm:h-16 md:h-24 lg:h-32 w-auto drop-shadow-2xl hover:scale-[1.02] transition-transform duration-300 origin-left"
-              />
+              <h3
+                className={`${squada.className} font-bold text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.5rem] leading-none tracking-normal uppercase cursor-default hover:scale-[1.02] transition-transform duration-300 origin-left`}
+                style={{
+                  color: "#ffd369",
+                  WebkitTextStroke: "2px #4a154b",
+                  textShadow: `
+                    -1px 1px 0 #7b165d,
+                    -2px 2px 0 #691765,
+                    -3px 3px 0 #58186e,
+                    -4px 4px 0 #461976,
+                    -5px 5px 0 #351a7f,
+                    -6px 6px 0 #231b87,
+                    -7px 7px 0 #121c90,
+                    -8px 7px 0 #1a0526,
+                    -7px 8px 0 #1a0526,
+                    -8px 8px 0 #1a0526
+                  `,
+                }}
+              >
+                {event}
+              </h3>
             </motion.div>
           ))}
         </div>
