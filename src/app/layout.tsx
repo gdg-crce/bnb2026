@@ -24,7 +24,7 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "bitNbuild",
-  description: "A 50-hour build. Google Developer Groups.",
+  description: "A 24-hour build. Google Developer Groups.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

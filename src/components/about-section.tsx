@@ -2,22 +2,13 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { gsap, SplitText, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP } from "@/lib/gsap";
 import withCutImg from "../../public/about/withcut.png";
 import milesImg from "../../public/about/miles.png";
 import bigTrainTightImg from "../../public/bigtrain-tight.png";
-import timelineBg from "../../public/images/timeline-bg.jpg";
-import { motion } from "framer-motion";
 import TimelineSection from "./timeline-section";
+import PrizesSection from "./prizes-section";
 
-/**
- * About & Timeline Train Wipe Section:
- * 1. Initial State: The About room with withcut.png (wall/graffiti with parallax) from the top,
- *    and miles.png (Miles on sofa on the subway platform) stably right below it.
- * 2. On Scroll: The Subway Train drives from left to right across the screen.
- * 3. The passing train directly wipes away the About room and unveils the Timeline section underneath.
- * 4. Once the train has completely passed to the right, the Timeline section is right there in place.
- */
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const aboutRoomRef = useRef<HTMLDivElement>(null);
@@ -25,7 +16,12 @@ export default function AboutSection() {
   const milesRef = useRef<HTMLDivElement>(null);
   const trainRef = useRef<HTMLDivElement>(null);
   const headlightsRef = useRef<HTMLDivElement>(null);
+  const timelineContainerRef = useRef<HTMLDivElement>(null);
   const timelineScrollRef = useRef<HTMLDivElement>(null);
+  const prizesContainerRef = useRef<HTMLDivElement>(null);
+  const transitionOverlayRef = useRef<HTMLDivElement>(null);
+  const clipPathRef = useRef<SVGPathElement>(null);
+  const strokePathRef = useRef<SVGPathElement>(null);
 
   useGSAP(
     () => {
@@ -45,7 +41,15 @@ export default function AboutSection() {
           gsap.set(aboutRoomRef.current, { opacity: 1 });
         }
 
-        // Parallax effect on withcut.png background wall while miles.png stays stable
+        if (prizesContainerRef.current) {
+          gsap.set(prizesContainerRef.current, { opacity: 0, pointerEvents: "none" });
+        }
+
+        if (timelineContainerRef.current) {
+          gsap.set(timelineContainerRef.current, { opacity: 1, pointerEvents: "auto" });
+        }
+
+        // Parallax effect on withcut.png background wall
         if (withCutRef.current) {
           gsap.fromTo(
             withCutRef.current,
@@ -58,58 +62,78 @@ export default function AboutSection() {
                 trigger: sectionRef.current,
                 start: "top bottom",
                 end: "bottom top",
-                scrub: 1.2,
+                scrub: 1.0,
               },
             }
           );
         }
+
+        // Curve Animation State for Quadratic Bezier Morphing
+        const curve = {
+          y: 100,
+          cpY: 100,
+        };
+
+        const updatePath = () => {
+          const d = `M 0 100 V ${curve.y} Q 50 ${curve.cpY} 100 ${curve.y} V 100 z`;
+          if (clipPathRef.current) {
+            clipPathRef.current.setAttribute("d", d);
+          }
+          if (strokePathRef.current) {
+            strokePathRef.current.setAttribute("d", d);
+          }
+        };
+
+        // Initial state: Flat at bottom (invisible)
+        updatePath();
 
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1.8,
+            scrub: 1.5,
           },
+          onUpdate: updatePath,
         });
 
-        // 1. Phase 1: Generous hold on About Us room before train approaches (0.00 -> 0.12)
+        // 1. Phase 1: Generous hold on About Us room before train approaches (0.00 -> 0.08)
         tl.fromTo(
           headlightsRef.current,
           { opacity: 0, scale: 0.7 },
-          { opacity: 1, scale: 1, ease: "power2.out", duration: 0.04 },
-          0.10
+          { opacity: 1, scale: 1, ease: "power2.out", duration: 0.03 },
+          0.06
         );
 
-        // Train rolls in smoothly & slowly from left to center (0.12 -> 0.32)
+        // Train rolls in smoothly & slowly from left to center (0.08 -> 0.22)
         tl.to(
           trainRef.current,
-          { xPercent: 0, ease: "power1.out", duration: 0.20 },
-          0.12
+          { xPercent: 0, ease: "power1.out", duration: 0.14 },
+          0.08
         );
 
-        // 2. Dissolve About room as train covers the scene (0.22 -> 0.32)
+        // 2. Dissolve About room as train covers the scene (0.14 -> 0.22)
         tl.to(
           aboutRoomRef.current,
-          { opacity: 0, ease: "power1.inOut", duration: 0.10 },
+          { opacity: 0, ease: "power1.inOut", duration: 0.08 },
+          0.14
+        );
+
+        // 3. Phase 2: Slow cinematic crawl when train fits the screen wholly (0.22 -> 0.30)
+        tl.to(
+          trainRef.current,
+          { xPercent: 16, ease: "none", duration: 0.08 },
           0.22
         );
 
-        // 3. Phase 2: Slow cinematic crawl when train fits the screen wholly (0.32 -> 0.44)
+        // 4. Phase 3: Train smoothly departs OUT to the right (0.30 -> 0.38)
         tl.to(
           trainRef.current,
-          { xPercent: 16, ease: "none", duration: 0.12 },
-          0.32
+          { xPercent: 170, ease: "power1.in", duration: 0.08 },
+          0.30
         );
 
-        // 4. Phase 3: Train smoothly departs OUT to the right (0.44 -> 0.56)
-        tl.to(
-          trainRef.current,
-          { xPercent: 170, ease: "power1.in", duration: 0.12 },
-          0.44
-        );
-
-        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.56 -> 1.0)
+        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.38 -> 0.62)
         tl.to(
           timelineScrollRef.current,
           {
@@ -120,28 +144,69 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.44,
+            duration: 0.24,
           },
-          0.56
+          0.38
         );
-        // Pull the web upwards exactly as the next section slides over it
-        // This ensures the web perfectly visually sticks to the PrizesSection without any scrub delay
-        gsap.to(".timeline-web-strand", {
-          y: "-250vh",
-          ease: "power1.in",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "bottom 200%", // exactly 100vh before the bottom hits the screen
-            end: "bottom bottom",
-            scrub: true, // no trailing lag
-          }
-        });
+
+        // 6. Locked hold on end of timeline from 0.62 -> 0.68 (user sees all rounds stationary)
+
+        // 7. Morphing Curve Transition: Master Artwork dome sweeps UP from bottom to cover the screen (0.68 -> 0.79)
+        tl.to(
+          curve,
+          {
+            y: 50,
+            cpY: 0,
+            ease: "power2.in",
+            duration: 0.055,
+          },
+          0.68
+        );
+
+        tl.to(
+          curve,
+          {
+            y: 0,
+            cpY: 0,
+            ease: "power2.out",
+            duration: 0.055,
+          },
+          0.735
+        );
+
+        // 8. Under-Curtain Switch at Full Cover (0.79): Switch view from Timeline to Prizes
+        if (timelineContainerRef.current && prizesContainerRef.current) {
+          tl.set(timelineContainerRef.current, { opacity: 0, pointerEvents: "none" }, 0.79);
+          tl.set(prizesContainerRef.current, { opacity: 1, pointerEvents: "auto" }, 0.79);
+        }
+
+        // Hide transition overlay curtain at full cover so underlying interactive canvas takes over
+        if (transitionOverlayRef.current) {
+          tl.set(transitionOverlayRef.current, { opacity: 0 }, 0.79);
+        }
+
+        // 9. Prizes Section Elements Morph & Fade In organically on scroll (0.80 -> 0.88)
+        tl.fromTo(
+          ".prizes-mark",
+          { opacity: 0, y: -30 },
+          { opacity: 1, y: 0, ease: "power2.out", duration: 0.07 },
+          0.80
+        );
+
+        tl.fromTo(
+          ".prizes-trophies-wrap",
+          { opacity: 0, y: 35 },
+          { opacity: 1, y: 0, ease: "power2.out", duration: 0.08 },
+          0.81
+        );
+
+        // 10. Prizes Section remains pinned, fully visible & interactive from 0.88 -> 1.00 (Comfortable locked hold)
       });
     },
     { scope: sectionRef },
   );
 
-  // Subtle interactive mouse parallax for withcut.png (desktop depth)
+  // Interactive mouse parallax for withcut.png
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!withCutRef.current) return;
     const { clientX, clientY } = e;
@@ -175,39 +240,26 @@ export default function AboutSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative h-[850vh] w-full bg-black -mt-px -mb-[100vh]"
+      className="relative h-[850vh] w-full bg-black -mt-px -mb-px"
     >
-      <h2 className="sr-only">About Us & Hackathon Timeline</h2>
+      <h2 className="sr-only">About Us, Timeline & Prizes</h2>
 
       {/* Sticky Stage Container */}
       <div
         className="sticky top-0 h-screen w-full overflow-hidden bg-black flex items-center justify-center"
       >
-        {/* 
-          ══════════════════════════════════════════════════════════════
-          LAYER 0 (Base): The Timeline Section
-          - Revealed in place directly as the train passes from left to right
-          ══════════════════════════════════════════════════════════════
-        */}
-        <div className="absolute inset-0 z-0 h-full w-full pointer-events-auto overflow-hidden bg-[#fcd49b]">
+        {/* LAYER 0: The Timeline Section */}
+        <div ref={timelineContainerRef} className="absolute inset-0 z-0 h-full w-full pointer-events-auto overflow-hidden bg-[#fcd49b]">
           <div ref={timelineScrollRef} className="relative w-full">
             <TimelineSection />
           </div>
         </div>
 
-        {/* 
-          ══════════════════════════════════════════════════════════════
-          LAYER 1 (Middle): About Us Room (withcut.png + miles.png)
-          - withcut.png: Placed from top of section with parallax depth effect
-          - miles.png: Placed right below it, stable on the subway platform
-          - Wiped away as the train moves from left to right
-          ══════════════════════════════════════════════════════════════
-        */}
+        {/* LAYER 1: About Us Room */}
         <div
           ref={aboutRoomRef}
           className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform overflow-hidden"
         >
-          {/* Wall Background: withcut.png (Top-anchored with parallax motion) */}
           <div
             ref={withCutRef}
             className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-start justify-center"
@@ -221,14 +273,12 @@ export default function AboutSection() {
                 sizes="100vw"
                 className="h-full w-full object-cover object-top select-none"
               />
-              {/* Atmospheric lighting & contrast enhancement */}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-black/45" />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.5)_100%)]" />
             </div>
           </div>
 
-          {/* Platform Foreground: miles.png (Stable, placed right below / platform foreground) */}
           <div
             ref={milesRef}
             className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[12vh] sm:translate-y-[14vh] md:translate-y-[16vh]"
@@ -246,13 +296,7 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* 
-          ══════════════════════════════════════════════════════════════
-          LAYER 2 (Top): Subway Train (bigtrain-tight.png)
-          - Drives from left to right on scroll, wiping from About into Timeline
-          - Top roof & lights fully visible; wheels pushed cleanly below viewport
-          ══════════════════════════════════════════════════════════════
-        */}
+        {/* LAYER 2: Subway Train */}
         <div
           ref={trainRef}
           className="pointer-events-none absolute inset-0 z-20 flex h-full w-full items-center justify-center will-change-transform"
@@ -265,17 +309,11 @@ export default function AboutSection() {
               className="h-full w-auto max-w-none object-contain drop-shadow-[0_50px_140px_rgba(0,0,0,0.98)]"
             />
 
-            {/* Exactly 2 Real Looking Headlights */}
             <div
               ref={headlightsRef}
               className="pointer-events-none absolute inset-0 h-full w-full will-change-transform"
             >
-              {/* --- HEADLIGHT 1 (Bottom Left / Inner Lamp: left: 87.5%, top: 59.5%) --- */}
-              <div
-                className="absolute"
-                style={{ left: "87.5%", top: "59.5%" }}
-              >
-                {/* Wide Volumetric Forward Beam Cone */}
+              <div className="absolute" style={{ left: "87.5%", top: "59.5%" }}>
                 <div
                   className="absolute pointer-events-none"
                   style={{
@@ -292,8 +330,6 @@ export default function AboutSection() {
                     mixBlendMode: "screen",
                   }}
                 />
-
-                {/* Soft Bulb Glow */}
                 <div
                   className="absolute pointer-events-none rounded-full"
                   style={{
@@ -310,12 +346,7 @@ export default function AboutSection() {
                 />
               </div>
 
-              {/* --- HEADLIGHT 2 (Bottom Right / Outer Lamp: left: 97.2%, top: 59.0%) --- */}
-              <div
-                className="absolute"
-                style={{ left: "97.2%", top: "59.0%" }}
-              >
-                {/* Wide Volumetric Forward Beam Cone */}
+              <div className="absolute" style={{ left: "97.2%", top: "59.0%" }}>
                 <div
                   className="absolute pointer-events-none"
                   style={{
@@ -332,8 +363,6 @@ export default function AboutSection() {
                     mixBlendMode: "screen",
                   }}
                 />
-
-                {/* Soft Bulb Glow */}
                 <div
                   className="absolute pointer-events-none rounded-full"
                   style={{
@@ -350,6 +379,57 @@ export default function AboutSection() {
                 />
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* LAYER 3: The Prizes Stage */}
+        <div
+          ref={prizesContainerRef}
+          className="absolute inset-0 z-30 h-full w-full pointer-events-auto"
+        >
+          <PrizesSection />
+        </div>
+
+        {/* LAYER 4: Morphing Background Dome Overlay (100% pixel-aligned with Prizes 16:9 stage) */}
+        <div
+          ref={transitionOverlayRef}
+          className="pointer-events-none absolute inset-0 z-40 h-full w-full select-none flex items-center justify-center overflow-hidden"
+        >
+          <div
+            className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] aspect-[16/9] overflow-hidden bg-black flex items-center justify-center"
+            style={{ clipPath: "url(#dome-clip)", WebkitClipPath: "url(#dome-clip)", aspectRatio: "16 / 9" }}
+          >
+            <img
+              src="/images/Prizes/01_MASTER_BACKGROUND.png"
+              alt="Prizes Visual"
+              className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
+            />
+          </div>
+
+          <div className="absolute inset-0 max-w-[177.78vh] max-h-[56.25vw] aspect-[16/9] pointer-events-none flex items-center justify-center mx-auto my-auto">
+            <svg
+              className="pointer-events-none w-full h-full select-none"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <clipPath id="dome-clip" clipPathUnits="objectBoundingBox" transform="scale(0.01, 0.01)">
+                  <path
+                    ref={clipPathRef}
+                    d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
+                  />
+                </clipPath>
+              </defs>
+              <path
+                ref={strokePathRef}
+                stroke="#22b6d6"
+                fill="none"
+                strokeWidth="1.5px"
+                vectorEffect="non-scaling-stroke"
+                d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
+              />
+            </svg>
           </div>
         </div>
 

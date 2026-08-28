@@ -1081,6 +1081,27 @@ body {
   box-shadow: 15px 15px 0 rgba(252, 212, 155, 0.6);
 }
 
+/* ============ MARQUEE & UTILITY ANIMATIONS ============ */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
 
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
 
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
 
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 35s linear infinite;
+}
