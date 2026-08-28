@@ -176,7 +176,7 @@ export default function AboutSection() {
           0.15
         );
 
-        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.22 -> 0.52)
+        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.22 -> 0.46)
         tl.to(
           timelineScrollRef.current,
           {
@@ -187,21 +187,21 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.30,
+            duration: 0.24,
           },
           0.22
         );
 
-        // 6. Locked hold on end of timeline from 0.52 -> 0.60 (user sees all rounds stationary)
+        // 6. Locked hold on end of timeline from 0.46 -> 0.51 (user sees all rounds stationary)
 
-        // 7. Dynamic Morphing SVG wave sweeps down from top to cover locked timeline (0.60 -> 0.74)
+        // 7. Dynamic Morphing SVG wave sweeps down from top to cover locked timeline (0.51 -> 0.63)
         for (let i = 0; i < NUM_OVERLAY_PATHS; i++) {
           const bottomPts = allBottomY[i];
-          const pathDelay = i * 0.025;
+          const pathDelay = i * 0.02;
           for (let j = 0; j < NUM_OVERLAY_POINTS; j++) {
-            const ptDelay = OVERLAY_POINT_OFFSETS[j] * 0.04;
-            const start = 0.60 + ptDelay + pathDelay;
-            const dur = 0.74 - start;
+            const ptDelay = OVERLAY_POINT_OFFSETS[j] * 0.03;
+            const start = 0.51 + ptDelay + pathDelay;
+            const dur = 0.63 - start;
             tl.to(
               bottomPts,
               {
@@ -214,20 +214,20 @@ export default function AboutSection() {
           }
         }
 
-        // 8. Under-Curtain Switch at Full Cover (0.75): Switch view from Timeline to Prizes
+        // 8. Under-Curtain Switch at Full Cover (0.635): Switch view from Timeline to Prizes
         if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { opacity: 0, pointerEvents: "none" }, 0.75);
-          tl.set(prizesContainerRef.current, { opacity: 1, pointerEvents: "auto" }, 0.75);
+          tl.set(timelineContainerRef.current, { opacity: 0, pointerEvents: "none" }, 0.635);
+          tl.set(prizesContainerRef.current, { opacity: 1, pointerEvents: "auto" }, 0.635);
         }
 
-        // 9. Dynamic Morphing SVG wave pulls down to bottom, revealing Prizes stage (0.77 -> 0.91)
+        // 9. Dynamic Morphing SVG wave pulls down to bottom, revealing Prizes stage (0.64 -> 0.75)
         for (let i = 0; i < NUM_OVERLAY_PATHS; i++) {
           const topPts = allTopY[i];
-          const pathDelay = (NUM_OVERLAY_PATHS - i - 1) * 0.025;
+          const pathDelay = (NUM_OVERLAY_PATHS - i - 1) * 0.02;
           for (let j = 0; j < NUM_OVERLAY_POINTS; j++) {
-            const ptDelay = OVERLAY_POINT_OFFSETS[j] * 0.04;
-            const start = 0.77 + ptDelay + pathDelay;
-            const dur = 0.91 - start;
+            const ptDelay = OVERLAY_POINT_OFFSETS[j] * 0.03;
+            const start = 0.64 + ptDelay + pathDelay;
+            const dur = 0.75 - start;
             tl.to(
               topPts,
               {
@@ -240,7 +240,7 @@ export default function AboutSection() {
           }
         }
 
-        // 10. Prizes Section remains pinned, open & fully interactive from 0.91 -> 1.00
+        // 10. Prizes Section remains pinned, open & fully interactive from 0.75 -> 1.00 (Comfortable locked hold)
       });
     },
     { scope: sectionRef },
