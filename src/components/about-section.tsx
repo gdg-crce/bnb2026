@@ -69,47 +69,47 @@ export default function AboutSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1.6,
+            scrub: 1.8,
           },
         });
 
-        // 1. Phase 1: Generous hold on About Us room before train enters (0.00 -> 0.04)
+        // 1. Phase 1: Generous hold on About Us room before train approaches (0.00 -> 0.12)
         tl.fromTo(
           headlightsRef.current,
-          { opacity: 0, scale: 0.8 },
-          { opacity: 1, scale: 1, ease: "power2.out", duration: 0.02 },
-          0.04
+          { opacity: 0, scale: 0.7 },
+          { opacity: 1, scale: 1, ease: "power2.out", duration: 0.04 },
+          0.10
         );
 
-        // Train rolls in smoothly from left to center (0.04 -> 0.12)
+        // Train rolls in smoothly & slowly from left to center (0.12 -> 0.32)
         tl.to(
           trainRef.current,
-          { xPercent: 0, ease: "power1.out", duration: 0.08 },
-          0.04
-        );
-
-        // 2. Dissolve About room as train covers the scene (0.08 -> 0.12)
-        tl.to(
-          aboutRoomRef.current,
-          { opacity: 0, ease: "power1.inOut", duration: 0.04 },
-          0.08
-        );
-
-        // 3. Phase 2: Slow crawl/deceleration when train fits the screen wholly (0.12 -> 0.18)
-        tl.to(
-          trainRef.current,
-          { xPercent: 14, ease: "none", duration: 0.06 },
+          { xPercent: 0, ease: "power1.out", duration: 0.20 },
           0.12
         );
 
-        // 4. Phase 3: Train smoothly departs OUT to the right (0.18 -> 0.25)
+        // 2. Dissolve About room as train covers the scene (0.22 -> 0.32)
         tl.to(
-          trainRef.current,
-          { xPercent: 170, ease: "power1.in", duration: 0.07 },
-          0.18
+          aboutRoomRef.current,
+          { opacity: 0, ease: "power1.inOut", duration: 0.10 },
+          0.22
         );
 
-        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.25 -> 1.0)
+        // 3. Phase 2: Slow cinematic crawl when train fits the screen wholly (0.32 -> 0.44)
+        tl.to(
+          trainRef.current,
+          { xPercent: 16, ease: "none", duration: 0.12 },
+          0.32
+        );
+
+        // 4. Phase 3: Train smoothly departs OUT to the right (0.44 -> 0.56)
+        tl.to(
+          trainRef.current,
+          { xPercent: 170, ease: "power1.in", duration: 0.12 },
+          0.44
+        );
+
+        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.56 -> 1.0)
         tl.to(
           timelineScrollRef.current,
           {
@@ -120,9 +120,9 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.75,
+            duration: 0.44,
           },
-          0.25
+          0.56
         );
         // Pull the web upwards exactly as the next section slides over it
         // This ensures the web perfectly visually sticks to the PrizesSection without any scrub delay
@@ -175,7 +175,7 @@ export default function AboutSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative h-[700vh] w-full bg-black -mt-px -mb-[100vh]"
+      className="relative h-[850vh] w-full bg-black -mt-px -mb-[100vh]"
     >
       <h2 className="sr-only">About Us & Hackathon Timeline</h2>
 
@@ -257,7 +257,7 @@ export default function AboutSection() {
           ref={trainRef}
           className="pointer-events-none absolute inset-0 z-20 flex h-full w-full items-center justify-center will-change-transform"
         >
-          <div className="relative flex h-[100vh] sm:h-[104vh] md:h-[108vh] lg:h-[112vh] w-auto max-w-none items-center justify-center scale-100 sm:scale-[1.02] md:scale-[1.04] translate-y-[7vh] sm:translate-y-[8vh] md:translate-y-[9vh] lg:translate-y-[10vh]">
+          <div className="relative flex h-[112vh] sm:h-[116vh] md:h-[120vh] lg:h-[124vh] w-auto max-w-none items-center justify-center scale-100 sm:scale-[1.02] md:scale-[1.04] translate-y-[2vh] sm:translate-y-[2.5vh] md:translate-y-[3vh] lg:translate-y-[3.5vh]">
             <Image
               src={bigTrainTightImg}
               alt="Domains Subway Train"
