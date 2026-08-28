@@ -163,7 +163,9 @@ export default function PrizesSection() {
           scrollTrigger: { trigger: ".track-bounties-grid", start: "top 84%" },
         });
 
-        return () => split.revert();
+        return function cleanup() {
+          split.revert();
+        };
       });
     },
     { scope: root },
@@ -352,3 +354,4 @@ export default function PrizesSection() {
     </section>
   );
 }
+
