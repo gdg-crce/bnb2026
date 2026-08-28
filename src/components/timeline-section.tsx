@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-
 import { Squada_One } from "next/font/google";
 
 const squada = Squada_One({
@@ -9,6 +8,9 @@ const squada = Squada_One({
   subsets: ["latin"],
 });
 
+
+
+/* ── Main Timeline Section ────────────────────────────────────────────── */
 export default function TimelineSection() {
   const events = [
     "REGISTRATIONS",
@@ -48,21 +50,35 @@ export default function TimelineSection() {
           />
         </motion.div>
 
-        {/* Web Line */}
-        <div
-          className="absolute top-[13vw] bottom-[20px] left-[17%] md:left-[15%] lg:left-[13%] w-[5%] md:w-[3.5%] lg:w-[2.5%] pointer-events-none z-[30]"
-        >
-          <div className="w-full h-full relative flex justify-center">
-            {/* The actual web image */}
-            <img
-              src="/images/Timeline/web.png"
-              alt="Web"
-              className="w-full h-full object-cover object-top drop-shadow-[0_0_15px_rgba(255,255,255,1)]"
-            />
-          </div>
+        {/* Web Strand — continuous silk line running the full height */}
+        <div className="timeline-web-strand absolute top-[26vw] md:top-[22vw] lg:top-[19vw] bottom-[20px] left-[15%] md:left-[11%] lg:left-[10%] w-[18%] md:w-[14%] lg:w-[10%] pointer-events-none z-[5]">
+          <motion.div
+            initial={{ height: "0%" }}
+            whileInView={{ height: "100%" }}
+            viewport={{ once: true }}
+            transition={{ duration: 2, ease: "easeOut" }}
+            className="w-full flex flex-col items-center overflow-hidden"
+            style={{ 
+              mixBlendMode: "screen",
+              filter: "drop-shadow(0 0 2px rgba(255,255,255,0.4))"
+            }}
+          >
+            {Array.from({ length: 25 }).map((_, i) => (
+              <img 
+                key={i}
+                src="/images/Timeline/web.png"
+                alt=""
+                className="w-full block"
+                style={{ 
+                  transform: i % 2 === 1 ? "scaleY(-1)" : "none",
+                  marginTop: i === 0 ? "0" : "-1px" 
+                }}
+              />
+            ))}
+          </motion.div>
         </div>
 
-        {/* Timeline Events Container - NOW RELATIVE to push the section height naturally */}
+        {/* Timeline Events Container */}
         <div className="relative mt-12 sm:mt-16 md:mt-20 lg:mt-28 left-[30%] md:left-[25%] lg:left-[20%] w-[65%] md:w-[60%] lg:w-[50%] flex flex-col gap-8 sm:gap-10 md:gap-12 lg:gap-20 pointer-events-auto z-20">
           {events.map((event, index) => (
             <motion.div

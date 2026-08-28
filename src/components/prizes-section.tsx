@@ -173,7 +173,7 @@ export default function PrizesSection() {
     <section
       id="prizes"
       ref={root}
-      className="halftone relative z-10 overflow-hidden bg-void px-6 py-28 md:px-10 md:py-36"
+      className="halftone relative z-[50] overflow-hidden bg-void px-6 py-28 md:px-10 md:py-36"
     >
       {/* Real Spider-Verse Comic Skyline Background */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">

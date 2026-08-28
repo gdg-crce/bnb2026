@@ -103,6 +103,18 @@ export default function AboutSection() {
           },
           0.25
         );
+        // Pull the web upwards exactly as the next section slides over it
+        // This ensures the web perfectly visually sticks to the PrizesSection without any scrub delay
+        gsap.to(".timeline-web-strand", {
+          y: "-250vh",
+          ease: "power1.in",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "bottom 200%", // exactly 100vh before the bottom hits the screen
+            end: "bottom bottom",
+            scrub: true, // no trailing lag
+          }
+        });
       });
     },
     { scope: sectionRef },
@@ -112,7 +124,7 @@ export default function AboutSection() {
     <section
       id="about"
       ref={sectionRef}
-      className="relative h-[600vh] w-full bg-black -mt-px"
+      className="relative h-[700vh] w-full bg-black -mt-px -mb-[100vh]"
     >
       <h2 className="sr-only">About Us & Hackathon Timeline</h2>
 
