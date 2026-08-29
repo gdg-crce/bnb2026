@@ -90,8 +90,8 @@ export default function TimelineSection() {
         className="absolute inset-0 w-full h-full object-fill z-0 pointer-events-none select-none"
       />
 
-      {/* Timeline Title Logo (Enlarged) */}
-      <div className="absolute top-4 sm:top-7 md:top-10 lg:top-12 xl:top-14 left-1/2 -translate-x-1/2 z-30 w-[92%] sm:w-[82%] md:w-[72%] lg:w-[62%] xl:w-[54%] max-w-[920px] pointer-events-none select-none">
+      {/* Timeline Title Logo (Enlarged & Positioned Higher) */}
+      <div className="absolute top-1 sm:top-2 md:top-3 lg:top-4 xl:top-5 left-1/2 -translate-x-1/2 z-30 w-[92%] sm:w-[82%] md:w-[72%] lg:w-[62%] xl:w-[54%] max-w-[920px] pointer-events-none select-none">
         <motion.img
           initial={{ opacity: 0, y: -30, scale: 0.9 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}

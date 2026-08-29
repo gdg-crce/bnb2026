@@ -70,7 +70,7 @@ export default function AboutSection() {
         tl.fromTo(
           headlightsRef.current,
           { opacity: 0 },
-          { opacity: 1, ease: "sine.out", duration: 0.06 },
+          { opacity: 0.48, ease: "sine.out", duration: 0.06 },
           0.28
         );
 
@@ -109,7 +109,7 @@ export default function AboutSection() {
         // In mobile timeline: web is already there unspooled till the end (100%) right from the start!
         gsap.set(".timeline-web-clip", { height: "100%" });
 
-        // 5. Timeline scrolls directly down through all events without long pause on mobile (0.54 -> 0.74)
+        // 5. Timeline scrolls directly down through all events without long pause on mobile (0.52 -> 0.68)
         tl.to(
           timelineScrollRef.current,
           {
@@ -120,12 +120,12 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.20,
+            duration: 0.16,
           },
-          0.54
+          0.52
         );
 
-        // 6. Smoothly glide Prizes section up over Timeline (0.74 -> 0.88)
+        // 6. Smoothly glide Prizes section up over Timeline (0.70 -> 0.79)
         tl.to(
           timelineScrollRef.current,
           {
@@ -136,22 +136,24 @@ export default function AboutSection() {
               return diff > 0 ? -diff * 0.45 : 0;
             },
             ease: "power2.out",
-            duration: 0.14,
+            duration: 0.09,
           },
-          0.74
+          0.70
         );
 
         tl.to(
           prizesContainerRef.current,
-          { yPercent: 0, ease: "power3.out", duration: 0.14, force3D: true },
-          0.74
+          { yPercent: 0, ease: "power3.out", duration: 0.09, force3D: true },
+          0.70
         );
 
         if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.88);
-          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.88);
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.79);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.79);
         }
-        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.88);
+        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.79);
+
+        // 7. Generous Hold / Pause on Prizes Section (0.79 -> 1.00) before unpinning
       });
 
       // Desktop Choreography (>=769px)
@@ -187,7 +189,7 @@ export default function AboutSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.5,
+            scrub: 0.8,
             invalidateOnRefresh: true,
           },
         });
@@ -198,7 +200,7 @@ export default function AboutSection() {
         tl.fromTo(
           headlightsRef.current,
           { opacity: 0 },
-          { opacity: 1, ease: "sine.out", duration: 0.08 },
+          { opacity: 0.48, ease: "sine.out", duration: 0.08 },
           0.10
         );
 
@@ -242,9 +244,8 @@ export default function AboutSection() {
         gsap.set(".timeline-web-clip", { height: "0%" });
 
         // 5. Reduced PAUSE on Timeline entrance after train departs (0.34 -> 0.44)
-        // (Clean comfortable hold before scroll begins)
 
-        // 6. Smooth Timeline Continuous Auto-Scroll through to Result Declaration (0.44 -> 0.68)
+        // 6. Smooth Timeline Continuous Auto-Scroll through to Result Declaration (0.44 -> 0.66)
         tl.to(
           timelineScrollRef.current,
           {
@@ -255,7 +256,7 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.24,
+            duration: 0.22,
           },
           0.44
         );
@@ -263,13 +264,13 @@ export default function AboutSection() {
         tl.fromTo(
           ".timeline-web-clip",
           { height: "0%" },
-          { height: "100%", ease: "none", duration: 0.24 },
+          { height: "100%", ease: "none", duration: 0.22 },
           0.44
         );
 
-        // 7. Swift, minimal pause after Result Declaration (0.68 -> 0.70)
+        // 7. Comfortable pause after Result Declaration (0.66 -> 0.68)
 
-        // 8. Prizes Rise & Timeline reverse scroll (0.70 -> 0.78)
+        // 8. Silky glide of Prizes section up into full view (0.68 -> 0.77)
         tl.to(
           timelineScrollRef.current,
           {
@@ -277,27 +278,27 @@ export default function AboutSection() {
               const el = timelineScrollRef.current;
               if (!el) return 0;
               const diff = el.scrollHeight - window.innerHeight;
-              return diff > 0 ? -diff * 0.5 : 0;
+              return diff > 0 ? -diff * 0.45 : 0;
             },
             ease: "power2.out",
-            duration: 0.08,
+            duration: 0.09,
           },
-          0.70
+          0.68
         );
 
         tl.to(
           prizesContainerRef.current,
-          { yPercent: 0, ease: "power2.out", duration: 0.08 },
-          0.70
+          { yPercent: 0, ease: "power3.out", duration: 0.09, force3D: true },
+          0.68
         );
 
         if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.78);
-          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.78);
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.77);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.77);
         }
-        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.78);
+        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.77);
 
-        // 9. Increased, long comfortable PAUSE on Prizes Section from 0.78 -> 1.00 before continuing scroll to next section
+        // 9. Substantial, luxurious PAUSE on Prizes Section from 0.77 -> 1.00 (23% scroll distance) before scrolling to next section
       });
     },
     { scope: sectionRef },
@@ -361,12 +362,13 @@ export default function AboutSection() {
             ref={withCutRef}
             className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-center justify-center"
           >
-            <div className="relative h-full w-full flex items-center justify-center">
+            <div className="relative h-full w-full flex items-center justify-center translate-y-[3.5vh] sm:translate-y-[5.5vh] md:translate-y-[7.5vh]">
               <Image
                 src={withCutImg}
                 alt="About Us Subway Station Wall"
                 fill
                 priority
+                unoptimized
                 sizes="100vw"
                 className="h-full w-full object-cover object-center select-none"
               />
@@ -386,6 +388,7 @@ export default function AboutSection() {
                 alt="Miles Morales on Subway Platform Sofa"
                 fill
                 priority
+                unoptimized
                 sizes="100vw"
                 className="h-full w-full object-cover object-bottom select-none drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
               />
@@ -403,12 +406,13 @@ export default function AboutSection() {
               src={bigTrainTightImg}
               alt="Domains Subway Train"
               priority
-              className="h-full w-auto max-w-none object-contain select-none"
+              unoptimized
+              className="h-full w-auto max-w-none object-contain select-none [image-rendering:high-quality] [image-rendering:-webkit-optimize-contrast]"
             />
 
             <div
               ref={headlightsRef}
-              className="pointer-events-none absolute inset-0 h-full w-full will-change-transform"
+              className="pointer-events-none absolute inset-0 h-full w-full will-change-transform opacity-75"
             >
               <div className="absolute" style={{ left: "86.4%", top: "56.4%" }}>
                 <div
