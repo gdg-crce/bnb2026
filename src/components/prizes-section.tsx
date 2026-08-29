@@ -218,7 +218,7 @@ export default function PrizesSection() {
         const s = aspect / texAspect;
         coverX = (coverX - 0.5) * s + 0.5;
       }
-      const bgZoom = 0.85;
+      const bgZoom = 0.78;
       const zoomedX = Math.max(0.0, Math.min(1.0, (coverX - 0.5) / bgZoom + 0.5));
       const zoomedY = Math.max(0.0, Math.min(1.0, (coverY - 0.5) / bgZoom + 0.5));
 
@@ -349,7 +349,7 @@ export default function PrizesSection() {
           float s = aspect / texAspect;
           coverUv.x = (uv.x - 0.5) * s + 0.5;
         }
-        float bgZoom = 0.85;
+        float bgZoom = 0.78;
         vec2 zoomedUv = (coverUv - vec2(0.5)) / bgZoom + vec2(0.5);
 
         // Clean border fade to void black so no edge streak or clamp artifacts appear
@@ -1192,7 +1192,7 @@ export default function PrizesSection() {
           position: absolute;
           top: 50%;
           left: 50%;
-          transform: translate(-50%, -50%) scale(0.85);
+          transform: translate(-50%, -50%) scale(0.78);
           width: 100%;
           height: 100%;
           object-fit: cover;

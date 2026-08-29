@@ -1,27 +1,32 @@
 "use client";
 
-import {
-  ArrowUp,
-  Compass,
-  ShieldCheck,
-  Radio
-} from "lucide-react";
+import { ArrowUp, Mail, MapPin } from "lucide-react";
+import { Montserrat, Squada_One } from "next/font/google";
 
-const SECTIONS = [
-  { name: "About The Build", href: "#about" },
-  { name: "Prizes & Bounties", href: "#prizes" },
-  { name: "Domains & Tracks", href: "#domains" },
-  { name: "Sponsors & Allies", href: "#sponsors" },
-  { name: "FAQ Portal", href: "#faq" },
-  { name: "Contact The Squad", href: "#contact" },
+const squada = Squada_One({
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const QUICK_LINKS = [
+  { name: "Home", href: "#hero" },
+  { name: "About", href: "#about" },
+  { name: "Timeline", href: "#timeline" },
+  { name: "Domains", href: "#domains" },
+  { name: "Prizes", href: "#prizes" },
+  { name: "Sponsors", href: "#sponsors" },
+  { name: "FAQ", href: "#faq" },
+  { name: "Contact", href: "#contact" },
 ];
 
 const SOCIALS = [
-  { name: "Instagram", href: "https://instagram.com/gdgcrce", handle: "@gdgcrce", accent: "#E1306C" },
-  { name: "LinkedIn", href: "https://linkedin.com/company/gdg-crce", handle: "GDG CRCE", accent: "#0077B5" },
-  { name: "Discord", href: "https://discord.gg/gdgcrce", handle: "Official Arena", accent: "#5865F2" },
-  { name: "GitHub", href: "https://github.com/gdg-crce", handle: "gdg-crce", accent: "#FFE600" },
-  { name: "X / Twitter", href: "https://x.com/gdg_crce", handle: "@gdg_crce", accent: "#22b6d6" },
+  { name: "Instagram", href: "https://instagram.com/gdg_crce", label: "@gdg_crce" },
+  { name: "LinkedIn", href: "https://linkedin.com/company/gdg-crce", label: "GDG CRCE" },
 ];
 
 export default function Footer() {
@@ -33,149 +38,88 @@ export default function Footer() {
   };
 
   return (
-    <footer
-      className="halftone relative z-20 w-full overflow-hidden bg-void border-t border-paper/10 text-paper font-sans"
-    >
-      {/* Spider-Verse Warning Marquee Banner */}
-      <div className="w-full bg-[#FFE600] py-2 overflow-hidden select-none">
-        <div className="flex w-max animate-marquee whitespace-nowrap font-mono text-[0.6875rem] md:text-xs font-black text-black uppercase tracking-widest gap-8">
-          <span>// MULTIVERSE TRANSMISSION // 24 HOURS // ASSEMBLE YOUR CREW</span>
-          <span>•</span>
-          <span>// BIT N BUILD 2026 // MUMBAI MULTIVERSE // EARTH-1610 x EARTH-616</span>
-          <span>•</span>
-          <span>// CREATORS, HACKERS & DISRUPTORS // COLLIDE ACROSS DIMENSIONS</span>
-          <span>•</span>
-          <span>// MULTIVERSE TRANSMISSION // 24 HOURS // ASSEMBLE YOUR CREW</span>
-          <span>•</span>
-          <span>// BIT N BUILD 2026 // MUMBAI MULTIVERSE // EARTH-1610 x EARTH-616</span>
-          <span>•</span>
-          <span>// CREATORS, HACKERS & DISRUPTORS // COLLIDE ACROSS DIMENSIONS</span>
+    <footer className={`${montserrat.className} relative z-20 w-full overflow-hidden bg-[#070b14] text-white pt-10 pb-6 px-6 sm:px-12 border-t border-white/10 select-none`}>
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 pb-8 border-b border-white/10">
+        {/* Col 1: Brand & Tagline */}
+        <div className="md:col-span-5 flex flex-col justify-between">
+          <div>
+            <h3 className={`${squada.className} text-3xl sm:text-4xl text-[#ffd369] tracking-wider uppercase leading-none`}>
+              BIT N BUILD 2026
+            </h3>
+            <p className="mt-3 text-xs sm:text-sm text-white/70 leading-relaxed max-w-sm font-normal">
+              An International hackathon by <span className="text-white font-semibold">GDG CRCE</span>. Join with developers for coding, learning, and building amazing projects!
+            </p>
+          </div>
+
+          {/* Social Links (Instagram & LinkedIn only) */}
+          <div className="flex items-center gap-5 mt-6">
+            {SOCIALS.map((soc) => (
+              <a
+                key={soc.name}
+                href={soc.href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={soc.name}
+                className="text-xs sm:text-sm text-white/70 hover:text-[#ffd369] transition-colors font-medium"
+              >
+                {soc.name}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Col 2: Quick Links */}
+        <div className="md:col-span-4">
+          <h4 className={`${squada.className} text-xl sm:text-2xl text-[#ffd369] tracking-wider uppercase mb-3`}>
+            QUICK LINKS
+          </h4>
+          <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs sm:text-sm text-white/70 font-normal">
+            {QUICK_LINKS.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                className="hover:text-white transition-colors"
+              >
+                {link.name}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Col 3: Contact */}
+        <div className="md:col-span-3">
+          <h4 className={`${squada.className} text-xl sm:text-2xl text-[#ffd369] tracking-wider uppercase mb-3`}>
+            CONTACT
+          </h4>
+          <div className="space-y-3 text-xs sm:text-sm text-white/80 font-normal">
+            <a
+              href="mailto:gdgcrce@gmail.com"
+              className="flex items-center gap-2.5 hover:text-[#ffd369] transition-colors"
+            >
+              <Mail className="w-4 h-4 text-[#ffd369] shrink-0" />
+              <span>gdgcrce@gmail.com</span>
+            </a>
+            <div className="flex items-start gap-2.5 text-white/70">
+              <MapPin className="w-4 h-4 text-[#ffd369] shrink-0 mt-0.5" />
+              <span>CRCE, Bandra West, Mumbai, Maharashtra</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Main Footer Body */}
-      <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-20">
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-12 pb-16 border-b border-paper/10">
-
-          {/* Column 1: Brand & Description (5 cols) */}
-          <div className="md:col-span-5 flex flex-col justify-between space-y-6">
-            <div>
-              {/* Coordinates Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-paper/5 border border-paper/15 font-mono text-[10px] uppercase tracking-widest text-[#22b6d6] mb-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#e5308c] animate-ping" />
-                DIMENSION-616 // EARTH-1610 // MUMBAI
-              </div>
-
-              {/* Title */}
-              <h3 className="display text-3xl sm:text-4xl text-paper tracking-tight">
-                Bit N Build <span className="text-[#FFE600]">2026</span>
-              </h3>
-
-              <p className="mt-3 font-sans text-muted text-sm leading-relaxed max-w-md">
-                A 24-hour national hackathon presented by{" "}
-                <span className="text-paper font-semibold">Google Developer Groups CRCE</span>. Where code, design, and interdimensional innovation collide.
-              </p>
-            </div>
-
-            {/* Code Authority Badge */}
-            <div className="inline-flex items-center gap-3 p-3 rounded-lg bg-ink/90 border border-paper/15 w-fit">
-              <div className="w-8 h-8 rounded bg-[#d6070c] border border-black flex items-center justify-center text-white font-bold text-sm shadow-[2px_2px_0px_#000]">
-                🕷️
-              </div>
-              <div>
-                <div className="font-mono text-[9px] font-bold tracking-widest text-[#FFE600] uppercase">
-                  APPROVED BY
-                </div>
-                <div className="font-mono text-xs font-bold text-paper uppercase tracking-wider">
-                  MULTIVERSE CODE AUTHORITY
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Column 2: Navigation Links (3 cols) */}
-          <div className="md:col-span-3">
-            <h4 className="font-mono text-xs font-bold uppercase tracking-widest text-[#22b6d6] mb-6 flex items-center gap-2">
-              <Compass className="w-4 h-4 text-[#22b6d6]" />
-              // Sector Jumps
-            </h4>
-
-            <ul className="space-y-3 font-mono text-xs">
-              {SECTIONS.map((sec, idx) => (
-                <li key={idx}>
-                  <a
-                    href={sec.href}
-                    className="text-muted hover:text-paper inline-flex items-center gap-2 transition-colors group"
-                  >
-                    <span className="text-[#e5308c] group-hover:text-[#FFE600] transition-colors">
-                      ›
-                    </span>
-                    {sec.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3: Socials & Back to Top (4 cols) */}
-          <div className="md:col-span-4 flex flex-col justify-between space-y-8">
-            <div>
-              <h4 className="font-mono text-xs font-bold uppercase tracking-widest text-muted mb-4 flex items-center gap-2">
-                <Radio className="w-4 h-4 text-[#e5308c]" />
-                // Dimensional Channels
-              </h4>
-
-              <div className="grid grid-cols-2 gap-2.5">
-                {SOCIALS.map((soc) => (
-                  <a
-                    key={soc.name}
-                    href={soc.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex flex-col rounded border border-paper/15 bg-ink/80 p-2.5 backdrop-blur-sm transition-all hover:border-paper/40 hover:bg-paper/5"
-                  >
-                    <span className="font-mono text-xs font-bold text-paper transition-colors group-hover:text-white">
-                      {soc.name}
-                    </span>
-                    <span className="font-mono text-[10px] text-muted">
-                      {soc.handle}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Back to Top */}
-            <button
-              type="button"
-              onClick={scrollToTop}
-              className="inline-flex items-center justify-between w-full rounded-lg border border-paper/20 bg-ink/90 px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider text-paper transition-all hover:border-paper/50 hover:bg-ink hover:-translate-y-0.5"
-            >
-              <span className="flex items-center gap-2">
-                <span>🕸️</span>
-                <span>Back To Top</span>
-              </span>
-              <ArrowUp className="w-4 h-4 text-[#FFE600]" />
-            </button>
-          </div>
+      {/* Bottom Bar */}
+      <div className="max-w-7xl mx-auto pt-6 flex items-center justify-between text-xs text-white/50 font-normal">
+        <div>
+          © 2026 Bit N Build. All rights reserved. <span className="text-[#ffd369] font-medium">GDG CRCE</span>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="relative z-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <p className="font-mono text-xs text-muted">
-            © 2026 <span className="text-paper font-bold">Bit N Build</span>. Organized by{" "}
-            <span className="text-[#FFE600] font-bold">GDG CRCE</span>.
-          </p>
-
-          <div className="flex items-center gap-3 font-mono text-xs text-muted">
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#22b6d6]" />
-              SECURE TRANSMISSION
-            </span>
-            <span>•</span>
-            <span className="text-muted/60">EARTH-1610</span>
-          </div>
-        </div>
+        <button
+          onClick={scrollToTop}
+          aria-label="Back to top"
+          className="p-2.5 rounded-full bg-[#d6070c] hover:bg-[#ff2e35] text-white shadow-lg hover:scale-110 transition-all flex items-center justify-center cursor-pointer"
+        >
+          <ArrowUp className="w-4 h-4" />
+        </button>
       </div>
     </footer>
   );

@@ -11,19 +11,46 @@ const squada = Squada_One({
 /* ── Main Timeline Section ────────────────────────────────────────────── */
 export default function TimelineSection() {
   const events = [
-    "REGISTRATIONS",
-    "INTERNAL STATE ROUNDS",
-    "MAHARASHTRA STATE ROUND",
-    "FINAL ROUND",
-    "HACKATHON BEGINS",
-    "MENTORING SESSION",
-    "JUDGING ROUNDS 1 & 2",
-    "HACKATHON ENDS",
-    "RESULT DECLARATION",
+    {
+      title: "REGISTRATIONS",
+      date: "15TH AUGUST - 25TH SEPTEMBER",
+    },
+    {
+      title: "INTERNAL STATE ROUNDS",
+      date: "30TH AUGUST - 28TH SEPTEMBER",
+    },
+    {
+      title: "MAHARASHTRA STATE ROUND",
+      date: "3RD OCTOBER - 4TH OCTOBER",
+    },
+    {
+      title: "FINAL ROUND",
+      date: "31ST OCTOBER - 1ST NOVEMBER",
+    },
+    {
+      title: "HACKATHON BEGINS",
+      date: "31ST OCTOBER - 9:00 AM",
+    },
+    {
+      title: "MENTORING SESSION",
+      date: "31ST OCTOBER - 3:00 PM",
+    },
+    {
+      title: "JUDGING ROUNDS 1 & 2",
+      date: "31ST OCTOBER - 1ST NOVEMBER",
+    },
+    {
+      title: "HACKATHON ENDS",
+      date: "1ST NOVEMBER - 9:00 AM",
+    },
+    {
+      title: "RESULT DECLARATION",
+      date: "1ST NOVEMBER - 12:00 PM",
+    },
   ];
 
   return (
-    <section className="relative w-full min-h-[100vh] bg-[#fcd49b] flex flex-col transform-gpu" id="timeline">
+    <section className="relative w-full min-h-[100vh] bg-black flex flex-col transform-gpu" id="timeline">
       {/* Background Image - Absolute and stretched to cover the entire div height */}
       <img
         src="/images/Timeline/TimelineSection.png"
@@ -45,7 +72,7 @@ export default function TimelineSection() {
       </div>
 
       {/* Foreground Container */}
-      <div className="relative z-10 w-full pt-[18vw] sm:pt-[16vw] md:pt-[14vw] lg:pt-[12vw] pb-6 sm:pb-8 px-4">
+      <div className="relative z-10 w-full pt-[18vw] sm:pt-[16vw] md:pt-[14vw] lg:pt-[12vw] pb-28 sm:pb-36 md:pb-44 px-4">
         {/* Pavitr Prabhakar (Shifted slightly right into arch center) */}
         <motion.div
           initial={{ opacity: 0, x: -50, y: 50 }}
@@ -91,11 +118,20 @@ export default function TimelineSection() {
                 />
               ))}
             </div>
+
+            {/* Spider-Hand attached directly at the bottom where the webs terminate */}
+            <div className="absolute -bottom-8 sm:-bottom-12 md:-bottom-14 left-1/2 -translate-x-1/2 w-[180%] sm:w-[210%] md:w-[240%] z-20 pointer-events-none select-none flex justify-center">
+              <img
+                src="/spiderhand.png"
+                alt="Spider-Man Web Hand"
+                className="w-full h-auto object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.9)] select-none pointer-events-none"
+              />
+            </div>
           </div>
         </div>
 
         {/* Timeline Events Container (Shifted right for clean generous spacing from web) */}
-        <div className="relative mt-24 sm:mt-36 md:mt-44 lg:mt-52 xl:mt-60 left-[38%] sm:left-[33%] md:left-[29%] lg:left-[24.5%] xl:left-[22.5%] w-[58%] sm:w-[65%] md:w-[69%] lg:w-[73%] flex flex-col gap-6 sm:gap-10 md:gap-12 lg:gap-20 pointer-events-auto z-20">
+        <div className="relative mt-24 sm:mt-36 md:mt-44 lg:mt-52 xl:mt-60 left-[38%] sm:left-[33%] md:left-[29%] lg:left-[24.5%] xl:left-[22.5%] w-[58%] sm:w-[65%] md:w-[69%] lg:w-[73%] flex flex-col gap-7 sm:gap-10 md:gap-12 lg:gap-16 pointer-events-auto z-20">
           {events.map((event, index) => (
             <motion.div
               key={index}
@@ -103,7 +139,7 @@ export default function TimelineSection() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.45, delay: 0.05, ease: "easeOut" }}
-              className="w-full flex justify-start py-0.5 sm:py-1 transform-gpu"
+              className="w-full flex flex-col items-start justify-start py-0.5 sm:py-1 transform-gpu"
             >
               <h3
                 className={`${squada.className} font-bold text-3xl min-[480px]:text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.5rem] leading-tight sm:leading-none tracking-normal uppercase cursor-default hover:scale-[1.02] transition-transform duration-300 origin-left`}
@@ -124,8 +160,16 @@ export default function TimelineSection() {
                   `,
                 }}
               >
-                {event}
+                {event.title}
               </h3>
+
+              {/* Date Badge Container matching reference design */}
+              <div className="mt-1.5 sm:mt-2 md:mt-2.5 inline-flex items-center gap-2.5 sm:gap-3 px-3.5 py-1 sm:px-4 sm:py-1.5 md:px-5 md:py-2 rounded-[6px] sm:rounded-[7px] bg-[#220a27] border-[1.5px] sm:border-2 border-[#fdb827] shadow-[0_4px_16px_rgba(0,0,0,0.6)] select-none">
+                <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#9f1361] shrink-0" />
+                <span className={`${squada.className} text-base sm:text-lg md:text-xl lg:text-2xl text-[#ffd369] tracking-[0.06em] uppercase leading-none pt-0.5`}>
+                  {event.date}
+                </span>
+              </div>
             </motion.div>
           ))}
         </div>
