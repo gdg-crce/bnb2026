@@ -123,10 +123,7 @@ export default function ContactSection() {
         {/* SECTION HEADER: Consistent Typography with Chromatic Ghost Split */}
         {/* ========================================================================= */}
         <div className="contact-mark relative mb-20 flex flex-col items-start md:mb-24">
-          <div className="flex items-center gap-3">
-            <span className="inline-block h-2 w-2 rounded-full bg-[#FFE600] shadow-[0_0_10px_#FFE600]" />
-            <span className="eyebrow text-[#FFE600]">Spider-Society // Direct Frequencies</span>
-          </div>
+          
 
           <div className="relative mt-4">
             {/* Red Ghost */}

@@ -117,7 +117,6 @@ export default function FAQSection() {
         {/* Section Header with Chromatic Split Typography from Commit 353bd25 */}
         <div className="faq-mark relative mb-16 flex flex-col items-center text-center md:mb-20">
           <div className="flex items-center gap-3">
-            <span className="inline-block h-2 w-2 rounded-full bg-red shadow-[0_0_10px_#d6070c]" />
           </div>
 
           <div className="relative mt-4">

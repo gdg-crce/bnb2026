@@ -633,23 +633,25 @@ button img {
 
 /* Stepped Chromatic Aberration Twitch (Animated on Twos) */
 .sv-glitch-cyan {
-  animation: sv-twitch-cyan 0.4s steps(2) infinite;
+  animation: sv-twitch-cyan 0.7s steps(2) infinite;
   will-change: transform;
 }
 
 .sv-glitch-magenta {
-  animation: sv-twitch-magenta 0.45s steps(2) infinite;
+  animation: sv-twitch-magenta 0.85s steps(2) infinite;
   will-change: transform;
 }
 
 @keyframes sv-twitch-cyan {
-  0%, 100% { transform: translate3d(-3.5px, 0.5px, 0); }
-  50%      { transform: translate3d(-7px, -1px, 0); }
+  0%, 72%, 100% { transform: translate3d(-2.5px, 0.5px, 0); }
+  78%           { transform: translate3d(-5.5px, -1px, 0); }
+  88%           { transform: translate3d(-3.5px, 0.5px, 0); }
 }
 
 @keyframes sv-twitch-magenta {
-  0%, 100% { transform: translate3d(3.5px, -0.5px, 0); }
-  50%      { transform: translate3d(7px, 1px, 0); }
+  0%, 72%, 100% { transform: translate3d(2.5px, -0.5px, 0); }
+  78%           { transform: translate3d(5.5px, 1px, 0); }
+  88%           { transform: translate3d(3.5px, -0.5px, 0); }
 }
 
 /* Ben-Day Comic Print Halftone Shading */
