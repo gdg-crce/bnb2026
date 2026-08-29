@@ -123,10 +123,7 @@ export default function ContactSection() {
         {/* SECTION HEADER: Consistent Typography with Chromatic Ghost Split */}
         {/* ========================================================================= */}
         <div className="contact-mark relative mb-20 flex flex-col items-start md:mb-24">
-          <div className="flex items-center gap-3">
-            <span className="inline-block h-2 w-2 rounded-full bg-[#FFE600] shadow-[0_0_10px_#FFE600]" />
-            <span className="eyebrow text-[#FFE600]">Spider-Society // Direct Frequencies</span>
-          </div>
+          
 
           <div className="relative mt-4">
             {/* Red Ghost */}
@@ -336,10 +333,7 @@ export default function ContactSection() {
               </div>
 
               <div>
-                <div className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-[#22b6d6] mb-1">
-                  <Radio className="h-3 w-3 text-[#22b6d6] animate-pulse" />
-                  <span>// Central Dispatch Protocol</span>
-                </div>
+                
                 <h4 className="font-mono text-xl sm:text-2xl md:text-3xl font-black text-paper tracking-tight">
                   gdgcrce@gmail.com
                 </h4>

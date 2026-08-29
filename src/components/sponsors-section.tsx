@@ -4,6 +4,8 @@ import { useRef } from "react";
 import Image from "next/image";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
 
+import GhostFibers from "@/components/GhostFibers";
+
 const MARK_SIZE =
   "text-[clamp(3rem,14vw,5.5rem)] md:text-[clamp(3.5rem,8vw,7rem)]";
 
@@ -69,13 +71,6 @@ export default function SponsorsSection() {
           stagger: 0.04,
           duration: 1.1,
           ease: "power4.out",
-          scrollTrigger: { trigger: ".sponsors-mark", start: "top 84%" },
-        });
-
-        gsap.from(".sponsors-lede", {
-          opacity: 0,
-          y: 24,
-          duration: 0.9,
           scrollTrigger: { trigger: ".sponsors-mark", start: "top 84%" },
         });
 
@@ -147,17 +142,48 @@ export default function SponsorsSection() {
     <section
       id="sponsors"
       ref={root}
-      className="relative z-10 overflow-x-clip bg-black py-24 md:py-36 px-6"
+      className="relative z-10 overflow-hidden bg-black py-24 md:py-36 px-6"
     >
+      {/* Spiderverse GhostFibers Multiverse Web Background (Darkened) */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-50">
+        <GhostFibers
+          lineColor="#e60049"
+          glowColor="#00c8e6"
+          speed={0.18}
+          scale={2.4}
+          rotation={12}
+          rotationSpeed={0.18}
+          layers={5}
+          waveAmplitude={0.018}
+          waveFrequency={3.2}
+          waveSpeed={0.14}
+          layerSpeed={0.06}
+          twist={0.12}
+          twistFrequency={4.5}
+          twistSpeed={0.9}
+          lineFrequency={5.5}
+          lineSpacing={2.2}
+          lineSharpness={18}
+          glowFalloff={9.5}
+          glowIntensity={1.2}
+          brightness={1.25}
+          blueBoost={1.2}
+          vignette={0.9}
+          grain={0.05}
+          dpr={1}
+        />
+      </div>
+
+      {/* Dark tint and gradient overlay strictly behind the sponsor cards/images */}
+      <div className="absolute inset-0 pointer-events-none z-0 bg-black/60" />
+      <div className="absolute inset-0 pointer-events-none z-0 bg-gradient-to-b from-black via-transparent to-black" />
+      <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-black/20 via-black/60 to-black" />
 
       <div className="container mx-auto max-w-6xl relative z-10">
         
         {/* Section Header with Chromatic Split Typography */}
         <div className="sponsors-mark relative mb-16 flex flex-col items-start md:mb-20">
-          <div className="flex items-center gap-3">
-            <span className="inline-block h-2 w-2 rounded-full bg-[#22b6d6] shadow-[0_0_10px_#22b6d6]" />
-            <span className="eyebrow text-[#22b6d6]">Spider-Society // Allies & Sponsors</span>
-          </div>
+       
 
           <div className="relative mt-4">
             {/* Red Ghost */}
@@ -182,16 +208,14 @@ export default function SponsorsSection() {
             </h2>
           </div>
 
-          <p className="sponsors-lede mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-            Backed by global technology leaders and developer communities powering builders across the multiverse.
-          </p>
+         
         </div>
 
         {/* --- Previous Years Sponsors --- */}
         <div className="prev-sponsors-container">
           <div className="text-left mb-10">
             <SectionTitle className="text-paper">
-              <span className="text-[#22b6d6] mr-2 font-mono">⚡</span>
+            
               PREVIOUS SPONSORS
             </SectionTitle>
             <div className="h-0.5 w-24 bg-[#22b6d6]/40 rounded-full mt-2 mb-8"></div>
