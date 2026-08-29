@@ -7,6 +7,7 @@ import HeroGlitchReveal from "@/components/hero-glitch-reveal";
 import beforeHeroImg from "../../public/images/beforehero.jpg";
 import heroBgImg from "../../public/images/herobg.png";
 import logoImg from "../../public/images/logo.png";
+import blackLogoImg from "../../public/images/blacklogo.png";
 
 /**
  * Cinematic Hero Sequence:
@@ -22,6 +23,7 @@ export default function HeroVideo() {
   const heroImageRef = useRef<HTMLDivElement>(null);
   const preloaderVideoRef = useRef<HTMLVideoElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
+  const blackLogoRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const [isPreloaderActive, setIsPreloaderActive] = useState(true);
 
@@ -143,7 +145,7 @@ export default function HeroVideo() {
 
         // 4. Logo fades and glides down from the TOP with buttery smooth ease
         tl.fromTo(
-          logoRef.current,
+          [logoRef.current, blackLogoRef.current],
           {
             opacity: 0,
             y: -60,
@@ -225,7 +227,7 @@ export default function HeroVideo() {
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/80 to-transparent z-10" />
         </div>
 
-        {/* Layer 1: logo.png (Fades in from top, positioned lower into hero focal area) */}
+        {/* Layer 1: Base Red Logo */}
         <div
           ref={logoRef}
           className="pointer-events-none absolute inset-x-0 top-[18vh] z-10 flex justify-center opacity-0 sm:top-[22vh] md:top-[25vh] transform-gpu will-change-transform"
@@ -240,10 +242,32 @@ export default function HeroVideo() {
           </div>
         </div>
 
+        {/* Layer 1b: Black Logo Mask Reveal Layer (Reveals blacklogo.png inside the liquid spline mask) */}
+        <div
+          className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-hidden"
+          style={{
+            clipPath: "url(#sv-liquid-spline-clip)",
+          }}
+        >
+          <div
+            ref={blackLogoRef}
+            className="pointer-events-none absolute inset-x-0 top-[18vh] flex justify-center opacity-0 sm:top-[22vh] md:top-[25vh] transform-gpu will-change-transform"
+          >
+            <div className="relative flex max-h-[46vh] w-[min(92vw,780px)] items-center justify-center">
+              <Image
+                src={blackLogoImg}
+                alt="Bit N Build Black Logo"
+                priority
+                className="h-auto w-full object-contain drop-shadow-[0_20px_60px_rgba(0,0,0,0.95)]"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Layer 2: Spider-Verse Yellow Dialogue Box CTA (Moved higher upwards) */}
         <div
           ref={ctaRef}
-          className="pointer-events-none absolute inset-x-0 bottom-[18vh] z-10 flex justify-center opacity-0 sm:bottom-[22vh] md:bottom-[25vh] lg:bottom-[26vh] transform-gpu will-change-transform"
+          className="pointer-events-none absolute inset-x-0 bottom-[18vh] z-20 flex justify-center opacity-0 sm:bottom-[22vh] md:bottom-[25vh] lg:bottom-[26vh] transform-gpu will-change-transform"
         >
           <div className="pointer-events-auto">
             <a
@@ -266,7 +290,7 @@ export default function HeroVideo() {
         {/* Layer 3: beforehero.jpg (Zooms directly into eye) */}
         <div
           ref={heroImageRef}
-          className="pointer-events-none absolute inset-0 z-20 h-full w-full origin-[70%_48%] transform-gpu will-change-transform"
+          className="pointer-events-none absolute inset-0 z-30 h-full w-full origin-[70%_48%] transform-gpu will-change-transform"
         >
           <Image
             src={beforeHeroImg}

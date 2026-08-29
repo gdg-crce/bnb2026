@@ -27,28 +27,28 @@ export default function AboutSection() {
       media.add("(prefers-reduced-motion: no-preference)", () => {
         // Initialize train completely offscreen to the left and headlights off
         if (trainRef.current) {
-          gsap.set(trainRef.current, { xPercent: -170 });
+          gsap.set(trainRef.current, { xPercent: -150, force3D: true });
         }
 
         if (headlightsRef.current) {
-          gsap.set(headlightsRef.current, { opacity: 0 });
+          gsap.set(headlightsRef.current, { opacity: 0, force3D: true });
         }
 
         if (aboutRoomRef.current) {
-          gsap.set(aboutRoomRef.current, { opacity: 1 });
+          gsap.set(aboutRoomRef.current, { opacity: 1, force3D: true });
         }
 
         if (prizesContainerRef.current) {
-          gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible" });
+          gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible", force3D: true });
         }
 
         if (timelineContainerRef.current) {
-          gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none" });
+          gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none", force3D: true });
         }
 
         // Keep withcut.png scaled slightly for clean horizontal parallax bleed
         if (withCutRef.current) {
-          gsap.set(withCutRef.current, { scale: 1.04, y: 0, x: 0 });
+          gsap.set(withCutRef.current, { scale: 1.04, y: 0, x: 0, force3D: true });
         }
 
         const tl = gsap.timeline({
@@ -56,54 +56,55 @@ export default function AboutSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.85,
+            scrub: 0.5,
+            invalidateOnRefresh: true,
           },
         });
 
-        // 1. Phase 1: Generous hold on About Us room before train approaches (0.00 -> 0.08)
+        // 1. Phase 1: Headlights bloom as train approaches from the dark (0.02 -> 0.08)
         tl.fromTo(
           headlightsRef.current,
-          { opacity: 0, scale: 0.7 },
-          { opacity: 1, scale: 1, ease: "power2.out", duration: 0.03 },
-          0.06
+          { opacity: 0 },
+          { opacity: 1, ease: "sine.out", duration: 0.06 },
+          0.02
         );
 
-        // Train rolls in smoothly & slowly from left to center (0.08 -> 0.22)
+        // Train rolls in smoothly & naturally from left into frame (0.02 -> 0.22)
         tl.to(
           trainRef.current,
-          { xPercent: 0, ease: "power1.out", duration: 0.14 },
-          0.08
+          { xPercent: 0, ease: "sine.out", duration: 0.20 },
+          0.02
         );
 
-        // 2. Dissolve About room as train covers the scene (0.14 -> 0.22)
+        // 2. Dissolve About room seamlessly as train covers the scene (0.12 -> 0.22)
         tl.to(
           aboutRoomRef.current,
-          { opacity: 0, ease: "power1.inOut", duration: 0.08 },
-          0.14
+          { opacity: 0, ease: "sine.inOut", duration: 0.10 },
+          0.12
         );
 
-        // Reveal Timeline underneath as train covers the scene (0.14 -> 0.22)
+        // Reveal Timeline underneath as train covers the scene (0.12 -> 0.22)
         if (timelineContainerRef.current) {
           tl.to(
             timelineContainerRef.current,
-            { opacity: 1, ease: "power1.inOut", duration: 0.08 },
-            0.14
+            { opacity: 1, ease: "sine.inOut", duration: 0.10 },
+            0.12
           );
           tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.22);
         }
 
-        // 3. Phase 2: Slow cinematic crawl when train fits the screen wholly (0.22 -> 0.30)
+        // 3. Phase 2: Smooth cruise across the scene (0.22 -> 0.29)
         tl.to(
           trainRef.current,
-          { xPercent: 16, ease: "none", duration: 0.08 },
+          { xPercent: 15, ease: "none", duration: 0.07 },
           0.22
         );
 
-        // 4. Phase 3: Train smoothly departs OUT to the right (0.30 -> 0.38)
+        // 4. Phase 3: Train smoothly departs OUT to the right into Timeline (0.29 -> 0.36)
         tl.to(
           trainRef.current,
-          { xPercent: 170, ease: "power1.in", duration: 0.08 },
-          0.30
+          { xPercent: 150, ease: "power1.in", duration: 0.07 },
+          0.29
         );
 
         // Initialize web strand at 0% height (at Pavitr's hand)
@@ -111,7 +112,7 @@ export default function AboutSection() {
           height: "0%",
         });
 
-        // 5. Phase 3: Smooth Timeline Continuous Auto-Scroll (0.38 -> 0.60)
+        // 5. Phase 3: Smooth Timeline Continuous Auto-Scroll through to Result Declaration (0.34 -> 0.48)
         tl.to(
           timelineScrollRef.current,
           {
@@ -122,12 +123,12 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.22,
+            duration: 0.14,
           },
-          0.38
+          0.34
         );
 
-        // 5b. Web strand shoots & unspools downwards from Pavitr as user scrolls (0.38 -> 0.60)
+        // 5b. Web strand shoots & unspools downwards from Pavitr as user scrolls (0.34 -> 0.48)
         tl.fromTo(
           ".timeline-web-clip",
           {
@@ -136,46 +137,51 @@ export default function AboutSection() {
           {
             height: "100%",
             ease: "none",
-            duration: 0.22,
+            duration: 0.14,
           },
-          0.38
+          0.34
         );
 
-        // 6. Brief hold on completed timeline (0.60 -> 0.62)
+        // 6. Extended, comfortable hold on completed timeline past Result Declaration (0.48 -> 0.72)
 
-        // 7. Prizes section gets PULLED UP over the timeline as a whole panel (0.62 -> 0.76)
+        // 7. ONLY AFTER the extended pause (0.72 -> 0.84):
+        // Timeline section reverse scrolls back to its half (-diff * 0.5)
+        tl.to(
+          timelineScrollRef.current,
+          {
+            y: () => {
+              const el = timelineScrollRef.current;
+              if (!el) return 0;
+              const diff = el.scrollHeight - window.innerHeight;
+              return diff > 0 ? -diff * 0.5 : 0;
+            },
+            ease: "power2.out",
+            duration: 0.12,
+          },
+          0.72
+        );
+
+        // Prizes section gets brought fully up (yPercent: 100 -> 0) by the time reverse scroll reaches half
         tl.to(
           prizesContainerRef.current,
           {
             yPercent: 0,
             ease: "power2.out",
-            duration: 0.14,
+            duration: 0.12,
           },
-          0.62
-        );
-
-        // Subtle timeline recoil — gets pushed down slightly as prizes slides over it
-        tl.to(
-          timelineContainerRef.current,
-          {
-            yPercent: -8,
-            scale: 0.97,
-            ease: "power1.in",
-            duration: 0.14,
-          },
-          0.62
+          0.72
         );
 
         // Switch pointer events once prizes fully covers the screen
         if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.76);
-          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.76);
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.84);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.84);
         }
 
-        // Force-ensure prizes is fully in position at 0.76 (safety net)
-        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.76);
+        // Force-ensure prizes is fully in position at 0.84 (safety net)
+        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.84);
 
-        // 8. Prizes Section remains pinned, fully visible & interactive from 0.76 -> 1.00 (Long comfortable hold)
+        // 8. Long comfortable pause & hold on Prizes Section from 0.84 -> 1.00 before continuing scroll to next section
       });
     },
     { scope: sectionRef },
@@ -274,14 +280,14 @@ export default function AboutSection() {
         {/* LAYER 2: Subway Train */}
         <div
           ref={trainRef}
-          className="pointer-events-none absolute inset-0 z-20 flex h-full w-full items-center justify-center will-change-transform"
+          className="pointer-events-none absolute inset-0 z-20 flex h-full w-full items-center justify-center will-change-transform transform-gpu [backface-visibility:hidden]"
         >
-          <div className="relative flex h-[184vh] sm:h-[188vh] md:h-[192vh] lg:h-[196vh] w-auto max-w-none items-center justify-center scale-100 translate-y-[5.5vh] sm:translate-y-[6vh] md:translate-y-[6.5vh]">
+          <div className="relative flex h-[184vh] sm:h-[188vh] md:h-[192vh] lg:h-[196vh] w-auto max-w-none items-center justify-center scale-100 translate-y-[5.5vh] sm:translate-y-[6vh] md:translate-y-[6.5vh] transform-gpu [backface-visibility:hidden]">
             <Image
               src={bigTrainTightImg}
               alt="Domains Subway Train"
               priority
-              className="h-full w-auto max-w-none object-contain drop-shadow-[0_50px_140px_rgba(0,0,0,0.98)]"
+              className="h-full w-auto max-w-none object-contain select-none"
             />
 
             <div

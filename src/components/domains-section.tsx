@@ -65,7 +65,7 @@ export default function DomainsSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.9,
+            scrub: 1.2,
           },
         });
 
@@ -81,7 +81,7 @@ export default function DomainsSection() {
             xPercent: 0,
             scale: 1,
             opacity: 1,
-            ease: "power2.out",
+            ease: "power2.inOut",
             duration: 0.35,
           },
           0,
