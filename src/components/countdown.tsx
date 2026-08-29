@@ -89,18 +89,12 @@ export default function Countdown() {
   const { columns, seconds, minutes } = clock ?? PLACEHOLDER;
 
   return (
-    <div className="countdown relative flex w-full flex-col items-center">
-      <div
-        aria-hidden="true"
-        className="countdown-halo pointer-events-none absolute -inset-x-[20%] -inset-y-[35%] -z-10 opacity-40"
-      />
+    <div className="countdown relative flex w-full flex-col items-center justify-center">
+      <span className="eyebrow text-paper/85 tracking-widest text-[0.625rem] sm:text-xs">
+        {EVENT.DURATION_HOURS} hours of building
+      </span>
 
-      <span className="eyebrow">{EVENT.DURATION_HOURS} hours of building</span>
-
-      {/* No rule between the label and the digits: the web already supplies
-          the structure, and a red hairline next to a red second hand is two
-          accents doing one job. */}
-      <div className="relative mt-12 md:mt-16">
+      <div className="relative mt-1 sm:mt-2">
         <WebDial seconds={seconds} minutes={minutes} />
 
         <div
@@ -118,12 +112,12 @@ export default function Countdown() {
               {index > 0 && (
                 <span
                   aria-hidden="true"
-                  className="mx-4 w-px self-stretch bg-paper/15 sm:mx-6 md:mx-8"
+                  className="mx-3 w-px self-stretch bg-paper/20 sm:mx-5 md:mx-7"
                 />
               )}
-              <div className="flex flex-col items-center gap-3 md:gap-4">
+              <div className="flex flex-col items-center gap-1 sm:gap-2">
                 <span
-                  className="font-mono text-[clamp(2.25rem,8.5vw,5rem)] leading-none font-medium text-paper"
+                  className="font-mono text-[clamp(1.75rem,5.2vw,3.5rem)] leading-none font-medium text-paper drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]"
                   // Locks the glyph advance so digits sit still while they change.
                   style={{ fontVariantNumeric: "tabular-nums" }}
                 >
@@ -132,7 +126,7 @@ export default function Countdown() {
                 {/* Full words need more room than a two-digit column gives on
                     a phone; the abbreviations keep every label inside its own
                     column instead of colliding with the next one. */}
-                <span className="eyebrow text-[0.5625rem] whitespace-nowrap md:text-[0.625rem]">
+                <span className="eyebrow text-[0.5rem] whitespace-nowrap text-paper/75 sm:text-[0.5625rem] md:text-[0.625rem]">
                   <span className="sm:hidden">{column.short}</span>
                   <span className="hidden sm:inline">{column.label}</span>
                 </span>

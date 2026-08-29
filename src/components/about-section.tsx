@@ -5,7 +5,7 @@ import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 import withCutImg from "../../public/about/withcut.png";
 import milesImg from "../../public/about/miles.png";
-import bigTrainTightImg from "../../public/bigtrain-tight.png";
+import bigTrainTightImg from "../../public/trainwithdeets.png";
 import TimelineSection from "./timeline-section";
 import PrizesSection from "./prizes-section";
 
@@ -43,26 +43,12 @@ export default function AboutSection() {
         }
 
         if (timelineContainerRef.current) {
-          gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 1, pointerEvents: "auto" });
+          gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none" });
         }
 
-        // Parallax effect on withcut.png background wall
+        // Keep withcut.png scaled slightly for clean horizontal parallax bleed
         if (withCutRef.current) {
-          gsap.fromTo(
-            withCutRef.current,
-            { yPercent: -4, scale: 1.03 },
-            {
-              yPercent: 4,
-              scale: 1.01,
-              ease: "none",
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: 1.0,
-              },
-            }
-          );
+          gsap.set(withCutRef.current, { scale: 1.04, y: 0, x: 0 });
         }
 
         const tl = gsap.timeline({
@@ -70,7 +56,7 @@ export default function AboutSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1.5,
+            scrub: 0.85,
           },
         });
 
@@ -96,6 +82,16 @@ export default function AboutSection() {
           0.14
         );
 
+        // Reveal Timeline underneath as train covers the scene (0.14 -> 0.22)
+        if (timelineContainerRef.current) {
+          tl.to(
+            timelineContainerRef.current,
+            { opacity: 1, ease: "power1.inOut", duration: 0.08 },
+            0.14
+          );
+          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.22);
+        }
+
         // 3. Phase 2: Slow cinematic crawl when train fits the screen wholly (0.22 -> 0.30)
         tl.to(
           trainRef.current,
@@ -115,7 +111,7 @@ export default function AboutSection() {
           height: "0%",
         });
 
-        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.38 -> 0.60)
+        // 5. Phase 3: Smooth Timeline Continuous Auto-Scroll (0.38 -> 0.60)
         tl.to(
           timelineScrollRef.current,
           {
@@ -185,18 +181,18 @@ export default function AboutSection() {
     { scope: sectionRef },
   );
 
-  // Interactive mouse parallax for withcut.png
+  // Interactive mouse parallax for withcut.png (Horizontal-focused with bare minimum vertical)
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!withCutRef.current) return;
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = window;
-    const xOffset = ((clientX / innerWidth) - 0.5) * -20;
-    const yOffset = ((clientY / innerHeight) - 0.5) * -12;
+    const xOffset = ((clientX / innerWidth) - 0.5) * -24;
+    const yOffset = ((clientY / innerHeight) - 0.5) * -2;
 
     gsap.to(withCutRef.current, {
       x: xOffset,
       y: yOffset,
-      duration: 0.7,
+      duration: 0.8,
       ease: "power2.out",
       overwrite: "auto",
     });
@@ -227,8 +223,8 @@ export default function AboutSection() {
       <div
         className="sticky top-0 h-screen w-full overflow-hidden bg-black flex items-center justify-center"
       >
-        {/* LAYER 0: The Timeline Section */}
-        <div ref={timelineContainerRef} className="absolute inset-0 z-0 h-full w-full pointer-events-auto overflow-hidden bg-[#fcd49b]">
+        {/* LAYER 0: The Timeline Section (Hidden until train enters) */}
+        <div ref={timelineContainerRef} className="absolute inset-0 z-0 h-full w-full pointer-events-none overflow-hidden bg-[#fcd49b] opacity-0">
           <div ref={timelineScrollRef} className="relative w-full">
             <TimelineSection />
           </div>
@@ -237,13 +233,13 @@ export default function AboutSection() {
         {/* LAYER 1: About Us Room */}
         <div
           ref={aboutRoomRef}
-          className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform overflow-hidden"
+          className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform overflow-hidden bg-black"
         >
           <div
             ref={withCutRef}
             className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-start justify-center"
           >
-            <div className="relative h-[114%] w-full -top-[2%] sm:-top-[1%] md:top-0 flex items-start justify-center translate-y-[2vh] sm:translate-y-[3vh] md:translate-y-[4vh]">
+            <div className="relative h-[106%] w-[108%] top-0 -left-[4%] flex items-start justify-center translate-y-[2vh] sm:translate-y-[2.5vh] md:translate-y-[3vh]">
               <Image
                 src={withCutImg}
                 alt="About Us Subway Station Wall"
@@ -253,7 +249,7 @@ export default function AboutSection() {
                 className="h-full w-full object-cover object-top select-none"
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-black/45" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/40" />
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.5)_100%)]" />
             </div>
           </div>
@@ -280,7 +276,7 @@ export default function AboutSection() {
           ref={trainRef}
           className="pointer-events-none absolute inset-0 z-20 flex h-full w-full items-center justify-center will-change-transform"
         >
-          <div className="relative flex h-[112vh] sm:h-[116vh] md:h-[120vh] lg:h-[124vh] w-auto max-w-none items-center justify-center scale-100 sm:scale-[1.02] md:scale-[1.04] translate-y-[2vh] sm:translate-y-[2.5vh] md:translate-y-[3vh] lg:translate-y-[3.5vh]">
+          <div className="relative flex h-[184vh] sm:h-[188vh] md:h-[192vh] lg:h-[196vh] w-auto max-w-none items-center justify-center scale-100 translate-y-[5.5vh] sm:translate-y-[6vh] md:translate-y-[6.5vh]">
             <Image
               src={bigTrainTightImg}
               alt="Domains Subway Train"
@@ -292,7 +288,7 @@ export default function AboutSection() {
               ref={headlightsRef}
               className="pointer-events-none absolute inset-0 h-full w-full will-change-transform"
             >
-              <div className="absolute" style={{ left: "87.5%", top: "59.5%" }}>
+              <div className="absolute" style={{ left: "86.4%", top: "56.4%" }}>
                 <div
                   className="absolute pointer-events-none"
                   style={{
@@ -325,7 +321,7 @@ export default function AboutSection() {
                 />
               </div>
 
-              <div className="absolute" style={{ left: "97.2%", top: "59.0%" }}>
+              <div className="absolute" style={{ left: "96.1%", top: "55.9%" }}>
                 <div
                   className="absolute pointer-events-none"
                   style={{

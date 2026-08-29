@@ -8,8 +8,6 @@ const squada = Squada_One({
   subsets: ["latin"],
 });
 
-
-
 /* ── Main Timeline Section ────────────────────────────────────────────── */
 export default function TimelineSection() {
   const events = [
@@ -25,12 +23,12 @@ export default function TimelineSection() {
   ];
 
   return (
-    <section className="relative w-full min-h-[100vh] bg-[#fcd49b] flex flex-col" id="timeline">
+    <section className="relative w-full min-h-[100vh] bg-[#fcd49b] flex flex-col transform-gpu" id="timeline">
       {/* Background Image - Absolute and stretched to cover the entire div height */}
       <img
         src="/images/Timeline/TimelineSection.png"
         alt="Timeline Background"
-        className="absolute inset-0 w-full h-full object-fill z-0"
+        className="absolute inset-0 w-full h-full object-fill z-0 pointer-events-none select-none"
       />
 
       {/* Foreground Container */}
@@ -41,7 +39,7 @@ export default function TimelineSection() {
           whileInView={{ opacity: 1, x: 0, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="absolute top-[13vw] sm:top-[11vw] md:top-[9vw] lg:top-[7.5vw] xl:top-[6.5vw] left-[1.5%] sm:left-[2%] md:left-[2.5%] w-[42%] sm:w-[35%] md:w-[28%] lg:w-[23%] xl:w-[21%] pointer-events-auto z-10 select-none"
+          className="absolute top-[13vw] sm:top-[11vw] md:top-[9vw] lg:top-[7.5vw] xl:top-[6.5vw] left-[1.5%] sm:left-[2%] md:left-[2.5%] w-[42%] sm:w-[35%] md:w-[28%] lg:w-[23%] xl:w-[21%] pointer-events-auto z-10 select-none transform-gpu will-change-transform"
         >
           <img
             src="/images/Timeline/PavitrPrabhakr.png"
@@ -51,7 +49,7 @@ export default function TimelineSection() {
         </motion.div>
 
         {/* Web Strand — continuous silk line shooting directly from Pavitr's wrist down the full height */}
-        <div className="timeline-web-strand absolute top-[34vw] sm:top-[28vw] md:top-[23vw] lg:top-[19vw] xl:top-[17.5vw] bottom-[40px] left-[25%] sm:left-[21%] md:left-[17%] lg:left-[14.2%] xl:left-[13%] w-[26%] sm:w-[22%] md:w-[17%] lg:w-[13.5%] xl:w-[12%] pointer-events-none z-[5]">
+        <div className="timeline-web-strand absolute top-[34vw] sm:top-[28vw] md:top-[23vw] lg:top-[19vw] xl:top-[17.5vw] bottom-[40px] left-[25%] sm:left-[21%] md:left-[17%] lg:left-[14.2%] xl:left-[13%] w-[26%] sm:w-[22%] md:w-[17%] lg:w-[13.5%] xl:w-[12%] pointer-events-none z-[5] transform-gpu">
           {/* Scroll-driven height container (Reveals from Pavitr's wrist downwards as user scrolls) */}
           <div
             className="timeline-web-clip relative w-full h-full overflow-hidden will-change-[height]"
@@ -60,10 +58,10 @@ export default function TimelineSection() {
             }}
           >
             <div
-              className="w-full flex flex-col items-center"
+              className="w-full flex flex-col items-center transform-gpu"
               style={{
                 mixBlendMode: "screen",
-                filter: "drop-shadow(0 0 2px rgba(26,5,38,0.9)) drop-shadow(0 0 5px rgba(255,255,255,1)) drop-shadow(0 0 16px rgba(34,182,214,0.9))",
+                filter: "drop-shadow(0 0 6px rgba(34,182,214,0.85)) drop-shadow(0 0 12px rgba(255,255,255,0.7))",
               }}
             >
               {Array.from({ length: 30 }).map((_, i) => (
@@ -71,6 +69,8 @@ export default function TimelineSection() {
                   key={i}
                   src="/images/Timeline/web.png"
                   alt=""
+                  loading="lazy"
+                  decoding="async"
                   className="w-full block select-none pointer-events-none scale-110"
                   style={{
                     transform: i % 2 === 1 ? "scaleY(-1) scaleX(1.1)" : "scaleX(1.1)",
@@ -87,11 +87,11 @@ export default function TimelineSection() {
           {events.map((event, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, x: 50, filter: "blur(10px)" }}
-              whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-              className="w-full flex justify-start py-1"
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: 0.05, ease: "easeOut" }}
+              className="w-full flex justify-start py-1 transform-gpu"
             >
               <h3
                 className={`${squada.className} font-bold text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.5rem] leading-none tracking-normal uppercase cursor-default hover:scale-[1.02] transition-transform duration-300 origin-left`}
@@ -121,3 +121,4 @@ export default function TimelineSection() {
     </section>
   );
 }
+

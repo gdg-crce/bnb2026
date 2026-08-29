@@ -21,7 +21,7 @@ const CONTACTS = [
   },
   {
     name: "Varad Joshi",
-    role: "TECHNICAL HEAD",
+    role: "MANAGEMENT HEAD",
     phone: "+91 9082158583",
     accent: "#FFE600", // Miles Electric Yellow
     glowColor: "rgba(255, 230, 0, 0.4)",
@@ -30,7 +30,7 @@ const CONTACTS = [
   },
   {
     name: "Abhishek Jose",
-    role: "TECH LEAD",
+    role: "TECHNICAL LEAD",
     phone: "+91 77389 69557",
     accent: "#00f0ff", // 2099 Laser Cyan
     glowColor: "rgba(0, 240, 255, 0.4)",
@@ -118,7 +118,7 @@ export default function ContactSection() {
       </div>
 
       <div className="container relative mx-auto max-w-6xl">
-        
+
         {/* ========================================================================= */}
         {/* SECTION HEADER: Consistent Typography with Chromatic Ghost Split */}
         {/* ========================================================================= */}
@@ -160,7 +160,7 @@ export default function ContactSection() {
         {/* CARDS CONTAINER: WEB STRANDS DANGLING AROUND TAPED POSTER CARDS */}
         {/* ========================================================================= */}
         <div className="contact-cards-container relative mb-20">
-          
+
           {/* Top Structural Web Anchors with SVG Geometry */}
           <div className="hidden md:flex justify-around px-16 relative z-0 pointer-events-none -mb-3">
             {CONTACTS.map((contact, i) => (
@@ -324,7 +324,7 @@ export default function ContactSection() {
         {/* ========================================================================= */}
         <div className="w-full max-w-4xl mx-auto">
           <div className="group relative flex flex-col items-center justify-between gap-6 rounded-2xl border border-paper/20 bg-ink/90 p-6 sm:p-8 md:flex-row md:p-9 backdrop-blur-xl transition-all duration-300 hover:border-paper/50">
-            
+
             {/* Background Ambient Glows */}
             <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-[#FFE600]/10 blur-2xl" />
             <div className="pointer-events-none absolute -right-10 -bottom-10 h-40 w-40 rounded-full bg-[#ff2e88]/10 blur-2xl" />

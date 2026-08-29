@@ -730,11 +730,29 @@ export default function PrizesSection() {
     seedInitialBubbles();
 
     // -------------------------------------------------------------
+    // VISIBILITY OBSERVER (Pause WebGL rendering when off-screen)
+    // -------------------------------------------------------------
+    let isVisible = true;
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+        });
+      },
+      { threshold: 0.01 }
+    );
+    if (section) {
+      visibilityObserver.observe(section);
+    }
+
+    // -------------------------------------------------------------
     // MAIN ANIMATION LOOP
     // -------------------------------------------------------------
     function animate() {
       if (isDestroyed) return;
       animFrameId = requestAnimationFrame(animate);
+
+      if (!isVisible) return;
 
       const delta = clock.getDelta();
       const elapsedTime = clock.getElapsedTime();
@@ -794,6 +812,7 @@ export default function PrizesSection() {
     return () => {
       isDestroyed = true;
       cancelAnimationFrame(animFrameId);
+      visibilityObserver.disconnect();
       window.removeEventListener("resize", resizeWebGL);
       resizeObserver.disconnect();
       stage.removeEventListener("mousemove", onStageMouseMove);
