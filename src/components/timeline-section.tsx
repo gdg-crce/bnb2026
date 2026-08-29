@@ -87,8 +87,13 @@ export default function TimelineSection() {
       <img
         src="/images/Timeline/TimelineSection.png"
         alt="Timeline Background"
-        className="absolute inset-0 w-full h-full object-fill z-0 pointer-events-none select-none"
+        className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none select-none"
       />
+
+      {/* Dark tint and gradient overlay strictly behind the content - adjusted to keep webs visible */}
+      <div className="absolute inset-0 pointer-events-none z-[1] bg-gradient-to-b from-black/60 via-transparent to-black/60" />
+      <div className="absolute inset-0 pointer-events-none z-[1] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-transparent to-black/70" />
+
 
       {/* Timeline Title Logo (Enlarged & Positioned Higher) */}
       <div className="absolute top-1 sm:top-2 md:top-3 lg:top-4 xl:top-5 left-1/2 -translate-x-1/2 z-30 w-[92%] sm:w-[82%] md:w-[72%] lg:w-[62%] xl:w-[54%] max-w-[920px] pointer-events-none select-none">
