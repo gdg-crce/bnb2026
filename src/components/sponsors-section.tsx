@@ -154,10 +154,7 @@ export default function SponsorsSection() {
         
         {/* Section Header with Chromatic Split Typography */}
         <div className="sponsors-mark relative mb-16 flex flex-col items-start md:mb-20">
-          <div className="flex items-center gap-3">
-            <span className="inline-block h-2 w-2 rounded-full bg-[#22b6d6] shadow-[0_0_10px_#22b6d6]" />
-            <span className="eyebrow text-[#22b6d6]">Spider-Society // Allies & Sponsors</span>
-          </div>
+       
 
           <div className="relative mt-4">
             {/* Red Ghost */}
@@ -182,16 +179,14 @@ export default function SponsorsSection() {
             </h2>
           </div>
 
-          <p className="sponsors-lede mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-            Backed by global technology leaders and developer communities powering builders across the multiverse.
-          </p>
+         
         </div>
 
         {/* --- Previous Years Sponsors --- */}
         <div className="prev-sponsors-container">
           <div className="text-left mb-10">
             <SectionTitle className="text-paper">
-              <span className="text-[#22b6d6] mr-2 font-mono">⚡</span>
+            
               PREVIOUS SPONSORS
             </SectionTitle>
             <div className="h-0.5 w-24 bg-[#22b6d6]/40 rounded-full mt-2 mb-8"></div>

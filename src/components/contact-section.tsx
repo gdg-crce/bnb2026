@@ -336,10 +336,7 @@ export default function ContactSection() {
               </div>
 
               <div>
-                <div className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-[#22b6d6] mb-1">
-                  <Radio className="h-3 w-3 text-[#22b6d6] animate-pulse" />
-                  <span>// Central Dispatch Protocol</span>
-                </div>
+                
                 <h4 className="font-mono text-xl sm:text-2xl md:text-3xl font-black text-paper tracking-tight">
                   gdgcrce@gmail.com
                 </h4>

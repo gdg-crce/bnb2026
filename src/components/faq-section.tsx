@@ -118,7 +118,6 @@ export default function FAQSection() {
         <div className="faq-mark relative mb-16 flex flex-col items-center text-center md:mb-20">
           <div className="flex items-center gap-3">
             <span className="inline-block h-2 w-2 rounded-full bg-red shadow-[0_0_10px_#d6070c]" />
-            <span className="eyebrow text-red">Earth-65 // Mission Briefing</span>
           </div>
 
           <div className="relative mt-4">
