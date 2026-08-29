@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spider-Verse Trophy Experience</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Main 16:9 Desktop Viewport Stage -->
+    <div id="stage-16-9" class="stage-container">
+      
+      <!-- WebGL Background Layer (01_MASTER_BACKGROUND.png with shader mutation) -->
+      <canvas id="bg-canvas"></canvas>
+
+      <!-- Original Spider Webs Layer (07_SPIDER_WEBS.png based on reference photo) -->
+      <div id="webs-layer">
+        <img src="/assets/07_SPIDER_WEBS.png" alt="Spider Webs" class="webs-img" draggable="false" />
+      </div>
+
+      <!-- Trophy Interactive Layers -->
+      <div id="trophies-layer">
+        
+        <!-- Left Trophy Wrapper -->
+        <div class="trophy-wrapper" id="trophy-left" data-trophy="left">
+          <img src="/assets/03_LEFT_TROPHY.png" alt="Left Trophy" class="trophy-img" draggable="false" />
+        </div>
+
+        <!-- Center Trophy Wrapper -->
+        <div class="trophy-wrapper" id="trophy-center" data-trophy="center">
+          <img src="/assets/04_CENTER_TROPHY.png" alt="Center Trophy" class="trophy-img" draggable="false" />
+        </div>
+
+        <!-- Right Trophy Wrapper -->
+        <div class="trophy-wrapper" id="trophy-right" data-trophy="right">
+          <img src="/assets/05_RIGHT_TROPHY.png" alt="Right Trophy" class="trophy-img" draggable="false" />
+        </div>
+
+        <!-- Interactive Hitboxes for precise hover detection -->
+        <div class="trophy-hitbox" id="hitbox-left" data-trophy="left"></div>
+        <div class="trophy-hitbox" id="hitbox-center" data-trophy="center"></div>
+        <div class="trophy-hitbox" id="hitbox-right" data-trophy="right"></div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

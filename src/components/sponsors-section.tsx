@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import sponsorsBg from "../../public/images/sponsors-bg.jpg";
 
 const MARK_SIZE =
   "text-[clamp(3rem,14vw,5.5rem)] md:text-[clamp(3.5rem,8vw,7rem)]";
@@ -147,25 +146,8 @@ export default function SponsorsSection() {
     <section
       id="sponsors"
       ref={root}
-      className="halftone relative z-10 overflow-x-clip bg-void py-24 md:py-36 px-6"
+      className="halftone relative z-10 overflow-x-clip bg-black py-24 md:py-36 px-6"
     >
-      {/* Spider-Society Tech Lab Background: Stays still during section scroll, then scrolls out with section */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="sticky top-0 h-screen w-full overflow-hidden">
-          <Image
-            src={sponsorsBg}
-            alt="Spider-Society Tech Lab Backdrop"
-            fill
-            sizes="100vw"
-            priority={false}
-            className="object-cover object-center opacity-45 brightness-100 contrast-115"
-          />
-
-          {/* Vignette & Void Bleed so text & sponsor cards remain readable */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(8,7,11,0.15)_0%,rgba(8,7,11,0.6)_60%,rgba(8,7,11,0.95)_100%)]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-void via-transparent to-void" />
-        </div>
-      </div>
 
       <div className="container mx-auto max-w-6xl relative z-10">
         

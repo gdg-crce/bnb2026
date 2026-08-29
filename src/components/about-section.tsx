@@ -19,9 +19,6 @@ export default function AboutSection() {
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const timelineScrollRef = useRef<HTMLDivElement>(null);
   const prizesContainerRef = useRef<HTMLDivElement>(null);
-  const transitionOverlayRef = useRef<HTMLDivElement>(null);
-  const clipPathRef = useRef<SVGPathElement>(null);
-  const strokePathRef = useRef<SVGPathElement>(null);
 
   useGSAP(
     () => {
@@ -42,11 +39,11 @@ export default function AboutSection() {
         }
 
         if (prizesContainerRef.current) {
-          gsap.set(prizesContainerRef.current, { opacity: 0, pointerEvents: "none" });
+          gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible" });
         }
 
         if (timelineContainerRef.current) {
-          gsap.set(timelineContainerRef.current, { opacity: 1, pointerEvents: "auto" });
+          gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 1, pointerEvents: "auto" });
         }
 
         // Parallax effect on withcut.png background wall
@@ -68,25 +65,6 @@ export default function AboutSection() {
           );
         }
 
-        // Curve Animation State for Quadratic Bezier Morphing
-        const curve = {
-          y: 100,
-          cpY: 100,
-        };
-
-        const updatePath = () => {
-          const d = `M 0 100 V ${curve.y} Q 50 ${curve.cpY} 100 ${curve.y} V 100 z`;
-          if (clipPathRef.current) {
-            clipPathRef.current.setAttribute("d", d);
-          }
-          if (strokePathRef.current) {
-            strokePathRef.current.setAttribute("d", d);
-          }
-        };
-
-        // Initial state: Flat at bottom (invisible)
-        updatePath();
-
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -94,7 +72,6 @@ export default function AboutSection() {
             end: "bottom bottom",
             scrub: 1.5,
           },
-          onUpdate: updatePath,
         });
 
         // 1. Phase 1: Generous hold on About Us room before train approaches (0.00 -> 0.08)
@@ -133,7 +110,12 @@ export default function AboutSection() {
           0.30
         );
 
-        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.38 -> 0.62)
+        // Initialize web strand at 0% height (at Pavitr's hand)
+        gsap.set(".timeline-web-clip", {
+          height: "0%",
+        });
+
+        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.38 -> 0.60)
         tl.to(
           timelineScrollRef.current,
           {
@@ -144,63 +126,60 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.24,
+            duration: 0.22,
           },
           0.38
         );
 
-        // 6. Locked hold on end of timeline from 0.62 -> 0.68 (user sees all rounds stationary)
-
-        // 7. Morphing Curve Transition: Master Artwork dome sweeps UP from bottom to cover the screen (0.68 -> 0.79)
-        tl.to(
-          curve,
+        // 5b. Web strand shoots & unspools downwards from Pavitr as user scrolls (0.38 -> 0.60)
+        tl.fromTo(
+          ".timeline-web-clip",
           {
-            y: 50,
-            cpY: 0,
-            ease: "power2.in",
-            duration: 0.055,
+            height: "0%",
           },
-          0.68
+          {
+            height: "100%",
+            ease: "none",
+            duration: 0.22,
+          },
+          0.38
         );
 
+        // 6. Brief hold on completed timeline (0.60 -> 0.62)
+
+        // 7. Prizes section gets PULLED UP over the timeline as a whole panel (0.62 -> 0.76)
         tl.to(
-          curve,
+          prizesContainerRef.current,
           {
-            y: 0,
-            cpY: 0,
+            yPercent: 0,
             ease: "power2.out",
-            duration: 0.055,
+            duration: 0.14,
           },
-          0.735
+          0.62
         );
 
-        // 8. Under-Curtain Switch at Full Cover (0.79): Switch view from Timeline to Prizes
+        // Subtle timeline recoil — gets pushed down slightly as prizes slides over it
+        tl.to(
+          timelineContainerRef.current,
+          {
+            yPercent: -8,
+            scale: 0.97,
+            ease: "power1.in",
+            duration: 0.14,
+          },
+          0.62
+        );
+
+        // Switch pointer events once prizes fully covers the screen
         if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { opacity: 0, pointerEvents: "none" }, 0.79);
-          tl.set(prizesContainerRef.current, { opacity: 1, pointerEvents: "auto" }, 0.79);
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.76);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.76);
         }
 
-        // Hide transition overlay curtain at full cover so underlying interactive canvas takes over
-        if (transitionOverlayRef.current) {
-          tl.set(transitionOverlayRef.current, { opacity: 0 }, 0.79);
-        }
+        // Force-ensure prizes is fully in position at 0.76 (safety net)
+        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.76);
 
-        // 9. Prizes Section Elements Morph & Fade In organically on scroll (0.80 -> 0.88)
-        tl.fromTo(
-          ".prizes-mark",
-          { opacity: 0, y: -30 },
-          { opacity: 1, y: 0, ease: "power2.out", duration: 0.07 },
-          0.80
-        );
-
-        tl.fromTo(
-          ".prizes-trophies-wrap",
-          { opacity: 0, y: 35 },
-          { opacity: 1, y: 0, ease: "power2.out", duration: 0.08 },
-          0.81
-        );
-
-        // 10. Prizes Section remains pinned, fully visible & interactive from 0.88 -> 1.00 (Comfortable locked hold)
+        // 8. Prizes Section remains pinned, fully visible & interactive from 0.76 -> 1.00 (Long comfortable hold)
       });
     },
     { scope: sectionRef },
@@ -240,7 +219,7 @@ export default function AboutSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative h-[850vh] w-full bg-black -mt-px -mb-px"
+      className="relative h-[900vh] w-full bg-black -mt-px -mb-px"
     >
       <h2 className="sr-only">About Us, Timeline & Prizes</h2>
 
@@ -382,55 +361,12 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* LAYER 3: The Prizes Stage */}
+        {/* LAYER 3: The Prizes Stage (Slides Up Over Timeline) */}
         <div
           ref={prizesContainerRef}
-          className="absolute inset-0 z-30 h-full w-full pointer-events-auto"
+          className="absolute inset-0 z-30 h-full w-full pointer-events-auto will-change-transform"
         >
           <PrizesSection />
-        </div>
-
-        {/* LAYER 4: Morphing Background Dome Overlay (100% pixel-aligned with Prizes 16:9 stage) */}
-        <div
-          ref={transitionOverlayRef}
-          className="pointer-events-none absolute inset-0 z-40 h-full w-full select-none flex items-center justify-center overflow-hidden"
-        >
-          <div
-            className="relative w-full h-full max-w-[177.78vh] max-h-[56.25vw] aspect-[16/9] overflow-hidden bg-black flex items-center justify-center"
-            style={{ clipPath: "url(#dome-clip)", WebkitClipPath: "url(#dome-clip)", aspectRatio: "16 / 9" }}
-          >
-            <img
-              src="/images/Prizes/01_MASTER_BACKGROUND.png"
-              alt="Prizes Visual"
-              className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
-            />
-          </div>
-
-          <div className="absolute inset-0 max-w-[177.78vh] max-h-[56.25vw] aspect-[16/9] pointer-events-none flex items-center justify-center mx-auto my-auto">
-            <svg
-              className="pointer-events-none w-full h-full select-none"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <defs>
-                <clipPath id="dome-clip" clipPathUnits="objectBoundingBox" transform="scale(0.01, 0.01)">
-                  <path
-                    ref={clipPathRef}
-                    d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
-                  />
-                </clipPath>
-              </defs>
-              <path
-                ref={strokePathRef}
-                stroke="#22b6d6"
-                fill="none"
-                strokeWidth="1.5px"
-                vectorEffect="non-scaling-stroke"
-                d="M 0 100 V 100 Q 50 100 100 100 V 100 z"
-              />
-            </svg>
-          </div>
         </div>
 
       </div>
