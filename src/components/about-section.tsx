@@ -70,7 +70,7 @@ export default function AboutSection() {
         tl.fromTo(
           headlightsRef.current,
           { opacity: 0 },
-          { opacity: 1, ease: "sine.out", duration: 0.06 },
+          { opacity: 0.48, ease: "sine.out", duration: 0.06 },
           0.28
         );
 
@@ -200,7 +200,7 @@ export default function AboutSection() {
         tl.fromTo(
           headlightsRef.current,
           { opacity: 0 },
-          { opacity: 1, ease: "sine.out", duration: 0.08 },
+          { opacity: 0.48, ease: "sine.out", duration: 0.08 },
           0.10
         );
 
@@ -362,12 +362,13 @@ export default function AboutSection() {
             ref={withCutRef}
             className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-center justify-center"
           >
-            <div className="relative h-full w-full flex items-center justify-center">
+            <div className="relative h-full w-full flex items-center justify-center translate-y-[3.5vh] sm:translate-y-[5.5vh] md:translate-y-[7.5vh]">
               <Image
                 src={withCutImg}
                 alt="About Us Subway Station Wall"
                 fill
                 priority
+                unoptimized
                 sizes="100vw"
                 className="h-full w-full object-cover object-center select-none"
               />
@@ -387,6 +388,7 @@ export default function AboutSection() {
                 alt="Miles Morales on Subway Platform Sofa"
                 fill
                 priority
+                unoptimized
                 sizes="100vw"
                 className="h-full w-full object-cover object-bottom select-none drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
               />
@@ -404,12 +406,13 @@ export default function AboutSection() {
               src={bigTrainTightImg}
               alt="Domains Subway Train"
               priority
-              className="h-full w-auto max-w-none object-contain select-none"
+              unoptimized
+              className="h-full w-auto max-w-none object-contain select-none [image-rendering:high-quality] [image-rendering:-webkit-optimize-contrast]"
             />
 
             <div
               ref={headlightsRef}
-              className="pointer-events-none absolute inset-0 h-full w-full will-change-transform"
+              className="pointer-events-none absolute inset-0 h-full w-full will-change-transform opacity-75"
             >
               <div className="absolute" style={{ left: "86.4%", top: "56.4%" }}>
                 <div
