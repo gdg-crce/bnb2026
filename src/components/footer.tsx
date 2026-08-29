@@ -110,20 +110,33 @@ export default function Footer() {
     <footer
       className="halftone relative z-20 w-full overflow-hidden bg-void border-t border-paper/10 text-paper font-sans"
     >
-      {/* Spider-Verse Warning Marquee Banner */}
-      <div className="w-full bg-[#FFE600] py-2 overflow-hidden select-none">
-        <div className="flex w-max animate-marquee whitespace-nowrap font-mono text-[0.6875rem] md:text-xs font-black text-black uppercase tracking-widest gap-8">
-          <span>// MULTIVERSE TRANSMISSION // 24 HOURS // ASSEMBLE YOUR CREW</span>
-          <span>•</span>
-          <span>// BIT N BUILD 2026 // MUMBAI MULTIVERSE // EARTH-1610 x EARTH-616</span>
-          <span>•</span>
-          <span>// CREATORS, HACKERS & DISRUPTORS // COLLIDE ACROSS DIMENSIONS</span>
-          <span>•</span>
-          <span>// MULTIVERSE TRANSMISSION // 24 HOURS // ASSEMBLE YOUR CREW</span>
-          <span>•</span>
-          <span>// BIT N BUILD 2026 // MUMBAI MULTIVERSE // EARTH-1610 x EARTH-616</span>
-          <span>•</span>
-          <span>// CREATORS, HACKERS & DISRUPTORS // COLLIDE ACROSS DIMENSIONS</span>
+      {/* Event Marquee Strip */}
+      <div className="w-full bg-[#FFE600] py-2.5 overflow-hidden select-none border-b border-black">
+        <div className="flex w-max animate-marquee whitespace-nowrap font-mono text-[11px] md:text-xs font-black text-black uppercase tracking-widest gap-8">
+          <span>BIT N BUILD 2026</span>
+          <span>✦</span>
+          <span>NATIONAL LEVEL HACKATHON</span>
+          <span>✦</span>
+          <span>24 HOURS OF INNOVATION</span>
+          <span>✦</span>
+          <span>ORGANIZED BY GDG CRCE</span>
+          <span>✦</span>
+          <span>OCTOBER 31 – NOVEMBER 1, 2026</span>
+          <span>✦</span>
+          <span>MUMBAI, INDIA</span>
+          <span>✦</span>
+          <span>BIT N BUILD 2026</span>
+          <span>✦</span>
+          <span>NATIONAL LEVEL HACKATHON</span>
+          <span>✦</span>
+          <span>24 HOURS OF INNOVATION</span>
+          <span>✦</span>
+          <span>ORGANIZED BY GDG CRCE</span>
+          <span>✦</span>
+          <span>OCTOBER 31 – NOVEMBER 1, 2026</span>
+          <span>✦</span>
+          <span>MUMBAI, INDIA</span>
+          <span>✦</span>
         </div>
       </div>
 
@@ -236,14 +249,6 @@ export default function Footer() {
             <span className="text-[#FFE600] font-bold">GDG CRCE</span>.
           </p>
 
-          <div className="flex items-center gap-3 font-mono text-xs text-muted">
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#22b6d6]" />
-              SECURE TRANSMISSION
-            </span>
-            <span>•</span>
-            <span className="text-muted/60">EARTH-1610</span>
-          </div>
         </div>
       </div>
     </footer>
