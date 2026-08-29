@@ -7,25 +7,13 @@ export default function PrizesSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const trophyLeftRef = useRef<HTMLDivElement>(null);
-  const trophyCenterRef = useRef<HTMLDivElement>(null);
-  const trophyRightRef = useRef<HTMLDivElement>(null);
-  const hitboxLeftRef = useRef<HTMLDivElement>(null);
-  const hitboxCenterRef = useRef<HTMLDivElement>(null);
-  const hitboxRightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
     const stage = stageRef.current;
     const canvas = canvasRef.current;
-    const trophyLeft = trophyLeftRef.current;
-    const trophyCenter = trophyCenterRef.current;
-    const trophyRight = trophyRightRef.current;
-    const hitboxLeft = hitboxLeftRef.current;
-    const hitboxCenter = hitboxCenterRef.current;
-    const hitboxRight = hitboxRightRef.current;
 
-    if (!stage || !canvas || !trophyLeft || !trophyCenter || !trophyRight || !hitboxLeft || !hitboxCenter || !hitboxRight) {
+    if (!stage || !canvas) {
       return;
     }
 
@@ -52,31 +40,6 @@ export default function PrizesSection() {
       sampleCtx?.drawImage(bgImg, 0, 0);
       bgImageLoaded = true;
     }
-
-    // Trophy Wrappers & Hitboxes
-    const trophies = {
-      left: {
-        wrapper: trophyLeft,
-        hitbox: hitboxLeft,
-        isHovered: false,
-        curr: { tx: 0, ty: 0, rotX: 0, rotY: 0, rotZ: 0, scale: 1 },
-        target: { tx: 0, ty: 0, rotX: 0, rotY: 0, rotZ: 0, scale: 1 },
-      },
-      center: {
-        wrapper: trophyCenter,
-        hitbox: hitboxCenter,
-        isHovered: false,
-        curr: { tx: 0, ty: 0, rotX: 0, rotY: 0, rotZ: 0, scale: 1 },
-        target: { tx: 0, ty: 0, rotX: 0, rotY: 0, rotZ: 0, scale: 1 },
-      },
-      right: {
-        wrapper: trophyRight,
-        hitbox: hitboxRight,
-        isHovered: false,
-        curr: { tx: 0, ty: 0, rotX: 0, rotY: 0, rotZ: 0, scale: 1 },
-        target: { tx: 0, ty: 0, rotX: 0, rotY: 0, rotZ: 0, scale: 1 },
-      },
-    };
 
     // Strictly Protected Award Zones (exact trophy silhouettes)
     const trophySafetyZones = [
@@ -229,7 +192,7 @@ export default function PrizesSection() {
 
     function sampleArtworkColor(normX: number, normY: number): THREE.Vector3 | null {
       // Don't spawn bubbles on the outer edge margins (prevents cut-off lines)
-      if (normX < 0.06 || normX > 0.94 || normY < 0.06 || normY > 0.94) {
+      if (normX < 0.03 || normX > 0.97 || normY < 0.03 || normY > 0.97) {
         return null;
       }
 
@@ -245,8 +208,22 @@ export default function PrizesSection() {
         return normX < 0.48 ? new THREE.Vector3(0.55, 0.04, 0.92) : new THREE.Vector3(0.0, 0.85, 1.0);
       }
 
-      const px = Math.floor(normX * sampleCanvas.width);
-      const py = Math.floor((1.0 - normY) * sampleCanvas.height);
+      const texAspect = 1812.0 / 1019.0;
+      let coverX = normX;
+      let coverY = 1.0 - normY;
+      if (aspect > texAspect) {
+        const s = texAspect / aspect;
+        coverY = (coverY - 0.5) * s + 0.5;
+      } else {
+        const s = aspect / texAspect;
+        coverX = (coverX - 0.5) * s + 0.5;
+      }
+      const bgZoom = 0.85;
+      const zoomedX = Math.max(0.0, Math.min(1.0, (coverX - 0.5) / bgZoom + 0.5));
+      const zoomedY = Math.max(0.0, Math.min(1.0, (coverY - 0.5) / bgZoom + 0.5));
+
+      const px = Math.floor(zoomedX * sampleCanvas.width);
+      const py = Math.floor(zoomedY * sampleCanvas.height);
 
       // Sample neighborhood patch to catch true artwork ink color
       const radius = 4;
@@ -362,7 +339,26 @@ export default function PrizesSection() {
         vec2 st = (uv - vec2(0.5)) * vec2(aspect, 1.0);
         vec2 mouseSt = (u_mouse - vec2(0.5)) * vec2(aspect, 1.0);
         
-        vec4 baseColor = texture2D(u_texture, uv);
+        // Full screen cover mapping with aspect-ratio compensation & zoom
+        float texAspect = 1812.0 / 1019.0;
+        vec2 coverUv = uv;
+        if (aspect > texAspect) {
+          float s = texAspect / aspect;
+          coverUv.y = (uv.y - 0.5) * s + 0.5;
+        } else {
+          float s = aspect / texAspect;
+          coverUv.x = (uv.x - 0.5) * s + 0.5;
+        }
+        float bgZoom = 0.85;
+        vec2 zoomedUv = (coverUv - vec2(0.5)) / bgZoom + vec2(0.5);
+
+        // Clean border fade to void black so no edge streak or clamp artifacts appear
+        vec2 edgeDist = min(zoomedUv, 1.0 - zoomedUv);
+        float edgeMask = smoothstep(0.0, 0.03, min(edgeDist.x, edgeDist.y));
+        vec4 rawTex = (zoomedUv.x >= 0.0 && zoomedUv.x <= 1.0 && zoomedUv.y >= 0.0 && zoomedUv.y <= 1.0)
+          ? texture2D(u_texture, zoomedUv)
+          : vec4(0.0, 0.0, 0.0, 1.0);
+        vec4 baseColor = rawTex * edgeMask;
         
         float distFromCenter = length(st);
         float centerProtection = smoothstep(0.20, 0.38, distFromCenter);
@@ -550,19 +546,11 @@ export default function PrizesSection() {
         const sampledColor = sampleArtworkColor(normX, normY);
         spawnBubbleCluster(mouseSt, normX, 1.0 - normY, sampledColor);
       }
+
     };
 
     const onStageMouseLeave = () => {
       targetActivity = 0.0;
-      (Object.keys(trophies) as Array<keyof typeof trophies>).forEach((key) => {
-        trophies[key].isHovered = false;
-        trophies[key].target.tx = 0;
-        trophies[key].target.ty = 0;
-        trophies[key].target.rotX = 0;
-        trophies[key].target.rotY = 0;
-        trophies[key].target.rotZ = 0;
-        trophies[key].target.scale = 1;
-      });
     };
 
     stage.addEventListener("mousemove", onStageMouseMove);
@@ -571,52 +559,6 @@ export default function PrizesSection() {
       section.addEventListener("mousemove", onStageMouseMove);
       section.addEventListener("mouseleave", onStageMouseLeave);
     }
-
-    // Setup Trophy Hitbox Events
-    const hitboxCleanups: Array<() => void> = [];
-
-    (Object.keys(trophies) as Array<keyof typeof trophies>).forEach((key) => {
-      const trophy = trophies[key];
-      const hitbox = trophy.hitbox;
-
-      const onHitboxEnter = () => {
-        trophy.isHovered = true;
-        trophy.target.ty = -14.0;
-        trophy.target.scale = 1.012;
-      };
-
-      const onHitboxMove = (e: MouseEvent) => {
-        if (!trophy.isHovered) return;
-        const rect = hitbox.getBoundingClientRect();
-        const normX = ((e.clientX - rect.left) / rect.width - 0.5) * 2.0;
-        const normY = ((e.clientY - rect.top) / rect.height - 0.5) * 2.0;
-
-        trophy.target.tx = normX * 5.0;
-        trophy.target.rotZ = normX * 1.5;
-        trophy.target.rotY = normX * 3.0;
-        trophy.target.rotX = -normY * 2.5;
-      };
-
-      const onHitboxLeave = () => {
-        trophy.isHovered = false;
-        trophy.target.tx = 0;
-        trophy.target.ty = 0;
-        trophy.target.rotX = 0;
-        trophy.target.rotY = 0;
-        trophy.target.rotZ = 0;
-        trophy.target.scale = 1;
-      };
-
-      hitbox.addEventListener("mouseenter", onHitboxEnter);
-      hitbox.addEventListener("mousemove", onHitboxMove);
-      hitbox.addEventListener("mouseleave", onHitboxLeave);
-
-      hitboxCleanups.push(() => {
-        hitbox.removeEventListener("mouseenter", onHitboxEnter);
-        hitbox.removeEventListener("mousemove", onHitboxMove);
-        hitbox.removeEventListener("mouseleave", onHitboxLeave);
-      });
-    });
 
     // -------------------------------------------------------------
     // AMBIENT CONTINUOUS IDLE BUBBLING (Rich Black & Grey Majority, Outward Flow)
@@ -781,22 +723,6 @@ export default function PrizesSection() {
 
         renderer.render(scene, camera);
       }
-
-      (Object.keys(trophies) as Array<keyof typeof trophies>).forEach((key) => {
-        const trophy = trophies[key];
-        const curr = trophy.curr;
-        const target = trophy.target;
-
-        const lerpFactor = 0.08;
-        curr.tx += (target.tx - curr.tx) * lerpFactor;
-        curr.ty += (target.ty - curr.ty) * lerpFactor;
-        curr.rotX += (target.rotX - curr.rotX) * lerpFactor;
-        curr.rotY += (target.rotY - curr.rotY) * lerpFactor;
-        curr.rotZ += (target.rotZ - curr.rotZ) * lerpFactor;
-        curr.scale += (target.scale - curr.scale) * lerpFactor;
-
-        trophy.wrapper.style.transform = `translate3d(${curr.tx.toFixed(2)}px, ${curr.ty.toFixed(2)}px, 0px) rotateX(${curr.rotX.toFixed(2)}deg) rotateY(${curr.rotY.toFixed(2)}deg) rotateZ(${curr.rotZ.toFixed(2)}deg) scale(${curr.scale.toFixed(4)})`;
-      });
     }
 
     animate();
@@ -813,7 +739,6 @@ export default function PrizesSection() {
         section.removeEventListener("mousemove", onStageMouseMove);
         section.removeEventListener("mouseleave", onStageMouseLeave);
       }
-      hitboxCleanups.forEach((cleanup) => cleanup());
 
       geometry.dispose();
       material.dispose();
@@ -1131,13 +1056,13 @@ export default function PrizesSection() {
       </div>
 
       {/* ============================================================== */}
-      {/* DESKTOP-ONLY 16:9 VIEWPORT STAGE (hidden md:block) */}
+      {/* DESKTOP-ONLY FULL-SCREEN VIEWPORT STAGE (hidden md:block) */}
       {/* ============================================================== */}
       <div id="stage-16-9" ref={stageRef} className="hidden md:block stage-container">
-        {/* WebGL Background Layer */}
+        {/* Full-Screen WebGL Background Layer */}
         <canvas id="bg-canvas" ref={canvasRef}></canvas>
 
-        {/* Spider Webs Layer */}
+        {/* Full-Screen Spider Webs Layer */}
         <div id="webs-layer">
           <img
             src="/assets/07_SPIDER_WEBS.png"
@@ -1147,43 +1072,42 @@ export default function PrizesSection() {
           />
         </div>
 
-        {/* Trophy Interactive Layers */}
-        <div id="trophies-layer">
-          <div className="trophy-wrapper" id="trophy-left" ref={trophyLeftRef} data-trophy="left">
-            <img src="/assets/03_LEFT_TROPHY.png" alt="Left Trophy" className="trophy-img" draggable={false} />
-          </div>
-
-          <div className="trophy-wrapper" id="trophy-center" ref={trophyCenterRef} data-trophy="center">
-            <img src="/assets/04_CENTER_TROPHY.png" alt="Center Trophy" className="trophy-img" draggable={false} />
-          </div>
-
-          <div className="trophy-wrapper" id="trophy-right" ref={trophyRightRef} data-trophy="right">
-            <img src="/assets/05_RIGHT_TROPHY.png" alt="Right Trophy" className="trophy-img" draggable={false} />
-          </div>
-
-          <div className="trophy-hitbox" id="hitbox-left" ref={hitboxLeftRef} data-trophy="left"></div>
-          <div className="trophy-hitbox" id="hitbox-center" ref={hitboxCenterRef} data-trophy="center"></div>
-          <div className="trophy-hitbox" id="hitbox-right" ref={hitboxRightRef} data-trophy="right"></div>
-        </div>
-
-        {/* Prizes Title Layer on Top */}
+        {/* Prizes Title Layer - Dead Center of the Whole Screen */}
         <div id="prizes-title-layer">
           <img
-            src="/prizes/title.png"
+            src="/prizestitle.png"
             alt="Prizes Title"
             className="prizes-title-img"
             draggable={false}
           />
         </div>
 
-        {/* Money / Cash Prize Badges Layer Below Trophies */}
-        <div id="prizes-money-layer">
-          <img
-            src="/prizes/money.png"
-            alt="Prize Money"
-            className="prizes-money-img"
-            draggable={false}
-          />
+        {/* Centered Stage Content Wrapper (Trophies & Prize Badges) */}
+        <div className="stage-content-wrapper">
+          {/* Trophy Interactive Layers */}
+          <div id="trophies-layer">
+            <div className="trophy-wrapper" id="trophy-left">
+              <img src="/left.png" alt="Left Trophy" className="trophy-img" draggable={false} />
+            </div>
+
+            <div className="trophy-wrapper" id="trophy-center">
+              <img src="/center.png" alt="Center Trophy" className="trophy-img" draggable={false} />
+            </div>
+
+            <div className="trophy-wrapper" id="trophy-right">
+              <img src="/right.png" alt="Right Trophy" className="trophy-img" draggable={false} />
+            </div>
+          </div>
+
+          {/* Money / Cash Prize Badges Layer Below Trophies */}
+          <div id="prizes-money-layer">
+            <img
+              src="/prizes/money.png"
+              alt="Prize Money"
+              className="prizes-money-img"
+              draggable={false}
+            />
+          </div>
         </div>
       </div>
 
@@ -1204,29 +1128,39 @@ export default function PrizesSection() {
 
         .stage-container {
           position: relative;
-          width: min(100vw, calc(100vh * (16 / 9)));
-          height: min(100vh, calc(100vw * (9 / 16)));
-          aspect-ratio: 16 / 9;
+          width: 100%;
+          height: 100%;
           background-color: #000000;
           overflow: hidden;
-          box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
           pointer-events: auto;
         }
 
+        .stage-content-wrapper {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: min(100vw, calc(100vh * (16 / 9)));
+          height: min(100vh, calc(100vw * (9 / 16)));
+          aspect-ratio: 16 / 9;
+          pointer-events: none;
+          z-index: 3;
+        }
+
         @media (max-width: 768px) {
-          .stage-container {
+          .stage-content-wrapper {
             width: 100vw;
             height: calc(100vw * (9 / 16));
-            transform: scale(2.15);
+            transform: translate(-50%, -50%) scale(2.15);
             transform-origin: center center;
           }
         }
 
         @media (max-width: 480px) {
-          .stage-container {
+          .stage-content-wrapper {
             width: 100vw;
             height: calc(100vw * (9 / 16));
-            transform: scale(2.35);
+            transform: translate(-50%, -50%) scale(2.35);
             transform-origin: center center;
           }
         }
@@ -1251,15 +1185,17 @@ export default function PrizesSection() {
           z-index: 2;
           pointer-events: none;
           mix-blend-mode: screen;
+          overflow: hidden;
         }
 
         .webs-img {
           position: absolute;
-          top: 0;
-          left: 0;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) scale(0.85);
           width: 100%;
           height: 100%;
-          object-fit: contain;
+          object-fit: cover;
           pointer-events: none;
           display: block;
           opacity: 0.92;
@@ -1268,21 +1204,20 @@ export default function PrizesSection() {
 
         #prizes-title-layer {
           position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          z-index: 4;
+          top: 3.5%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: clamp(220px, 20vw, 320px);
+          z-index: 10;
           pointer-events: none;
-          transform: translateX(-1.8%);
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
 
         .prizes-title-img {
-          position: absolute;
-          top: 0;
-          left: 0;
           width: 100%;
-          height: 100%;
+          height: auto;
           object-fit: contain;
           pointer-events: none;
           display: block;
@@ -1321,8 +1256,7 @@ export default function PrizesSection() {
           width: 100%;
           height: 100%;
           z-index: 3;
-          perspective: 1200px;
-          pointer-events: none;
+          pointer-events: none !important;
         }
 
         .trophy-wrapper {
@@ -1331,11 +1265,9 @@ export default function PrizesSection() {
           left: 0;
           width: 100%;
           height: 100%;
-          pointer-events: none;
-          will-change: transform;
-          transform-style: preserve-3d;
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
+          pointer-events: none !important;
+          transform: none !important;
+          will-change: auto;
         }
 
         .trophy-img {
@@ -1345,41 +1277,25 @@ export default function PrizesSection() {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          pointer-events: none;
+          pointer-events: none !important;
           display: block;
           image-rendering: high-quality;
           image-rendering: -webkit-optimize-contrast;
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
+        }
+
+        #trophy-left .trophy-img {
+          transform: translateX(-4.0%) translateY(3.0%) rotate(-12.0deg) scale(0.90) translateZ(0);
+          transform-origin: 32.0% 50%;
+        }
+
+        #trophy-center .trophy-img {
+          transform: translateX(-2.5%) scale(1.08) translateZ(0);
+          transform-origin: 50.6% 55%;
+        }
+
+        #trophy-right .trophy-img {
           transform: translateZ(0);
-        }
-
-        .trophy-hitbox {
-          position: absolute;
-          pointer-events: auto;
-          cursor: pointer;
-          z-index: 10;
-        }
-
-        #hitbox-left {
-          left: 16.91%;
-          top: 22.65%;
-          width: 19.55%;
-          height: 66.28%;
-        }
-
-        #hitbox-center {
-          left: 42.68%;
-          top: 22.52%;
-          width: 12.88%;
-          height: 61.46%;
-        }
-
-        #hitbox-right {
-          left: 60.54%;
-          top: 25%;
-          width: 13.4%;
-          height: 58.33%;
+          transform-origin: 70.5% 50%;
         }
       `}</style>
     </section>
