@@ -74,17 +74,102 @@ export default function PipesSection() {
       <h2 className="sr-only">Multiverse Conduit Countdown Transition</h2>
 
       {/* Pipem Background Image defining the exact section height */}
-      <div className="relative w-full overflow-hidden flex items-center justify-center">
+      <div className="relative min-h-[220px] sm:min-h-0 w-full overflow-hidden flex items-center justify-center bg-black py-4 sm:py-0">
         <Image
           src={pipemImg}
           alt="Multiverse Conduit Pipes Transition"
           priority
           sizes="100vw"
-          className="h-auto w-full block select-none"
+          className="h-full sm:h-auto w-full object-cover sm:object-contain block select-none min-h-[220px] sm:min-h-0"
         />
 
-        {/* Texts Graphic & Live Digits Container (1:1 with pipem.png, shifted cleanly downwards) */}
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center translate-y-[6%]">
+        {/* Mobile-Only Clean 2-Line Pure White Countdown (sm:hidden) */}
+        <div className="sm:hidden pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-2 text-center">
+          {/* Line 1: EVENT BEGINS IN */}
+          <div className="w-full flex items-center justify-center mb-1.5">
+            <h3
+              className={`${marker.className} font-bold text-white text-2xl min-[360px]:text-3xl tracking-wider uppercase drop-shadow-[0_4px_16px_rgba(0,0,0,1)]`}
+              style={{
+                WebkitTextStroke: "1px #000000",
+                textShadow: "-2px 2px 0 #000, 2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000, 0 4px 16px rgba(0,0,0,1)",
+              }}
+            >
+              EVENT BEGINS IN
+            </h3>
+          </div>
+
+          {/* Line 2: Numbers and Words on next line */}
+          <div className="flex items-center justify-center gap-3 min-[360px]:gap-4 text-white">
+            <div className="flex flex-col items-center">
+              <span
+                className={`${marker.className} font-bold text-white text-2xl min-[360px]:text-3xl leading-none`}
+                style={{
+                  WebkitTextStroke: "1px #000000",
+                  textShadow: "-2px 2px 0 #000, 2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000, 0 4px 16px rgba(0,0,0,1)",
+                }}
+              >
+                {timeLeft.days}
+              </span>
+              <span className="font-mono text-[10px] min-[360px]:text-xs font-black uppercase text-white tracking-widest mt-1">
+                DAYS
+              </span>
+            </div>
+
+            <span className={`${marker.className} text-white text-base min-[360px]:text-lg -mt-4`}>:</span>
+
+            <div className="flex flex-col items-center">
+              <span
+                className={`${marker.className} font-bold text-white text-2xl min-[360px]:text-3xl leading-none`}
+                style={{
+                  WebkitTextStroke: "1px #000000",
+                  textShadow: "-2px 2px 0 #000, 2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000, 0 4px 16px rgba(0,0,0,1)",
+                }}
+              >
+                {timeLeft.hours}
+              </span>
+              <span className="font-mono text-[10px] min-[360px]:text-xs font-black uppercase text-white tracking-widest mt-1">
+                HOURS
+              </span>
+            </div>
+
+            <span className={`${marker.className} text-white text-base min-[360px]:text-lg -mt-4`}>:</span>
+
+            <div className="flex flex-col items-center">
+              <span
+                className={`${marker.className} font-bold text-white text-2xl min-[360px]:text-3xl leading-none`}
+                style={{
+                  WebkitTextStroke: "1px #000000",
+                  textShadow: "-2px 2px 0 #000, 2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000, 0 4px 16px rgba(0,0,0,1)",
+                }}
+              >
+                {timeLeft.minutes}
+              </span>
+              <span className="font-mono text-[10px] min-[360px]:text-xs font-black uppercase text-white tracking-widest mt-1">
+                MINUTES
+              </span>
+            </div>
+
+            <span className={`${marker.className} text-white text-base min-[360px]:text-lg -mt-4`}>:</span>
+
+            <div className="flex flex-col items-center">
+              <span
+                className={`${marker.className} font-bold text-white text-2xl min-[360px]:text-3xl leading-none`}
+                style={{
+                  WebkitTextStroke: "1px #000000",
+                  textShadow: "-2px 2px 0 #000, 2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000, 0 4px 16px rgba(0,0,0,1)",
+                }}
+              >
+                {timeLeft.seconds}
+              </span>
+              <span className="font-mono text-[10px] min-[360px]:text-xs font-black uppercase text-white tracking-widest mt-1">
+                SECONDS
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Texts Graphic & Live Digits Container (hidden on mobile, visible sm+) */}
+        <div className="hidden sm:flex pointer-events-none absolute inset-0 z-10 items-center justify-center translate-y-[6%]">
           <div className="relative w-full h-full">
             {/* Base Texts Graphic ("EVENT BEGINS IN", "DAYS", "HOURS", "MINUTES", "SECONDS") */}
             <Image

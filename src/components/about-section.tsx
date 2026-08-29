@@ -24,29 +24,160 @@ export default function AboutSection() {
     () => {
       const media = gsap.matchMedia();
 
-      media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Initialize train completely offscreen to the left and headlights off
-        if (trainRef.current) {
-          gsap.set(trainRef.current, { xPercent: -150, force3D: true });
-        }
+      // Mobile Choreography (<768px): About is fully visible first, train rolls in after scroll, departs completely, and timeline scrolls without long pauses
+      media.add("(max-width: 768px)", () => {
+        const getTrainOffscreenX = () => {
+          const w = typeof window !== "undefined" ? window.innerWidth : 390;
+          const h = typeof window !== "undefined" ? window.innerHeight : 844;
+          const trainWidth = h * 1.96 * 2.3;
+          return Math.max(w * 3.0, (trainWidth + w) * 0.75);
+        };
 
+        if (trainRef.current) {
+          gsap.set(trainRef.current, { x: () => -getTrainOffscreenX(), visibility: "hidden", force3D: true });
+        }
         if (headlightsRef.current) {
           gsap.set(headlightsRef.current, { opacity: 0, force3D: true });
         }
-
         if (aboutRoomRef.current) {
           gsap.set(aboutRoomRef.current, { opacity: 1, force3D: true });
         }
-
         if (prizesContainerRef.current) {
           gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible", force3D: true });
         }
-
         if (timelineContainerRef.current) {
           gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none", force3D: true });
         }
+        if (withCutRef.current) {
+          gsap.set(withCutRef.current, { scale: 1.04, y: 0, x: 0, force3D: true });
+        }
 
-        // Keep withcut.png scaled slightly for clean horizontal parallax bleed
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 0.8,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        // 1. About section is fully visible & scrolled first from 0.00 -> 0.28
+
+        // 2. Train arrives AFTER about has been viewed (0.28 -> 0.44)
+        tl.set(trainRef.current, { visibility: "visible" }, 0.28);
+
+        tl.fromTo(
+          headlightsRef.current,
+          { opacity: 0 },
+          { opacity: 1, ease: "sine.out", duration: 0.06 },
+          0.28
+        );
+
+        tl.to(
+          trainRef.current,
+          { x: 0, ease: "sine.out", duration: 0.16 },
+          0.28
+        );
+
+        // 3. Dissolve About room & Reveal Timeline underneath as train covers screen (0.36 -> 0.44)
+        tl.to(
+          aboutRoomRef.current,
+          { opacity: 0, ease: "sine.inOut", duration: 0.08 },
+          0.36
+        );
+
+        if (timelineContainerRef.current) {
+          tl.to(
+            timelineContainerRef.current,
+            { opacity: 1, ease: "sine.inOut", duration: 0.08 },
+            0.36
+          );
+          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.44);
+        }
+
+        // 4. Train moves away completely to the right (0.44 -> 0.54)
+        tl.to(
+          trainRef.current,
+          { x: () => getTrainOffscreenX(), ease: "power1.in", duration: 0.10 },
+          0.44
+        );
+
+        // Immediately hide train so it is completely removed
+        tl.set(trainRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.54);
+
+        // In mobile timeline: web is already there unspooled till the end (100%) right from the start!
+        gsap.set(".timeline-web-clip", { height: "100%" });
+
+        // 5. Timeline scrolls directly down through all events without long pause on mobile (0.54 -> 0.74)
+        tl.to(
+          timelineScrollRef.current,
+          {
+            y: () => {
+              const el = timelineScrollRef.current;
+              if (!el) return 0;
+              const diff = el.scrollHeight - window.innerHeight;
+              return diff > 0 ? -diff : 0;
+            },
+            ease: "none",
+            duration: 0.20,
+          },
+          0.54
+        );
+
+        // 6. Smoothly glide Prizes section up over Timeline (0.74 -> 0.88)
+        tl.to(
+          timelineScrollRef.current,
+          {
+            y: () => {
+              const el = timelineScrollRef.current;
+              if (!el) return 0;
+              const diff = el.scrollHeight - window.innerHeight;
+              return diff > 0 ? -diff * 0.45 : 0;
+            },
+            ease: "power2.out",
+            duration: 0.14,
+          },
+          0.74
+        );
+
+        tl.to(
+          prizesContainerRef.current,
+          { yPercent: 0, ease: "power3.out", duration: 0.14, force3D: true },
+          0.74
+        );
+
+        if (timelineContainerRef.current && prizesContainerRef.current) {
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.88);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.88);
+        }
+        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.88);
+      });
+
+      // Desktop Choreography (>=769px)
+      media.add("(min-width: 769px)", () => {
+        const getTrainOffscreenX = () => {
+          const w = typeof window !== "undefined" ? window.innerWidth : 1920;
+          const h = typeof window !== "undefined" ? window.innerHeight : 1080;
+          const trainWidth = h * 1.96 * 2.3;
+          return Math.max(w * 2.5, (trainWidth + w) * 0.65);
+        };
+
+        if (trainRef.current) {
+          gsap.set(trainRef.current, { x: () => -getTrainOffscreenX(), visibility: "hidden", force3D: true });
+        }
+        if (headlightsRef.current) {
+          gsap.set(headlightsRef.current, { opacity: 0, force3D: true });
+        }
+        if (aboutRoomRef.current) {
+          gsap.set(aboutRoomRef.current, { opacity: 1, force3D: true });
+        }
+        if (prizesContainerRef.current) {
+          gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible", force3D: true });
+        }
+        if (timelineContainerRef.current) {
+          gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none", force3D: true });
+        }
         if (withCutRef.current) {
           gsap.set(withCutRef.current, { scale: 1.04, y: 0, x: 0, force3D: true });
         }
@@ -61,58 +192,59 @@ export default function AboutSection() {
           },
         });
 
-        // 1. Phase 1: Headlights bloom as train approaches from the dark (0.02 -> 0.08)
+        // 1. Train arrives (0.10 -> 0.28)
+        tl.set(trainRef.current, { visibility: "visible" }, 0.10);
+
         tl.fromTo(
           headlightsRef.current,
           { opacity: 0 },
-          { opacity: 1, ease: "sine.out", duration: 0.06 },
-          0.02
+          { opacity: 1, ease: "sine.out", duration: 0.08 },
+          0.10
         );
 
-        // Train rolls in smoothly & naturally from left into frame (0.02 -> 0.22)
         tl.to(
           trainRef.current,
-          { xPercent: 0, ease: "sine.out", duration: 0.20 },
-          0.02
+          { x: 0, ease: "sine.out", duration: 0.18 },
+          0.10
         );
 
-        // 2. Dissolve About room seamlessly as train covers the scene (0.12 -> 0.22)
+        // 2. Dissolve About room & Reveal Timeline underneath (0.20 -> 0.28)
         tl.to(
           aboutRoomRef.current,
-          { opacity: 0, ease: "sine.inOut", duration: 0.10 },
-          0.12
+          { opacity: 0, ease: "sine.inOut", duration: 0.08 },
+          0.20
         );
 
-        // Reveal Timeline underneath as train covers the scene (0.12 -> 0.22)
         if (timelineContainerRef.current) {
           tl.to(
             timelineContainerRef.current,
-            { opacity: 1, ease: "sine.inOut", duration: 0.10 },
-            0.12
+            { opacity: 1, ease: "sine.inOut", duration: 0.08 },
+            0.20
           );
-          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.22);
+          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.28);
         }
 
-        // 3. Phase 2: Smooth cruise across the scene (0.22 -> 0.29)
+        // 3. Cruise & Depart (0.28 -> 0.34)
         tl.to(
           trainRef.current,
-          { xPercent: 15, ease: "none", duration: 0.07 },
-          0.22
+          { x: () => typeof window !== "undefined" ? window.innerWidth * 0.12 : 150, ease: "none", duration: 0.03 },
+          0.28
         );
 
-        // 4. Phase 3: Train smoothly departs OUT to the right into Timeline (0.29 -> 0.36)
         tl.to(
           trainRef.current,
-          { xPercent: 150, ease: "power1.in", duration: 0.07 },
+          { x: () => getTrainOffscreenX(), ease: "power1.in", duration: 0.05 },
           0.29
         );
 
-        // Initialize web strand at 0% height (at Pavitr's hand)
-        gsap.set(".timeline-web-clip", {
-          height: "0%",
-        });
+        tl.set(trainRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.34);
 
-        // 5. Phase 3: Smooth Timeline Continuous Auto-Scroll through to Result Declaration (0.34 -> 0.48)
+        gsap.set(".timeline-web-clip", { height: "0%" });
+
+        // 5. Reduced PAUSE on Timeline entrance after train departs (0.34 -> 0.44)
+        // (Clean comfortable hold before scroll begins)
+
+        // 6. Smooth Timeline Continuous Auto-Scroll through to Result Declaration (0.44 -> 0.68)
         tl.to(
           timelineScrollRef.current,
           {
@@ -123,29 +255,21 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.14,
+            duration: 0.24,
           },
-          0.34
+          0.44
         );
 
-        // 5b. Web strand shoots & unspools downwards from Pavitr as user scrolls (0.34 -> 0.48)
         tl.fromTo(
           ".timeline-web-clip",
-          {
-            height: "0%",
-          },
-          {
-            height: "100%",
-            ease: "none",
-            duration: 0.14,
-          },
-          0.34
+          { height: "0%" },
+          { height: "100%", ease: "none", duration: 0.24 },
+          0.44
         );
 
-        // 6. Extended, comfortable hold on completed timeline past Result Declaration (0.48 -> 0.72)
+        // 7. Swift, minimal pause after Result Declaration (0.68 -> 0.70)
 
-        // 7. ONLY AFTER the extended pause (0.72 -> 0.84):
-        // Timeline section reverse scrolls back to its half (-diff * 0.5)
+        // 8. Prizes Rise & Timeline reverse scroll (0.70 -> 0.78)
         tl.to(
           timelineScrollRef.current,
           {
@@ -156,32 +280,24 @@ export default function AboutSection() {
               return diff > 0 ? -diff * 0.5 : 0;
             },
             ease: "power2.out",
-            duration: 0.12,
+            duration: 0.08,
           },
-          0.72
+          0.70
         );
 
-        // Prizes section gets brought fully up (yPercent: 100 -> 0) by the time reverse scroll reaches half
         tl.to(
           prizesContainerRef.current,
-          {
-            yPercent: 0,
-            ease: "power2.out",
-            duration: 0.12,
-          },
-          0.72
+          { yPercent: 0, ease: "power2.out", duration: 0.08 },
+          0.70
         );
 
-        // Switch pointer events once prizes fully covers the screen
         if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.84);
-          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.84);
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.78);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.78);
         }
+        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.78);
 
-        // Force-ensure prizes is fully in position at 0.84 (safety net)
-        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.84);
-
-        // 8. Long comfortable pause & hold on Prizes Section from 0.84 -> 1.00 before continuing scroll to next section
+        // 9. Increased, long comfortable PAUSE on Prizes Section from 0.78 -> 1.00 before continuing scroll to next section
       });
     },
     { scope: sectionRef },
@@ -243,16 +359,16 @@ export default function AboutSection() {
         >
           <div
             ref={withCutRef}
-            className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-start justify-center"
+            className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-center justify-center"
           >
-            <div className="relative h-[106%] w-[108%] top-0 -left-[4%] flex items-start justify-center translate-y-[2vh] sm:translate-y-[2.5vh] md:translate-y-[3vh]">
+            <div className="relative h-full w-full flex items-center justify-center">
               <Image
                 src={withCutImg}
                 alt="About Us Subway Station Wall"
                 fill
                 priority
                 sizes="100vw"
-                className="h-full w-full object-cover object-top select-none"
+                className="h-full w-full object-cover object-center select-none"
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-black/45" />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/40" />
@@ -262,9 +378,9 @@ export default function AboutSection() {
 
           <div
             ref={milesRef}
-            className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[12vh] sm:translate-y-[14vh] md:translate-y-[16vh]"
+            className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[6vh] sm:translate-y-[12vh] md:translate-y-[14vh]"
           >
-            <div className="relative h-full w-full">
+            <div className="relative h-full w-full flex items-end justify-center">
               <Image
                 src={milesImg}
                 alt="Miles Morales on Subway Platform Sofa"

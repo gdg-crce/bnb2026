@@ -262,7 +262,7 @@ export default function HeroGlitchReveal({
       onPointerMove={onMove}
       onPointerEnter={onEnter}
       onPointerLeave={onLeave}
-      className={`relative h-full w-full select-none overflow-hidden ${className}`}
+      className={`relative h-full w-full select-none overflow-hidden md:cursor-none ${className}`}
     >
       {/* ── Hidden SVG Liquid Spline ClipPath Definition ── */}
       <svg className="pointer-events-none absolute h-0 w-0" aria-hidden="true">

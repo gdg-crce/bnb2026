@@ -147,7 +147,7 @@ export default function SponsorsSection() {
     <section
       id="sponsors"
       ref={root}
-      className="halftone relative z-10 overflow-x-clip bg-black py-24 md:py-36 px-6"
+      className="relative z-10 overflow-x-clip bg-black py-24 md:py-36 px-6"
     >
 
       <div className="container mx-auto max-w-6xl relative z-10">
