@@ -326,7 +326,8 @@ export default function PrizesSection() {
     const lastMousePos = new THREE.Vector2(0.5, 0.5);
     let activity = 0.0;
     let targetActivity = 0.0;
-    const clock = new THREE.Clock();
+    let lastTime = performance.now();
+    const startTime = performance.now();
 
     const vertexShader = `
       varying vec2 v_uv;
@@ -746,9 +747,10 @@ export default function PrizesSection() {
 
       if (!isVisible) return;
 
-      const delta = clock.getDelta();
-      const elapsedTime = clock.getElapsedTime();
       const now = performance.now();
+      const delta = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+      const elapsedTime = (now - startTime) / 1000;
 
       mousePos.lerp(targetMousePos, 0.1);
       activity += (targetActivity - activity) * 0.08;

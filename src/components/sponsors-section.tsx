@@ -72,13 +72,6 @@ export default function SponsorsSection() {
           scrollTrigger: { trigger: ".sponsors-mark", start: "top 84%" },
         });
 
-        gsap.from(".sponsors-lede", {
-          opacity: 0,
-          y: 24,
-          duration: 0.9,
-          scrollTrigger: { trigger: ".sponsors-mark", start: "top 84%" },
-        });
-
         // Subsection titles animation
         gsap.to(".section-title", {
           opacity: 1,
