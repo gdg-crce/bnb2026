@@ -159,21 +159,26 @@ export default function AboutSection() {
           0.26
         );
 
-        // 5. Pull up the Prizes section perfectly in sync with the Timeline (0.60 -> 0.72)
-        // Instead of shrinking the web (which breaks the sync due to percentage math on a huge element),
-        // we physically pull BOTH containers up by exactly 85vh. They stay perfectly locked!
-        tl.set(prizesContainerRef.current, { opacity: 1 }, 0.59);
+        // 5. Prizes Mobile slides OVER the stationary Timeline (0.60 -> 0.72)
+        // Timeline doesn't move or fade out. Only the web retracts, 
+        // giving the illusion that the shrinking web pulls the Prizes section over the Timeline.
+
+        // Web retracts from 100% to 0% rapidly
         tl.to(
-          timelineContainerRef.current,
-          { y: () => -window.innerHeight * 0.85, ease: "power2.out", duration: 0.12, force3D: true },
+          ".timeline-web-clip",
+          { height: "0%", ease: "power2.in", duration: 0.08 },
           0.60
         );
 
-        tl.to(
-          prizesContainerRef.current,
-          { y: () => window.innerHeight * 0.15, ease: "power2.out", duration: 0.12, force3D: true },
-          0.60
-        );
+        if (prizesContainerRef.current) {
+          // Web snap effect! Prizes section pulled up rapidly
+          tl.fromTo(
+            prizesContainerRef.current,
+            { yPercent: 50 },
+            { yPercent: 0, opacity: 1, ease: "back.out(1.2)", duration: 0.12 },
+            0.60
+          );
+        }
 
         if (timelineContainerRef.current && prizesContainerRef.current) {
           tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.72);
