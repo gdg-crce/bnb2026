@@ -299,8 +299,12 @@ export default function AboutSection() {
     if (!withCutRef.current) return;
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = window;
-    const xOffset = ((clientX / innerWidth) - 0.5) * -24;
-    const yOffset = ((clientY / innerHeight) - 0.5) * -2;
+    const isMobile = window.innerWidth < 769;
+    const xMultiplier = isMobile ? -150 : -24;
+    const yMultiplier = isMobile ? -4 : -2;
+
+    const xOffset = ((clientX / innerWidth) - 0.5) * xMultiplier;
+    const yOffset = ((clientY / innerHeight) - 0.5) * yMultiplier;
 
     gsap.to(withCutRef.current, {
       x: xOffset,
@@ -350,22 +354,20 @@ export default function AboutSection() {
         >
           <div
             ref={withCutRef}
-            className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-center justify-center"
+            className="absolute inset-0 z-0 h-full w-full will-change-transform flex items-center justify-center"
           >
             <div className="relative h-full w-full flex items-center justify-center translate-y-[1.5vh] sm:translate-y-[3vh] md:translate-y-[4.5vh]">
               <Image
                 src={withCutImg}
                 alt="About Us Subway Station Wall"
-                fill
                 priority
                 unoptimized
-                sizes="100vw"
-                className="h-full w-full object-cover object-[52%_center] sm:object-center select-none scale-[1.0] sm:scale-100"
+                className="h-full w-auto max-w-none object-cover select-none scale-[1.0] sm:scale-100 -translate-x-[65vw] md:translate-x-0"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/35" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
             </div>
           </div>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/35" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
 
           <div
             ref={milesRef}
@@ -379,7 +381,7 @@ export default function AboutSection() {
                 priority
                 unoptimized
                 sizes="100vw"
-                className="h-full w-full object-cover object-[52%_bottom] sm:object-bottom select-none scale-[1.0] sm:scale-100 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
+                className="h-full w-full object-cover object-[35%_bottom] sm:object-bottom select-none scale-[1.0] sm:scale-100 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
               />
             </div>
           </div>
