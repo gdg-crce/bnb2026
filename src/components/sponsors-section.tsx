@@ -7,32 +7,36 @@ import { gsap, useGSAP } from "@/lib/gsap";
 import GhostFibers from "@/components/GhostFibers";
 
 const SponsorCard = ({ sponsor, className = "h-32 sm:h-36", tileClass = "prev-sponsor-tile" }: any) => (
-  <div className={`${tileClass} group relative p-1.5 bg-white rounded-2xl border-2 border-black/15 hover:border-[#22b6d6] transform-gpu transition-all duration-300 hover:shadow-[0_0_25px_rgba(34,182,214,0.4)] hover:-translate-y-1.5 will-change-transform shadow-[4px_4px_0px_#000000]`}>
-    <div className={`relative w-full ${className} bg-white rounded-xl overflow-hidden flex items-center justify-center p-3 sm:p-4 transform-gpu`}>
+  <div className={`${tileClass} group relative p-1 bg-[#100e18]/85 rounded-2xl border-2 border-red-500/30 hover:border-[#22b6d6] transform-gpu transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,182,214,0.35)] hover:-translate-y-1.5 opacity-0 translate-y-8 will-change-transform`}>
+    <div className={`relative w-full ${className} bg-black/40 rounded-xl overflow-hidden flex items-center justify-center p-4 transform-gpu`}>
       <Image
         src={sponsor.image}
         alt={sponsor.name}
         fill
         loading="lazy"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className="object-contain transition-transform duration-300 ease-out drop-shadow-[0_4px_10px_rgba(0,0,0,0.12)] group-hover:scale-110"
+        className={`object-contain transition-transform duration-300 ease-out drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-110 group-hover:saturate-125 group-hover:brightness-110 ${
+          sponsor.invert ? "filter invert" : ""
+        }`}
         onError={(e) => {
-          e.currentTarget.src = `https://placehold.co/200x100/ffffff/000000?text=${sponsor.name.replace(
+          e.currentTarget.src = `https://placehold.co/200x100/1a1a1a/ffffff?text=${sponsor.name.replace(
             /\s+/g,
             "+"
           )}`;
           e.currentTarget.onerror = null;
         }}
       />
-      {/* Subtle hover accent */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-red-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#22b6d6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      {/* Spiderverse Glitch / Glow overlay on hover */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-red-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#22b6d6]/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      {/* Shimmer sweep */}
+      <div className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-[220%] transition-all duration-700 ease-out"></div>
     </div>
   </div>
 );
 
 const SectionTitle = ({ children, className = "" }: any) => (
-  <h3 className={`section-title mb-6 text-xl sm:text-2xl md:text-3xl font-bold font-mono tracking-wider ${className}`}>
+  <h3 className={`section-title mb-6 text-xl sm:text-2xl md:text-3xl font-bold font-mono tracking-wider opacity-0 translate-y-6 ${className}`}>
     {children}
   </h3>
 );
@@ -48,34 +52,34 @@ export default function SponsorsSection() {
         // Sponsors title image animation
         gsap.from(".sponsors-mark", {
           opacity: 0,
-          y: 24,
-          duration: 0.8,
-          ease: "power2.out",
-          scrollTrigger: { trigger: ".sponsors-mark", start: "top 92%" },
+          y: 30,
+          duration: 1.0,
+          ease: "power3.out",
+          scrollTrigger: { trigger: ".sponsors-mark", start: "top 84%" },
         });
 
         // Subsection titles animation
-        gsap.from(".section-title", {
-          opacity: 0,
-          y: 20,
-          duration: 0.7,
-          ease: "power2.out",
+        gsap.to(".section-title", {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out",
           scrollTrigger: {
             trigger: root.current,
-            start: "top 90%",
+            start: "top 75%",
           },
         });
 
         // Previous Sponsor cards animation
-        gsap.from(".prev-sponsor-tile", {
-          opacity: 0,
-          y: 24,
-          stagger: 0.02,
-          duration: 0.6,
-          ease: "power2.out",
+        gsap.to(".prev-sponsor-tile", {
+          opacity: 1,
+          y: 0,
+          stagger: 0.03,
+          duration: 0.7,
+          ease: "back.out(1.2)",
           scrollTrigger: {
             trigger: ".prev-sponsors-container",
-            start: "top 92%",
+            start: "top 80%",
           },
         });
       });
@@ -120,7 +124,7 @@ export default function SponsorsSection() {
     <section
       id="sponsors"
       ref={root}
-      className="relative z-10 overflow-hidden bg-black pt-12 sm:pt-20 md:pt-32 pb-24 md:pb-36 px-4 sm:px-6"
+      className="relative z-10 overflow-hidden bg-black pt-10 sm:pt-14 md:pt-18 pb-20 md:pb-28 px-6"
     >
       {/* Spiderverse GhostFibers Multiverse Web Background (Darkened) */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-50">
