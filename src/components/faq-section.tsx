@@ -109,7 +109,7 @@ const FAQ_BUBBLES: BubbleFAQ[] = [
   {
     id: 7,
     question: "WHO ARE JUDGES?",
-    answer: "Top industry engineering leaders, seasoned startup founders, and veteran developers judging on innovation and impact.",
+    answer: "Top industry engineering leaders, seasoned startup founders, and veteran developers.",
     category: "EVALUATION",
     accent: "#ff2e88",
     left: "85.0%",
@@ -185,11 +185,10 @@ export default function FAQSection() {
                 viewport={{ once: true, amount: 0.1 }}
                 transition={{ duration: 0.35, delay: idx * 0.05 }}
                 onClick={() => toggleMobileAccordion(item.id)}
-                className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer ${
-                  isOpen
+                className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer ${isOpen
                     ? "bg-[#140f20] border-[#ff2e88] shadow-[3px_3px_0px_#ff2e88]"
                     : "bg-[#0d0a14]/90 border-white/15 hover:border-white/40 shadow-[3px_3px_0px_#000]"
-                }`}
+                  }`}
               >
                 {/* Comic Card Header Row */}
                 <div className="p-3.5 flex items-center justify-between gap-3">
@@ -211,11 +210,10 @@ export default function FAQSection() {
 
                   {/* Toggle Button Icon */}
                   <div
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border transition-all duration-300 ${
-                      isOpen
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border transition-all duration-300 ${isOpen
                         ? "bg-[#ff2e88] border-black text-black rotate-180 shadow-[1px_1px_0px_#000]"
                         : "bg-white/10 border-white/20 text-white"
-                    }`}
+                      }`}
                   >
                     {isOpen ? (
                       <Minus className="w-4 h-4 stroke-[3]" />
@@ -291,9 +289,8 @@ export default function FAQSection() {
             >
               {/* Halftone RGB Glitch Texture Layer (Clipped to exact oval shape) */}
               <div
-                className={`absolute inset-0 transition-opacity duration-300 pointer-events-none overflow-hidden ${
-                  isActive ? "opacity-100" : "opacity-0"
-                }`}
+                className={`absolute inset-0 transition-opacity duration-300 pointer-events-none overflow-hidden ${isActive ? "opacity-100" : "opacity-0"
+                  }`}
                 style={{
                   backgroundImage: "url('/faq-glitch.png')",
                   backgroundSize: "cover",
@@ -312,9 +309,8 @@ export default function FAQSection() {
 
               {/* Question Text (Straight, Horizontal & Dead-Centered) */}
               <div
-                className={`absolute inset-0 z-10 w-full h-full transition-all duration-300 flex items-center justify-center text-center p-2 sm:p-3 ${
-                  isActive ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100"
-                }`}
+                className={`absolute inset-0 z-10 w-full h-full transition-all duration-300 flex items-center justify-center text-center p-2 sm:p-3 ${isActive ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100"
+                  }`}
               >
                 <span
                   className={`${squada.className} font-bold text-[10px] min-[400px]:text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#0d0410] leading-tight tracking-normal uppercase max-w-[85%]`}
@@ -325,9 +321,8 @@ export default function FAQSection() {
 
               {/* Answer Text (Straight, Horizontal & Dead-Centered) */}
               <div
-                className={`absolute inset-0 z-20 w-full h-full flex items-center justify-center p-2 min-[400px]:p-2.5 sm:p-3.5 md:p-4 text-center transition-all duration-300 overflow-hidden ${
-                  isActive ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none"
-                }`}
+                className={`absolute inset-0 z-20 w-full h-full flex items-center justify-center p-2 min-[400px]:p-2.5 sm:p-3.5 md:p-4 text-center transition-all duration-300 overflow-hidden ${isActive ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none"
+                  }`}
               >
                 <span
                   className={`${squada.className} font-bold text-[8px] min-[400px]:text-[9px] min-[500px]:text-[10px] sm:text-xs md:text-sm lg:text-[15px] xl:text-base text-white leading-snug tracking-wide uppercase max-w-[82%]`}

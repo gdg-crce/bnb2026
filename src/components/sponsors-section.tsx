@@ -7,19 +7,19 @@ import { gsap, useGSAP } from "@/lib/gsap";
 import GhostFibers from "@/components/GhostFibers";
 
 const SponsorCard = ({ sponsor, className = "h-32 sm:h-36", tileClass = "prev-sponsor-tile" }: any) => (
-  <div className={`${tileClass} group relative p-1 bg-[#100e18]/85 rounded-2xl border-2 border-red-500/30 hover:border-[#22b6d6] transform-gpu transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,182,214,0.35)] hover:-translate-y-1.5 opacity-0 translate-y-8 will-change-transform`}>
-    <div className={`relative w-full ${className} bg-black/40 rounded-xl overflow-hidden flex items-center justify-center p-4 transform-gpu`}>
+  <div className={`${tileClass} group relative p-1.5 bg-white rounded-2xl border-2 border-white/20 hover:border-[#22b6d6] shadow-[0_4px_20px_rgba(0,0,0,0.35)] transform-gpu transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,182,214,0.45)] hover:-translate-y-1.5 opacity-0 translate-y-8 will-change-transform`}>
+    <div className={`relative w-full ${className} bg-white rounded-xl overflow-hidden flex items-center justify-center p-3.5 sm:p-4 transform-gpu`}>
       <Image
         src={sponsor.image}
         alt={sponsor.name}
         fill
         loading="lazy"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className={`object-contain transition-transform duration-300 ease-out drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] group-hover:scale-110 group-hover:saturate-125 group-hover:brightness-110 ${
+        className={`object-contain transition-transform duration-300 ease-out group-hover:scale-108 ${
           sponsor.invert ? "filter invert" : ""
         }`}
         onError={(e) => {
-          e.currentTarget.src = `https://placehold.co/200x100/1a1a1a/ffffff?text=${sponsor.name.replace(
+          e.currentTarget.src = `https://placehold.co/200x100/ffffff/1a1a1a?text=${sponsor.name.replace(
             /\s+/g,
             "+"
           )}`;
@@ -27,10 +27,10 @@ const SponsorCard = ({ sponsor, className = "h-32 sm:h-36", tileClass = "prev-sp
         }}
       />
       {/* Spiderverse Glitch / Glow overlay on hover */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-red-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#22b6d6]/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-red-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#22b6d6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       {/* Shimmer sweep */}
-      <div className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-[220%] transition-all duration-700 ease-out"></div>
+      <div className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-black/5 to-transparent opacity-0 translate-x-0 group-hover:opacity-100 group-hover:translate-x-[220%] transition-all duration-700 ease-out"></div>
     </div>
   </div>
 );
@@ -164,27 +164,26 @@ export default function SponsorsSection() {
       <div className="container mx-auto max-w-6xl relative z-10">
         
         {/* Section Header with sponsortitle.png */}
-        <div className="sponsors-mark relative mb-6 sm:mb-8 md:mb-10 flex items-center justify-start">
-          <div className="relative w-full max-w-[260px] sm:max-w-[360px] md:max-w-[460px]">
+        <div className="sponsors-mark relative mb-8 sm:mb-10 md:mb-12 flex items-center justify-center">
+          <div className="relative w-full max-w-[280px] sm:max-w-[380px] md:max-w-[480px]">
             <Image
               src="/sponsortitle.png"
               alt="Sponsors"
               width={605}
               height={400}
               priority
-              className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
+              className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] mx-auto"
             />
           </div>
         </div>
 
         {/* --- Previous Years Sponsors --- */}
         <div className="prev-sponsors-container">
-          <div className="text-left mb-10">
+          <div className="text-center flex flex-col items-center mb-10">
             <SectionTitle className="text-paper">
-            
               PREVIOUS SPONSORS
             </SectionTitle>
-            <div className="h-0.5 w-24 bg-[#22b6d6]/40 rounded-full mt-2 mb-8"></div>
+            <div className="h-0.5 w-24 bg-[#22b6d6]/40 rounded-full mt-2 mb-8 mx-auto"></div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             {prevSponsors.map((sponsor) => (

@@ -65,85 +65,64 @@ export default function AboutSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.1, // Optimized for mobile touch (tighter response than desktop's 1.0)
+            scrub: 0.6, // Smoother, more cinematic scrub response for mobile touch
             invalidateOnRefresh: true,
             fastScrollEnd: true, // Prevents animation overlap on fast swipes
           },
         });
 
-        // 1. Train arrives immediately as user starts scrolling (0.01 -> 0.15)
+        // 1. Train arrives smoothly as user starts scrolling (0.01 -> 0.18)
         tl.set(trainRef.current, { visibility: "visible" }, 0.01);
 
         tl.fromTo(
           headlightsRef.current,
           { opacity: 0 },
-          { opacity: 0.48, ease: "sine.out", duration: 0.05 },
+          { opacity: 0.48, ease: "sine.out", duration: 0.08 },
           0.01
         );
 
         tl.to(
           trainRef.current,
-          { x: 0, ease: "power2.out", duration: 0.14 },
+          { x: 0, ease: "power1.out", duration: 0.18 },
           0.01
         );
 
-        // 2. Train sweeps across, revealing the parallax hole (0.08 -> 0.16)
-        tl.to(
-          withCutRef.current,
-          { scale: 1.0, y: -20, x: -10, ease: "power1.inOut", duration: 0.08 },
-          0.08
-        );
-        tl.to(
-          milesRef.current,
-          { scale: 1.1, y: 15, x: 5, ease: "power1.inOut", duration: 0.08 },
-          0.08
-        );
-
-        if (timelineContainerRef.current) {
-          tl.to(
-            timelineContainerRef.current,
-            { opacity: 1, ease: "sine.inOut", duration: 0.08 },
-            0.08
-          );
-          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.16);
-        }
-
-        // 3. Dive THROUGH the hole in the wall as the train departs (0.16 -> 0.26)
-        // Mobile uses a larger scale to ensure the hole clears vertical screen edges
+        // 2. While train is covering the view (0.18 -> 0.24), hide About room completely and activate Timeline
         tl.to(
           aboutRoomRef.current,
-          { opacity: 0, ease: "power2.in", duration: 0.10 },
-          0.16
+          { opacity: 0, ease: "sine.inOut", duration: 0.06 },
+          0.18
         );
-        tl.to(
-          withCutRef.current,
-          { scale: 7.0, y: -400, x: -100, ease: "power2.in", duration: 0.10 },
-          0.16
-        );
-        tl.to(
-          milesRef.current,
-          { scale: 7.5, y: 200, x: 50, ease: "power2.in", duration: 0.10 },
-          0.16
-        );
+        tl.set(aboutRoomRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.24);
 
-        // 3. Train departs smoothly to the right (0.16 -> 0.26)
+        if (timelineContainerRef.current) {
+          tl.set(timelineContainerRef.current, { visibility: "visible" }, 0.18);
+          tl.to(
+            timelineContainerRef.current,
+            { opacity: 1, ease: "sine.inOut", duration: 0.06 },
+            0.18
+          );
+          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.24);
+        }
+
+        // 3. Train departs to the right (0.24 -> 0.38), cleanly revealing the Timeline directly underneath!
         tl.to(
           trainRef.current,
-          { x: () => getTrainOffscreenX(), ease: "power2.in", duration: 0.10 },
-          0.16
+          { x: () => getTrainOffscreenX(), ease: "sine.inOut", duration: 0.14 },
+          0.24
         );
 
-        tl.set(trainRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.26);
+        tl.set(trainRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.38);
         gsap.set(".timeline-web-clip", { height: "0%" });
 
         tl.fromTo(
           ".timeline-web-clip",
           { height: "0%" },
-          { height: "100%", ease: "none", duration: 0.36 },
-          0.26
+          { height: "100%", ease: "none", duration: 0.26 },
+          0.38
         );
 
-        // 4. Timeline scrolls completely down through ALL events (0.26 -> 0.60)
+        // 4. Timeline scrolls completely down through ALL events (0.38 -> 0.64)
         tl.to(
           timelineScrollRef.current,
           {
@@ -154,52 +133,50 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.34,
+            duration: 0.26,
           },
-          0.26
+          0.38
         );
 
-        // 5. Prizes Mobile slides OVER the stationary Timeline (0.60 -> 0.72)
-        // Timeline doesn't move or fade out. Only the web retracts, 
-        // giving the illusion that the shrinking web pulls the Prizes section over the Timeline.
+        // 5. Web Pull Transition (0.64 -> 0.78):
+        // The web pulls the Prizes section up over the timeline while the timeline recoils / scrolls back up
+        tl.to(
+          timelineScrollRef.current,
+          {
+            y: () => {
+              const el = timelineScrollRef.current;
+              if (!el) return 0;
+              const diff = el.scrollHeight - window.innerHeight;
+              return diff > 0 ? -diff * 0.40 : 0;
+            },
+            ease: "power2.out",
+            duration: 0.14,
+          },
+          0.64
+        );
 
-        // Web retracts from 100% to 0% rapidly
+        // The web contracts smoothly, staying attached to the top of Prizes throughout the entire pull up
         tl.to(
           ".timeline-web-clip",
-          { height: "0%", ease: "power2.in", duration: 0.08 },
-          0.60
+          { height: "24%", ease: "power2.out", duration: 0.14 },
+          0.64
         );
 
         if (prizesContainerRef.current) {
-          // Web snap effect! Prizes section pulled up rapidly
           tl.fromTo(
             prizesContainerRef.current,
-            { yPercent: 50 },
-            { yPercent: 0, opacity: 1, ease: "back.out(1.2)", duration: 0.12 },
-            0.60
+            { y: () => window.innerHeight, opacity: 1 },
+            { y: 0, opacity: 1, ease: "power2.out", duration: 0.14, force3D: true },
+            0.64
           );
         }
 
         if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.72);
-          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.72);
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.78);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.78);
         }
 
-        // 6. Scroll Prizes up along with the Web to simulate native scrolling (0.72 -> 1.00)
-        tl.to(
-          timelineContainerRef.current,
-          {
-            y: () => {
-              const el = prizesContainerRef.current;
-              if (!el) return 0;
-              return -el.offsetHeight; // Perfect mathematical lock with the prizes container
-            },
-            ease: "none",
-            duration: 0.28
-          },
-          0.72
-        );
-
+        // 6. User smoothly scrolls through the Prizes content (0.78 -> 1.00)
         tl.to(
           prizesContainerRef.current,
           {
@@ -210,9 +187,9 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.28,
+            duration: 0.22,
           },
-          0.72
+          0.78
         );
       });
 
@@ -436,7 +413,7 @@ export default function AboutSection() {
         className="sticky top-0 h-screen w-full overflow-hidden bg-black flex items-center justify-center"
       >
         {/* LAYER 0: The Timeline Section (Hidden until train enters) */}
-        <div ref={timelineContainerRef} className="absolute inset-0 z-0 h-full w-full pointer-events-none overflow-hidden bg-black opacity-0">
+        <div ref={timelineContainerRef} className="absolute inset-0 z-10 h-full w-full pointer-events-none overflow-hidden bg-black opacity-0">
           <div ref={timelineScrollRef} className="relative w-full">
             <TimelineSection />
           </div>

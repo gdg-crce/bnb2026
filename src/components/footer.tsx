@@ -38,7 +38,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className={`${montserrat.className} relative z-20 w-full overflow-hidden bg-[#070b14] text-white pt-10 pb-6 px-6 sm:px-12 border-t border-white/10 select-none`}>
+    <footer className={`${montserrat.className} relative z-20 w-full overflow-hidden bg-black text-white pt-10 pb-6 px-6 sm:px-12 border-t border-white/30 md:border-t-0 select-none`}>
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 pb-8 border-b border-white/10">
         {/* Col 1: Brand & Tagline */}
         <div className="md:col-span-5 flex flex-col justify-between">

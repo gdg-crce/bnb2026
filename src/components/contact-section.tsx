@@ -17,6 +17,16 @@ interface CardItem {
 
 const CARDS: CardItem[] = [
   {
+    id: "shalom",
+    name: "SHALOM MENDES",
+    role: "VICE CHAIRPERSON",
+    value: "+91 75069 69477",
+    href: "tel:+917506969477",
+    type: "phone",
+    copyLabel: "COPY NUMBER",
+    accent: "#ff2e88",
+  },
+  {
     id: "kevin",
     name: "KEVIN SYNET",
     role: "HEAD OF OPERATIONS",
@@ -70,42 +80,54 @@ export default function ContactSection() {
   return (
     <section
       id="contact"
-      className="relative w-full overflow-hidden bg-black flex flex-col items-center justify-center select-none py-4 sm:py-6"
+      className="relative w-full overflow-hidden bg-black flex flex-col items-center justify-center select-none pt-2 pb-6 sm:py-6"
     >
       <h2 className="sr-only">Contact Us</h2>
 
       {/* ========================================================================= */}
       {/* 1. MOBILE RESPONSIVE CONTACT VIEW (< 768px)                               */}
       {/* ========================================================================= */}
-      <div className="md:hidden relative w-full flex flex-col items-center px-3 py-6 z-10">
-        <div className="relative w-full max-w-sm flex flex-col items-center">
-          {/* Header Title */}
-          <div className="w-full flex items-center justify-center mb-5">
-            <h3
-              className="text-3xl font-black text-white uppercase tracking-tight"
-              style={{
-                fontFamily: '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
-                textShadow: "2px 2px 0px #ff2e88, -2px -2px 0px #00f0ff",
-              }}
-            >
-              CONTACT US
-            </h3>
-          </div>
+      <div className="md:hidden relative w-full flex flex-col items-center px-4 pt-4 pb-8 z-10">
+        {/* Header Title Image - Dead Centered & Clean */}
+        <div className="w-full flex items-center justify-center mb-5">
+          <img
+            src="/contactuslogo.png"
+            alt="Contact Us"
+            className="w-[80vw] max-w-[330px] h-auto object-contain block mx-auto select-none pointer-events-none"
+            draggable={false}
+          />
+        </div>
 
+        <div className="relative w-full max-w-sm flex flex-col items-center">
           {/* 2-Column Responsive Comic Cards Grid */}
           <div className="grid grid-cols-2 gap-2.5 w-full">
             {CARDS.map((card) => (
               <div
                 key={card.id}
-                className="relative w-full bg-[#faf8f5] rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex flex-col items-center text-center p-2.5 select-none"
+                style={{
+                  fontFamily: '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                }}
+                className={`relative w-full bg-[#faf8f5] rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex flex-col items-center text-center p-2.5 select-none ${
+                  card.id === "email" ? "col-span-2 max-w-[260px] mx-auto" : ""
+                }`}
               >
                 {/* 1. Name */}
-                <h4 className="font-black text-black text-[12px] uppercase tracking-tight leading-tight font-sans mt-0.5">
+                <h4
+                  className="font-black text-black text-[12px] uppercase tracking-tight leading-tight mt-0.5"
+                  style={{
+                    fontFamily: '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                  }}
+                >
                   {card.name}
                 </h4>
 
                 {/* 2. Role Pill */}
-                <div className="mt-1 px-2 py-0.5 rounded-full border border-[#d2d0cc] bg-[#eae8e4] text-[#ff2e88] text-[7.5px] font-bold tracking-widest uppercase leading-none">
+                <div
+                  className="mt-1 px-2 py-0.5 rounded-full border border-[#d2d0cc] bg-[#eae8e4] text-[#ff2e88] text-[7.5px] font-bold tracking-widest uppercase leading-none"
+                  style={{
+                    fontFamily: '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                  }}
+                >
                   {card.role}
                 </div>
 
@@ -189,19 +211,21 @@ export default function ContactSection() {
           draggable={false}
         />
 
-        {/* 4 Contact Cards arranged 2 boxes per line in a 2x2 grid */}
+        {/* Contact Cards arranged in grid */}
         <div
-          className="absolute z-10 grid grid-cols-2 gap-2 sm:gap-3 md:gap-4.5"
+          className="absolute z-10 grid grid-cols-2 gap-2 sm:gap-2.5 md:gap-3"
           style={{
             left: "4%",
             width: "44%",
-            bottom: "13%",
+            bottom: "8%",
           }}
         >
           {CARDS.map((card) => (
             <div
               key={card.id}
-              className="relative w-full bg-[#faf8f5] rounded-[12px] sm:rounded-[16px] border-[1.5px] sm:border-[2px] border-black shadow-[2.5px_2.5px_0px_#000] sm:shadow-[3.5px_3.5px_0px_#000] flex flex-col items-center text-center p-2 sm:p-2.5 md:p-3 select-none transition-transform duration-200 hover:scale-[1.02]"
+              className={`relative w-full bg-[#faf8f5] rounded-[10px] sm:rounded-[14px] border-[1.5px] sm:border-[2px] border-black shadow-[2px_2px_0px_#000] sm:shadow-[3px_3px_0px_#000] flex flex-col items-center text-center p-1.5 sm:p-2 md:p-2.5 select-none transition-transform duration-200 hover:scale-[1.02] ${
+                card.id === "email" ? "col-span-2 max-w-[280px] mx-auto" : ""
+              }`}
             >
               {/* 1. Name */}
               <h3 className="font-black text-black text-[clamp(11px,1.45vw,20px)] uppercase tracking-tight leading-none font-sans mt-0.5">

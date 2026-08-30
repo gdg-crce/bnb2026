@@ -75,49 +75,49 @@ export default function DomainsSection() {
           },
         });
 
-        // 1. Train arrives smoothly from left (0.04 -> 0.32)
+        // 1. Train arrives smoothly and much slower from left (0.02 -> 0.40)
         tl.to(
           trainRef.current,
           {
             xPercent: 0,
-            ease: "power2.out",
-            duration: 0.28,
+            ease: "power1.out",
+            duration: 0.38,
           },
-          0.04,
+          0.02,
         );
 
-        // 2. HUD & Track Badges glide in (0.28 -> 0.38)
+        // 2. HUD & Track Badges glide in (0.35 -> 0.46)
         tl.fromTo(
           hudRef.current,
           { opacity: 0, y: -20 },
-          { opacity: 1, y: 0, ease: "sine.out", duration: 0.10 },
-          0.28,
+          { opacity: 1, y: 0, ease: "sine.out", duration: 0.11 },
+          0.35,
         );
 
         tl.fromTo(
           cardsRef.current,
           { opacity: 0, y: 30 },
           { opacity: 1, y: 0, ease: "sine.out", duration: 0.12 },
-          0.30,
+          0.38,
         );
 
-        // 3. Train holds full-screen during (0.38 -> 0.65) for comfortable exploration
+        // 3. Train holds full-screen during (0.46 -> 0.65) for comfortable exploration
 
-        // 4. Train scrolls away much slower and gradually to the right (0.55 -> 1.00)
+        // 4. Train scrolls away much slower and gradually to the right (0.60 -> 1.00)
         tl.to(
           trainRef.current,
           {
             xPercent: 100,
             ease: "power1.inOut",
-            duration: 0.45,
+            duration: 0.40,
           },
-          0.55,
+          0.60,
         );
 
         tl.to(
           [hudRef.current, cardsRef.current],
           { opacity: 0, y: -20, duration: 0.20 },
-          0.55,
+          0.60,
         );
       });
 

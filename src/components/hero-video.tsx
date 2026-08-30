@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import HeroGlitchReveal from "@/components/hero-glitch-reveal";
 import heroBgImg from "../../public/images/herobg.png";
-import logoImg from "../../public/images/logo.png";
-import blackLogoImg from "../../public/images/blacklogo.png";
+import logoImg from "../../public/images/herologo.png";
+import blackLogoImg from "../../public/images/blackhero.png";
 
 /**
  * Cinematic Hero Sequence:
@@ -130,9 +130,9 @@ export default function HeroVideo() {
 
         {/* Layer 1: Base Red Logo */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-[8vh] z-10 flex justify-center opacity-100 sm:top-[20vh] md:top-[24vh] transform-gpu will-change-transform px-1 sm:px-4"
+          className="pointer-events-none absolute inset-x-0 top-[8.5vh] z-10 flex justify-center opacity-100 sm:top-[13vh] md:top-[14vh] lg:top-[15vh] transform-gpu will-change-transform px-2 sm:px-4"
         >
-          <div className="relative flex max-h-[62vh] w-[min(98vw,920px)] scale-[1.18] origin-center items-center justify-center sm:scale-100">
+          <div className="relative flex max-h-[58vh] w-[min(90vw,920px)] scale-100 origin-center items-center justify-center sm:max-h-[56vh] md:max-h-[58vh] sm:w-[min(90vw,860px)] md:w-[min(92vw,880px)]">
             <Image
               src={logoImg}
               alt="Bit N Build Logo"
@@ -142,7 +142,7 @@ export default function HeroVideo() {
           </div>
         </div>
 
-        {/* Layer 1b: Black Logo Mask Reveal Layer (Reveals blacklogo.png inside the liquid spline mask) */}
+        {/* Layer 1b: Black Logo Mask Reveal Layer (Reveals blackhero.png inside the liquid spline mask) */}
         <div
           className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-hidden"
           style={{
@@ -150,9 +150,9 @@ export default function HeroVideo() {
           }}
         >
           <div
-            className="pointer-events-none absolute inset-x-0 top-[8vh] flex justify-center opacity-100 sm:top-[20vh] md:top-[24vh] transform-gpu will-change-transform px-1 sm:px-4"
+            className="pointer-events-none absolute inset-x-0 top-[8.5vh] flex justify-center opacity-100 sm:top-[13vh] md:top-[14vh] lg:top-[15vh] transform-gpu will-change-transform px-2 sm:px-4"
           >
-            <div className="relative flex max-h-[62vh] w-[min(98vw,920px)] scale-[1.18] origin-center items-center justify-center sm:scale-100">
+            <div className="relative flex max-h-[58vh] w-[min(90vw,920px)] scale-100 origin-center items-center justify-center sm:max-h-[56vh] md:max-h-[58vh] sm:w-[min(90vw,860px)] md:w-[min(92vw,880px)]">
               <Image
                 src={blackLogoImg}
                 alt="Bit N Build Black Logo"
@@ -163,9 +163,9 @@ export default function HeroVideo() {
           </div>
         </div>
 
-        {/* Layer 2: Spider-Verse Yellow Dialogue Box CTA (Shifted upwards on mobile) */}
+        {/* Layer 2: Spider-Verse Yellow Dialogue Box CTA (Shifted downwards on desktop to avoid overlap) */}
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-[28vh] z-20 flex justify-center opacity-100 sm:bottom-[24vh] md:bottom-[25vh] lg:bottom-[26vh] transform-gpu will-change-transform"
+          className="pointer-events-none absolute inset-x-0 bottom-[24vh] z-20 flex justify-center opacity-100 sm:bottom-[12vh] md:bottom-[11vh] lg:bottom-[10vh] transform-gpu will-change-transform"
         >
           <div className="pointer-events-auto">
             <a

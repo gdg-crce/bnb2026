@@ -26,6 +26,7 @@ export default function PrizesSection() {
     let bgImageLoaded = false;
 
     const bgImg = new window.Image();
+    bgImg.crossOrigin = "anonymous";
     bgImg.onload = () => {
       if (isDestroyed) return;
       sampleCanvas.width = bgImg.width;
@@ -41,17 +42,10 @@ export default function PrizesSection() {
       bgImageLoaded = true;
     }
 
-    // Strictly Protected Award Zones (exact trophy silhouettes)
-    const trophySafetyZones = [
-      { minX: 0.17, maxX: 0.36, minY: 0.23, maxY: 0.88 }, // Left trophy
-      { minX: 0.43, maxX: 0.56, minY: 0.23, maxY: 0.84 }, // Center trophy
-      { minX: 0.61, maxX: 0.74, minY: 0.25, maxY: 0.83 }, // Right trophy
-    ];
-
     // -------------------------------------------------------------
-    // BUBBLE SIMULATION ENGINE (350 DENSE ROUNDED ORGANIC & STATIONARY BUBBLES)
+    // BUBBLE SIMULATION ENGINE (PACKED FOR 100% MAC/SAFARI WEBGL COMPATIBILITY)
     // -------------------------------------------------------------
-    const MAX_BUBBLES = 350;
+    const MAX_BUBBLES = 80;
     interface Bubble {
       active: boolean;
       st: THREE.Vector2;
@@ -63,11 +57,11 @@ export default function PrizesSection() {
       state: number;
       life: number;
       maxLife: number;
-      shapeParams: THREE.Vector2;
+      shapeParam: number;
     }
 
     const bubbles: Bubble[] = [];
-    for (let i = 0; i < MAX_BUBBLES; i++) {
+    for (let i = 0; i < 160; i++) {
       bubbles.push({
         active: false,
         st: new THREE.Vector2(0, 0),
@@ -79,12 +73,11 @@ export default function PrizesSection() {
         state: 0,
         life: 0.0,
         maxLife: 1.0,
-        shapeParams: new THREE.Vector2(Math.random(), Math.random()),
+        shapeParam: Math.random(),
       });
     }
 
-
-    function spawnSingleBubble(borderSt: THREE.Vector2, normX: number, normY: number, colorVec: THREE.Vector3, radiusSize: number) {
+    function spawnSingleBubble(borderSt: THREE.Vector2, colorVec: THREE.Vector3, radiusSize: number) {
       const b = bubbles.find((item) => !item.active);
       if (!b) return;
 
@@ -93,7 +86,7 @@ export default function PrizesSection() {
       b.originSt.copy(borderSt);
 
       const angle = Math.random() * Math.PI * 2;
-      const speed = 0.0002 + Math.random() * 0.0006;
+      const speed = 0.00015 + Math.random() * 0.00045;
       b.vel.set(Math.cos(angle) * speed, Math.sin(angle) * speed);
 
       b.maxRadius = radiusSize;
@@ -101,20 +94,22 @@ export default function PrizesSection() {
       b.color.copy(colorVec);
       b.state = 1;
       b.life = 0.0;
-      b.maxLife = 0.7 + Math.random() * 1.5;
-      b.shapeParams.set(Math.random(), Math.random());
+      b.maxLife = 0.8 + Math.random() * 2.0;
+      b.shapeParam = Math.random();
     }
 
-    function spawnBubbleCluster(mouseSt: THREE.Vector2, normX: number, normY: number, baseColorVec: THREE.Vector3 | null) {
+    function spawnBubbleCluster(mouseSt: THREE.Vector2, baseColorVec: THREE.Vector3 | null) {
       if (!baseColorVec) return;
 
-      const count = 8 + Math.floor(Math.random() * 7);
-      const isBaseBlack = (baseColorVec.x < 0.15 && baseColorVec.y < 0.15 && baseColorVec.z < 0.20);
+      const count = 6 + Math.floor(Math.random() * 6);
+      const isBaseBlack = baseColorVec.x < 0.15 && baseColorVec.y < 0.15 && baseColorVec.z < 0.20;
 
       for (let i = 0; i < count; i++) {
         const offsetAngle = Math.random() * Math.PI * 2;
-        const offsetDist = Math.random() * 0.070;
-        const spawnSt = mouseSt.clone().add(new THREE.Vector2(Math.cos(offsetAngle) * offsetDist, Math.sin(offsetAngle) * offsetDist));
+        const offsetDist = Math.random() * 0.065;
+        const spawnSt = mouseSt
+          .clone()
+          .add(new THREE.Vector2(Math.cos(offsetAngle) * offsetDist, Math.sin(offsetAngle) * offsetDist));
 
         const sizeRoll = Math.random();
         let size = 0.005 + Math.random() * 0.005;
@@ -128,29 +123,35 @@ export default function PrizesSection() {
 
         let colorVar: THREE.Vector3;
         if (isBaseBlack) {
-          // Over black places -> strictly black and charcoal grey bubbles
           const roll = Math.random();
           if (roll < 0.55) {
             colorVar = new THREE.Vector3(0.015, 0.015, 0.025);
           } else if (roll < 0.85) {
-            colorVar = new THREE.Vector3(0.06 + Math.random() * 0.03, 0.06 + Math.random() * 0.03, 0.09 + Math.random() * 0.03);
+            colorVar = new THREE.Vector3(
+              0.06 + Math.random() * 0.03,
+              0.06 + Math.random() * 0.03,
+              0.09 + Math.random() * 0.03
+            );
           } else {
-            colorVar = new THREE.Vector3(0.12 + Math.random() * 0.04, 0.12 + Math.random() * 0.04, 0.16 + Math.random() * 0.04);
+            colorVar = new THREE.Vector3(
+              0.12 + Math.random() * 0.04,
+              0.12 + Math.random() * 0.04,
+              0.16 + Math.random() * 0.04
+            );
           }
         } else {
-          // Over colored artwork -> 70% pure artwork color (purple over purple, blue over blue), 30% black ink accent
-          if (Math.random() < 0.30) {
+          if (Math.random() < 0.3) {
             colorVar = new THREE.Vector3(0.015, 0.015, 0.025);
           } else {
             colorVar = new THREE.Vector3(
-              Math.min(1.0, baseColorVec.x * (0.90 + Math.random() * 0.20)),
-              Math.min(1.0, baseColorVec.y * (0.90 + Math.random() * 0.20)),
-              Math.min(1.0, baseColorVec.z * (0.90 + Math.random() * 0.20))
+              Math.min(1.0, baseColorVec.x * (0.9 + Math.random() * 0.2)),
+              Math.min(1.0, baseColorVec.y * (0.9 + Math.random() * 0.2)),
+              Math.min(1.0, baseColorVec.z * (0.9 + Math.random() * 0.2))
             );
           }
         }
 
-        spawnSingleBubble(spawnSt, normX, normY, colorVar, size);
+        spawnSingleBubble(spawnSt, colorVar, size);
       }
     }
 
@@ -194,10 +195,10 @@ export default function PrizesSection() {
       const clampedX = Math.max(0.0, Math.min(1.0, normX));
       const clampedY = Math.max(0.0, Math.min(1.0, normY));
 
-      const aspect = ((stage?.clientWidth || 1920) / (stage?.clientHeight || 1080));
-      const distFromCenter = Math.hypot((clampedX - 0.5) * aspect, (1.0 - clampedY) - 0.5);
+      const aspect = (stage?.clientWidth || 1920) / (stage?.clientHeight || 1080);
+      const distFromCenter = Math.hypot((clampedX - 0.5) * aspect, 1.0 - clampedY - 0.5);
 
-      // Don't bubble in the center (keeps center awards & trophies clean and unobstructed)
+      // Don't bubble directly in center (keeps trophies unobstructed)
       if (distFromCenter < 0.22) {
         return null;
       }
@@ -223,78 +224,85 @@ export default function PrizesSection() {
       const px = Math.floor(zoomedX * sampleCanvas.width);
       const py = Math.floor(zoomedY * sampleCanvas.height);
 
-      // Sample neighborhood patch to catch true artwork ink color
       const radius = 4;
       const startX = Math.max(0, px - radius);
       const startY = Math.max(0, py - radius);
       const width = Math.min(sampleCanvas.width - startX, radius * 2 + 1);
       const height = Math.min(sampleCanvas.height - startY, radius * 2 + 1);
 
-      const patchData = sampleCtx.getImageData(startX, startY, width, height).data;
-      let maxVibrancy = -1;
-      let bestR = 0,
-        bestG = 0,
-        bestB = 0;
+      try {
+        const patchData = sampleCtx.getImageData(startX, startY, width, height).data;
+        let maxVibrancy = -1;
+        let bestR = 0,
+          bestG = 0,
+          bestB = 0;
 
-      for (let i = 0; i < patchData.length; i += 4) {
-        const pr = patchData[i] / 255.0;
-        const pg = patchData[i + 1] / 255.0;
-        const pb = patchData[i + 2] / 255.0;
+        for (let i = 0; i < patchData.length; i += 4) {
+          const pr = patchData[i] / 255.0;
+          const pg = patchData[i + 1] / 255.0;
+          const pb = patchData[i + 2] / 255.0;
 
-        const maxC = Math.max(pr, Math.max(pg, pb));
-        const minC = Math.min(pr, Math.min(pg, pb));
-        const chroma = (maxC - minC) * maxC;
+          const maxC = Math.max(pr, Math.max(pg, pb));
+          const minC = Math.min(pr, Math.min(pg, pb));
+          const chroma = (maxC - minC) * maxC;
 
-        if (chroma > maxVibrancy) {
-          maxVibrancy = chroma;
-          bestR = pr;
-          bestG = pg;
-          bestB = pb;
+          if (chroma > maxVibrancy) {
+            maxVibrancy = chroma;
+            bestR = pr;
+            bestG = pg;
+            bestB = pb;
+          }
         }
+
+        const luma = bestR * 0.299 + bestG * 0.587 + bestB * 0.114;
+
+        if (luma < 0.14 || maxVibrancy < 0.02) {
+          const roll = Math.random();
+          if (roll < 0.6) {
+            return new THREE.Vector3(0.015, 0.015, 0.025);
+          } else if (roll < 0.88) {
+            return new THREE.Vector3(
+              0.06 + Math.random() * 0.03,
+              0.06 + Math.random() * 0.03,
+              0.09 + Math.random() * 0.03
+            );
+          } else {
+            return new THREE.Vector3(
+              0.12 + Math.random() * 0.04,
+              0.12 + Math.random() * 0.04,
+              0.16 + Math.random() * 0.04
+            );
+          }
+        }
+
+        if (normX < 0.48 && (bestR > 0.12 || bestB > 0.12)) {
+          const purpleRoll = Math.random();
+          if (purpleRoll < 0.5) {
+            return new THREE.Vector3(0.55 + Math.random() * 0.1, 0.02 + Math.random() * 0.04, 0.92 + Math.random() * 0.06);
+          } else if (purpleRoll < 0.85) {
+            return new THREE.Vector3(0.65 + Math.random() * 0.08, 0.04 + Math.random() * 0.04, 0.95 + Math.random() * 0.04);
+          } else {
+            return new THREE.Vector3(0.4 + Math.random() * 0.08, 0.02 + Math.random() * 0.03, 0.85 + Math.random() * 0.08);
+          }
+        }
+
+        if (normX >= 0.48 && (bestB > 0.15 || bestG > 0.15)) {
+          const cyanRoll = Math.random();
+          if (cyanRoll < 0.55) {
+            return new THREE.Vector3(0.0, 0.82 + Math.random() * 0.18, 0.98 + Math.random() * 0.02);
+          } else {
+            return new THREE.Vector3(0.08 + Math.random() * 0.1, 0.48 + Math.random() * 0.2, 0.98 + Math.random() * 0.02);
+          }
+        }
+      } catch {
+        // Fallback for strict browser context
       }
 
-      const luma = bestR * 0.299 + bestG * 0.587 + bestB * 0.114;
-
-      // 1. BLACK PLACES: Bubble black and dark charcoal grey around the black areas
-      if (luma < 0.14 || maxVibrancy < 0.02) {
-        const roll = Math.random();
-        if (roll < 0.60) {
-          return new THREE.Vector3(0.015, 0.015, 0.025); // Deep ink black
-        } else if (roll < 0.88) {
-          return new THREE.Vector3(0.06 + Math.random() * 0.03, 0.06 + Math.random() * 0.03, 0.09 + Math.random() * 0.03); // Charcoal dark grey
-        } else {
-          return new THREE.Vector3(0.12 + Math.random() * 0.04, 0.12 + Math.random() * 0.04, 0.16 + Math.random() * 0.04); // Medium ink grey
-        }
-      }
-
-      // 2. PURPLE PLACES (Left & Left-Center): Royal Purple / Deep Violet / Indigo
-      if (normX < 0.48 && (bestR > 0.12 || bestB > 0.12)) {
-        const purpleRoll = Math.random();
-        if (purpleRoll < 0.50) {
-          return new THREE.Vector3(0.55 + Math.random() * 0.10, 0.02 + Math.random() * 0.04, 0.92 + Math.random() * 0.06); // Deep royal purple
-        } else if (purpleRoll < 0.85) {
-          return new THREE.Vector3(0.65 + Math.random() * 0.08, 0.04 + Math.random() * 0.04, 0.95 + Math.random() * 0.04); // Luminous violet
-        } else {
-          return new THREE.Vector3(0.40 + Math.random() * 0.08, 0.02 + Math.random() * 0.03, 0.85 + Math.random() * 0.08); // Dark indigo
-        }
-      }
-
-      // 3. BLUE PLACES (Right & Right-Center): Electric Cyan / Royal Blue
-      if (normX >= 0.48 && (bestB > 0.15 || bestG > 0.15)) {
-        const cyanRoll = Math.random();
-        if (cyanRoll < 0.55) {
-          return new THREE.Vector3(0.0, 0.82 + Math.random() * 0.18, 0.98 + Math.random() * 0.02); // Electric cyan
-        } else {
-          return new THREE.Vector3(0.08 + Math.random() * 0.10, 0.48 + Math.random() * 0.20, 0.98 + Math.random() * 0.02); // Royal blue
-        }
-      }
-
-      // Default dark ink for ambiguous dark pixels
-      return new THREE.Vector3(0.015, 0.015, 0.025);
+      return normX < 0.48 ? new THREE.Vector3(0.55, 0.04, 0.92) : new THREE.Vector3(0.0, 0.85, 1.0);
     }
 
     // -------------------------------------------------------------
-    // WEBGL SHADER SYSTEM
+    // WEBGL SHADER SYSTEM (Metal / Safari / WebKit Optimized)
     // -------------------------------------------------------------
     const mousePos = new THREE.Vector2(0.5, 0.5);
     const targetMousePos = new THREE.Vector2(0.5, 0.5);
@@ -313,15 +321,19 @@ export default function PrizesSection() {
     `;
 
     const fragmentShader = `
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+
       uniform sampler2D u_texture;
       uniform vec2 u_mouse;
       uniform float u_activity;
       uniform float u_time;
       uniform vec2 u_resolution;
 
-      uniform vec4 u_bubbles[200];
-      uniform vec3 u_bubbleColors[200];
-      uniform vec2 u_bubbleParams[200];
+      #define NUM_BUBBLES 80
+      uniform vec4 u_bubbleA[NUM_BUBBLES]; // xy: pos, z: radius, w: state
+      uniform vec4 u_bubbleB[NUM_BUBBLES]; // xyz: color, w: shapeParam
 
       varying vec2 v_uv;
 
@@ -334,7 +346,7 @@ export default function PrizesSection() {
 
       void main() {
         vec2 uv = v_uv;
-        float aspect = u_resolution.x / u_resolution.y;
+        float aspect = u_resolution.x / max(u_resolution.y, 1.0);
         vec2 st = (uv - vec2(0.5)) * vec2(aspect, 1.0);
         vec2 mouseSt = (u_mouse - vec2(0.5)) * vec2(aspect, 1.0);
         
@@ -403,26 +415,27 @@ export default function PrizesSection() {
           compColor += webPulseColor * webPulse * 0.45;
         }
         
-        // 3. PURE FILLED DENSE ROUNDED MUTATING BUBBLES (200 SLOTS)
+        // 3. PURE FILLED DENSE ROUNDED MUTATING BUBBLES
         float fps = 12.0;
         float steppedTime = floor(u_time * fps) / fps;
 
-        for (int i = 0; i < 200; i++) {
-          vec4 bData = u_bubbles[i];
-          float radius = bData.z;
-          float state = bData.w;
+        for (int i = 0; i < NUM_BUBBLES; i++) {
+          vec4 bA = u_bubbleA[i];
+          float radius = bA.z;
+          float state = bA.w;
 
           if (radius > 0.0003) {
-            vec2 bSt = bData.xy;
-            vec3 bColor = u_bubbleColors[i];
-            vec2 bParams = u_bubbleParams[i];
+            vec2 bSt = bA.xy;
+            vec4 bB = u_bubbleB[i];
+            vec3 bColor = bB.xyz;
+            float shapeParam = bB.w;
 
             vec2 delta = st - bSt;
             float r = length(delta);
-            float theta = atan(delta.y, delta.x);
+            float theta = (r > 0.0001) ? atan(delta.y, delta.x) : 0.0;
 
-            float h1 = sin(2.0 * theta + bParams.x * 6.28 + steppedTime * 1.2);
-            float h2 = cos(3.0 * theta + bParams.y * 6.28);
+            float h1 = sin(2.0 * theta + shapeParam * 6.28 + steppedTime * 1.2);
+            float h2 = cos(3.0 * theta + shapeParam * 3.14);
             float roundedShape = 1.0 + 0.08 * h1 + 0.05 * h2;
 
             float effectiveRadius = radius * roundedShape;
@@ -449,11 +462,11 @@ export default function PrizesSection() {
       }
     `;
 
-    // --- IMMEDIATE WebGL Init (matches reference PRIZES/main.js) ---
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
       powerPreference: "high-performance",
+      alpha: true,
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
@@ -470,13 +483,11 @@ export default function PrizesSection() {
     bgTexture.magFilter = THREE.LinearFilter;
     bgTexture.generateMipmaps = false;
 
-    const bubbleVec4s: THREE.Vector4[] = [];
-    const bubbleColors: THREE.Vector3[] = [];
-    const bubbleParams: THREE.Vector2[] = [];
+    const bubbleAVecs: THREE.Vector4[] = [];
+    const bubbleBVecs: THREE.Vector4[] = [];
     for (let i = 0; i < MAX_BUBBLES; i++) {
-      bubbleVec4s.push(new THREE.Vector4(0, 0, 0, 0));
-      bubbleColors.push(new THREE.Vector3(0, 0, 0));
-      bubbleParams.push(new THREE.Vector2(0, 0));
+      bubbleAVecs.push(new THREE.Vector4(0, 0, 0, 0));
+      bubbleBVecs.push(new THREE.Vector4(0, 0, 0, 0));
     }
 
     const material = new THREE.ShaderMaterial({
@@ -490,9 +501,8 @@ export default function PrizesSection() {
         u_resolution: {
           value: new THREE.Vector2(stage.clientWidth || 1920, stage.clientHeight || 1080),
         },
-        u_bubbles: { value: bubbleVec4s },
-        u_bubbleColors: { value: bubbleColors },
-        u_bubbleParams: { value: bubbleParams },
+        u_bubbleA: { value: bubbleAVecs },
+        u_bubbleB: { value: bubbleBVecs },
       },
     });
 
@@ -519,14 +529,14 @@ export default function PrizesSection() {
     resizeObserver.observe(stage);
 
     // -------------------------------------------------------------
-    // MOUSE INTERACTION (Full Section + Stage)
+    // MOUSE & POINTER INTERACTION (Full Section + Stage + Safari/Mac Support)
     // -------------------------------------------------------------
     let lastSpawnTime = 0;
 
-    const onStageMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (clientX: number, clientY: number) => {
       const rect = stage.getBoundingClientRect();
-      const rawNormX = (e.clientX - rect.left) / rect.width;
-      const rawNormY = 1.0 - (e.clientY - rect.top) / rect.height;
+      const rawNormX = (clientX - rect.left) / rect.width;
+      const rawNormY = 1.0 - (clientY - rect.top) / rect.height;
       const normX = Math.max(0.0, Math.min(1.0, rawNormX));
       const normY = Math.max(0.0, Math.min(1.0, rawNormY));
 
@@ -541,11 +551,19 @@ export default function PrizesSection() {
       targetActivity = Math.min(1.0, activity + distMoved * 8.0 + 0.15);
 
       const now = performance.now();
-      if (now - lastSpawnTime > 50) {
+      if (now - lastSpawnTime > 40) {
         lastSpawnTime = now;
         const sampledColor = sampleArtworkColor(normX, normY);
-        spawnBubbleCluster(mouseSt, normX, 1.0 - normY, sampledColor);
+        spawnBubbleCluster(mouseSt, sampledColor);
       }
+    };
+
+    const onStageMouseMove = (e: MouseEvent) => {
+      handlePointerMove(e.clientX, e.clientY);
+    };
+
+    const onStagePointerMove = (e: PointerEvent) => {
+      handlePointerMove(e.clientX, e.clientY);
     };
 
     const onStageMouseLeave = () => {
@@ -553,47 +571,62 @@ export default function PrizesSection() {
     };
 
     stage.addEventListener("mousemove", onStageMouseMove);
+    stage.addEventListener("pointermove", onStagePointerMove);
     stage.addEventListener("mouseleave", onStageMouseLeave);
     if (section && section !== stage) {
       section.addEventListener("mousemove", onStageMouseMove);
+      section.addEventListener("pointermove", onStagePointerMove);
       section.addEventListener("mouseleave", onStageMouseLeave);
     }
 
     // -------------------------------------------------------------
-    // AMBIENT CONTINUOUS IDLE BUBBLING (Rich Black & Grey Majority, Outward Flow)
+    // CONTINUOUS AMBIENT & EDGE BUBBLING (Rich Side and Edge Density)
     // -------------------------------------------------------------
     let lastAmbientSpawnTime = 0;
 
     function spawnAmbientBubbles(now: number) {
-      if (now - lastAmbientSpawnTime < 30) return;
+      if (now - lastAmbientSpawnTime < 28) return;
       lastAmbientSpawnTime = now;
 
       let activeCount = 0;
-      for (let i = 0; i < MAX_BUBBLES; i++) {
+      for (let i = 0; i < bubbles.length; i++) {
         if (bubbles[i].active) activeCount++;
       }
 
-      // Maintain a rich, continuous baseline of 240+ active ambient & stationary bubbles throughout
-      if (activeCount < 260) {
-        const aspect = ((stage?.clientWidth || 1920) / (stage?.clientHeight || 1080));
-        const spawnBatch = 3 + Math.floor(Math.random() * 4); // 3 to 6 bubbles per tick
+      if (activeCount < 110) {
+        const aspect = (stage?.clientWidth || 1920) / (stage?.clientHeight || 1080);
+        const spawnBatch = 3 + Math.floor(Math.random() * 4);
 
         for (let s = 0; s < spawnBatch; s++) {
-          const ambientNormX = 0.005 + Math.random() * 0.99;
-          const ambientNormY = 0.005 + Math.random() * 0.99;
+          // 65% biased specifically to outer left/right edges and top/bottom perimeter
+          let ambientNormX: number;
+          let ambientNormY: number;
+
+          if (Math.random() < 0.65) {
+            // Edge zones: Left edge (0.01 - 0.28) or Right edge (0.72 - 0.99)
+            if (Math.random() < 0.5) {
+              ambientNormX = 0.01 + Math.random() * 0.27; // Left edge
+            } else {
+              ambientNormX = 0.72 + Math.random() * 0.27; // Right edge
+            }
+            ambientNormY = 0.05 + Math.random() * 0.90;
+          } else {
+            ambientNormX = 0.02 + Math.random() * 0.96;
+            ambientNormY = Math.random() < 0.5 ? 0.02 + Math.random() * 0.22 : 0.76 + Math.random() * 0.22;
+          }
 
           const sampledColor = sampleArtworkColor(ambientNormX, ambientNormY);
-          if (!sampledColor) continue; // Skips the center
+          if (!sampledColor) continue;
 
           const ambientSt = new THREE.Vector2((ambientNormX - 0.5) * aspect, ambientNormY - 0.5);
           const sizeRoll = Math.random();
           let size: number;
           if (sizeRoll < 0.45) {
-            size = 0.004 + Math.random() * 0.004; // small ink speckle
-          } else if (sizeRoll < 0.80) {
-            size = 0.009 + Math.random() * 0.007; // medium organic bubble
+            size = 0.004 + Math.random() * 0.004;
+          } else if (sizeRoll < 0.8) {
+            size = 0.009 + Math.random() * 0.007;
           } else {
-            size = 0.017 + Math.random() * 0.011; // large floating orb
+            size = 0.017 + Math.random() * 0.011;
           }
 
           const b = bubbles.find((item) => !item.active);
@@ -602,8 +635,7 @@ export default function PrizesSection() {
             b.st.copy(ambientSt);
             b.originSt.copy(ambientSt);
 
-            // 60% stationary/breathing bubbles, 40% gentle slow drift
-            const isStationary = Math.random() < 0.60;
+            const isStationary = Math.random() < 0.6;
             if (isStationary) {
               b.vel.set(0, 0);
             } else {
@@ -617,19 +649,27 @@ export default function PrizesSection() {
             b.color.copy(sampledColor);
             b.state = 1;
             b.life = 0.0;
-            b.maxLife = 3.5 + Math.random() * 5.0; // Long-lived stationary orbs
-            b.shapeParams.set(Math.random(), Math.random());
+            b.maxLife = 3.5 + Math.random() * 5.0;
+            b.shapeParam = Math.random();
           }
         }
       }
     }
 
-    // Seed initial ambient & stationary bubbles across the entire artwork including outer edges
+    // Seed initial ambient & stationary bubbles along sides and edges
     function seedInitialBubbles() {
-      const aspect = ((stage?.clientWidth || 1920) / (stage?.clientHeight || 1080));
-      for (let i = 0; i < 200; i++) {
-        const ambientNormX = 0.005 + Math.random() * 0.99;
-        const ambientNormY = 0.005 + Math.random() * 0.99;
+      const aspect = (stage?.clientWidth || 1920) / (stage?.clientHeight || 1080);
+      for (let i = 0; i < 90; i++) {
+        let ambientNormX: number;
+        let ambientNormY: number;
+
+        if (i < 45) {
+          ambientNormX = 0.01 + Math.random() * 0.28; // Left side
+          ambientNormY = 0.05 + Math.random() * 0.90;
+        } else {
+          ambientNormX = 0.72 + Math.random() * 0.27; // Right side
+          ambientNormY = 0.05 + Math.random() * 0.90;
+        }
 
         const sampledColor = sampleArtworkColor(ambientNormX, ambientNormY);
         if (!sampledColor) continue;
@@ -640,7 +680,7 @@ export default function PrizesSection() {
           b.active = true;
           b.st.copy(ambientSt);
           b.originSt.copy(ambientSt);
-          const isStationary = Math.random() < 0.60;
+          const isStationary = Math.random() < 0.6;
           if (isStationary) {
             b.vel.set(0, 0);
           } else {
@@ -648,13 +688,13 @@ export default function PrizesSection() {
             const speed = 0.00008 + Math.random() * 0.00018;
             b.vel.set(Math.cos(outwardAngle) * speed, Math.sin(outwardAngle) * speed);
           }
-          b.maxRadius = 0.005 + Math.random() * 0.014;
+          b.maxRadius = 0.006 + Math.random() * 0.014;
           b.currentRadius = b.maxRadius * (0.4 + Math.random() * 0.6);
           b.color.copy(sampledColor);
           b.state = 2;
           b.maxLife = 3.5 + Math.random() * 5.0;
           b.life = b.maxLife * Math.random();
-          b.shapeParams.set(Math.random(), Math.random());
+          b.shapeParam = Math.random();
         }
       }
     }
@@ -695,9 +735,7 @@ export default function PrizesSection() {
       activity += (targetActivity - activity) * 0.08;
       targetActivity *= 0.94;
 
-      // Continuously spawn ambient idle bubbles
       spawnAmbientBubbles(now);
-
       updateBubbles(delta);
 
       if (material && renderer && scene && camera) {
@@ -705,19 +743,21 @@ export default function PrizesSection() {
         material.uniforms.u_activity.value = activity;
         material.uniforms.u_time.value = elapsedTime;
 
-        const bVecs = material.uniforms.u_bubbles.value as THREE.Vector4[];
-        const bCols = material.uniforms.u_bubbleColors.value as THREE.Vector3[];
-        const bPars = material.uniforms.u_bubbleParams.value as THREE.Vector2[];
+        const bA = material.uniforms.u_bubbleA.value as THREE.Vector4[];
+        const bB = material.uniforms.u_bubbleB.value as THREE.Vector4[];
 
-        for (let i = 0; i < MAX_BUBBLES; i++) {
+        let activeIdx = 0;
+        for (let i = 0; i < bubbles.length && activeIdx < MAX_BUBBLES; i++) {
           const b = bubbles[i];
           if (b.active) {
-            bVecs[i].set(b.st.x, b.st.y, b.currentRadius, b.state);
-            bCols[i].copy(b.color);
-            bPars[i].copy(b.shapeParams);
-          } else {
-            bVecs[i].set(0, 0, 0, 0);
+            bA[activeIdx].set(b.st.x, b.st.y, b.currentRadius, b.state);
+            bB[activeIdx].set(b.color.x, b.color.y, b.color.z, b.shapeParam);
+            activeIdx++;
           }
+        }
+        for (let i = activeIdx; i < MAX_BUBBLES; i++) {
+          bA[i].set(0, 0, 0, 0);
+          bB[i].set(0, 0, 0, 0);
         }
 
         renderer.render(scene, camera);
@@ -733,9 +773,11 @@ export default function PrizesSection() {
       window.removeEventListener("resize", resizeWebGL);
       resizeObserver.disconnect();
       stage.removeEventListener("mousemove", onStageMouseMove);
+      stage.removeEventListener("pointermove", onStagePointerMove);
       stage.removeEventListener("mouseleave", onStageMouseLeave);
       if (section && section !== stage) {
         section.removeEventListener("mousemove", onStageMouseMove);
+        section.removeEventListener("pointermove", onStagePointerMove);
         section.removeEventListener("mouseleave", onStageMouseLeave);
       }
 
@@ -817,6 +859,8 @@ export default function PrizesSection() {
           position: relative;
           overflow: hidden;
           pointer-events: auto;
+          -webkit-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0);
         }
 
         .stage-container {
@@ -826,6 +870,8 @@ export default function PrizesSection() {
           background-color: #000000;
           overflow: hidden;
           pointer-events: auto;
+          -webkit-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0);
         }
 
         .stage-content-wrapper {
@@ -833,29 +879,12 @@ export default function PrizesSection() {
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
+          -webkit-transform: translate(-50%, -50%);
           width: min(100vw, calc(100vh * (16 / 9)));
           height: min(100vh, calc(100vw * (9 / 16)));
           aspect-ratio: 16 / 9;
           pointer-events: none;
           z-index: 3;
-        }
-
-        @media (max-width: 768px) {
-          .stage-content-wrapper {
-            width: 100vw;
-            height: calc(100vw * (9 / 16));
-            transform: translate(-50%, -50%) scale(2.15);
-            transform-origin: center center;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .stage-content-wrapper {
-            width: 100vw;
-            height: calc(100vw * (9 / 16));
-            transform: translate(-50%, -50%) scale(2.35);
-            transform-origin: center center;
-          }
         }
 
         #bg-canvas {
@@ -867,6 +896,8 @@ export default function PrizesSection() {
           display: block;
           z-index: 1;
           pointer-events: none;
+          -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
         }
 
         #webs-layer {
@@ -886,6 +917,7 @@ export default function PrizesSection() {
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%) scale(0.78);
+          -webkit-transform: translate(-50%, -50%) scale(0.78);
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -900,26 +932,13 @@ export default function PrizesSection() {
           top: 3.5%;
           left: 50%;
           transform: translateX(-50%);
+          -webkit-transform: translateX(-50%);
           width: clamp(220px, 20vw, 320px);
           z-index: 10;
           pointer-events: none;
           display: flex;
           justify-content: center;
           align-items: center;
-        }
-
-        @media (max-width: 768px) {
-          #prizes-title-layer {
-            top: 30.0%;
-            width: clamp(160px, 44vw, 240px);
-          }
-        }
-
-        @media (max-width: 480px) {
-          #prizes-title-layer {
-            top: 31.5%;
-            width: clamp(145px, 46vw, 210px);
-          }
         }
 
         .prizes-title-img {
@@ -929,6 +948,7 @@ export default function PrizesSection() {
           pointer-events: none;
           display: block;
           image-rendering: high-quality;
+          -webkit-filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
           filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
         }
 
@@ -941,6 +961,7 @@ export default function PrizesSection() {
           z-index: 5;
           pointer-events: none;
           transform: translateX(-1.8%);
+          -webkit-transform: translateX(-1.8%);
         }
 
         .prizes-money-img {
@@ -953,6 +974,7 @@ export default function PrizesSection() {
           pointer-events: none;
           display: block;
           image-rendering: high-quality;
+          -webkit-filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
           filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.8));
         }
 
@@ -974,6 +996,7 @@ export default function PrizesSection() {
           height: 100%;
           pointer-events: none !important;
           transform: none !important;
+          -webkit-transform: none !important;
           will-change: auto;
         }
 
@@ -991,18 +1014,24 @@ export default function PrizesSection() {
         }
 
         #trophy-left .trophy-img {
-          transform: translateX(-4.0%) translateY(3.0%) rotate(-12.0deg) scale(0.90) translateZ(0);
-          transform-origin: 32.0% 50%;
+          transform: translateX(-4%) translateY(3%) rotate(-12deg) scale(0.9) translateZ(0);
+          -webkit-transform: translateX(-4%) translateY(3%) rotate(-12deg) scale(0.9) translateZ(0);
+          transform-origin: 32% 50%;
+          -webkit-transform-origin: 32% 50%;
         }
 
         #trophy-center .trophy-img {
           transform: translateX(-2.5%) scale(1.08) translateZ(0);
+          -webkit-transform: translateX(-2.5%) scale(1.08) translateZ(0);
           transform-origin: 50.6% 55%;
+          -webkit-transform-origin: 50.6% 55%;
         }
 
         #trophy-right .trophy-img {
           transform: translateZ(0);
+          -webkit-transform: translateZ(0);
           transform-origin: 70.5% 50%;
+          -webkit-transform-origin: 70.5% 50%;
         }
       `}</style>
     </section>

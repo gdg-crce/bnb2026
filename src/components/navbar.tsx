@@ -101,12 +101,12 @@ export default function Navbar() {
             aria-label={isExpanded ? "Close navigation" : "Open navigation"}
             className="relative flex items-center justify-center p-1 rounded-full cursor-pointer transition-transform duration-200 active:scale-95 group focus:outline-none"
           >
-            <div className="relative w-7 h-7 lg:w-8 lg:h-8 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+            <div className="relative w-8 h-6 lg:w-9 lg:h-6.5 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
               <Image
-                src="/logo.png"
-                alt="Bit N Build Logo"
-                width={32}
-                height={32}
+                src="/gdglogo.png"
+                alt="GDG Crystal Logo"
+                width={48}
+                height={26}
                 className="w-full h-full object-contain select-none pointer-events-none drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]"
                 priority
               />
@@ -149,14 +149,14 @@ export default function Navbar() {
           onClick={toggleNavbar}
           aria-label={isExpanded ? "Close navigation" : "Open navigation"}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center justify-center p-2 rounded-full bg-black/85 border border-white/15 backdrop-blur-xl shadow-lg cursor-pointer focus:outline-none"
+          className="flex items-center justify-center px-2 py-1.5 rounded-full bg-black/85 border border-white/15 backdrop-blur-xl shadow-lg cursor-pointer focus:outline-none"
         >
           <Image
-            src="/logo.png"
-            alt="Bit N Build Logo"
-            width={26}
-            height={26}
-            className="w-6 h-6 object-contain select-none pointer-events-none"
+            src="/gdglogo.png"
+            alt="GDG Crystal Logo"
+            width={34}
+            height={19}
+            className="w-7 h-4 object-contain select-none pointer-events-none"
             priority
           />
         </motion.button>

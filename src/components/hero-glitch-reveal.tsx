@@ -52,8 +52,24 @@ export default function HeroGlitchReveal({
   const timeRef = useRef(0);
 
   const [isActive, setIsActive] = useState(false);
+  const [effectiveRevealSize, setEffectiveRevealSize] = useState(revealSize);
 
-  const baseRadius = revealSize / 2;
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== "undefined") {
+        if (window.innerWidth < 640) {
+          setEffectiveRevealSize(Math.min(revealSize * 0.72, 200));
+        } else {
+          setEffectiveRevealSize(revealSize);
+        }
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [revealSize]);
+
+  const baseRadius = effectiveRevealSize / 2;
 
   /* ── Measure exact object-cover image coordinates ── */
   useEffect(() => {
@@ -206,20 +222,22 @@ export default function HeroGlitchReveal({
     if (!rafRef.current) rafRef.current = requestAnimationFrame(tick);
   }, [tick]);
 
-  /* ── Pointer Event Handlers ── */
-  const onMove = useCallback(
-    (e: React.PointerEvent) => {
+  /* ── Pointer & Touch Event Handlers for Desktop Hover and Mobile Drag ── */
+  const updatePosition = useCallback(
+    (clientX: number, clientY: number, isStarting = false) => {
       const r = containerRef.current?.getBoundingClientRect();
       if (!r) return;
-      const x = e.clientX - r.left;
-      const y = e.clientY - r.top;
+      const x = clientX - r.left;
+      const y = clientY - r.top;
       target.current = { x, y };
 
-      if (!isHovered.current) {
+      if (isStarting || !isHovered.current) {
         isHovered.current = true;
         targetScale.current = 1;
         setIsActive(true);
-        current.current = { x, y };
+        if (isStarting) {
+          current.current = { x, y };
+        }
       }
 
       startLoop();
@@ -227,23 +245,47 @@ export default function HeroGlitchReveal({
     [startLoop],
   );
 
-  const onEnter = useCallback(
+  const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      const r = containerRef.current?.getBoundingClientRect();
-      if (!r) return;
-      const x = e.clientX - r.left;
-      const y = e.clientY - r.top;
-      target.current = { x, y };
-      current.current = { x, y };
-      isHovered.current = true;
-      targetScale.current = 1;
-      setIsActive(true);
-      startLoop();
+      updatePosition(e.clientX, e.clientY, true);
     },
-    [startLoop],
+    [updatePosition],
   );
 
-  const onLeave = useCallback(() => {
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      updatePosition(e.clientX, e.clientY, false);
+    },
+    [updatePosition],
+  );
+
+  const onPointerUp = useCallback(() => {
+    isHovered.current = false;
+    targetScale.current = 0;
+    startLoop();
+  }, [startLoop]);
+
+  const onTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        updatePosition(touch.clientX, touch.clientY, true);
+      }
+    },
+    [updatePosition],
+  );
+
+  const onTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        updatePosition(touch.clientX, touch.clientY, false);
+      }
+    },
+    [updatePosition],
+  );
+
+  const onTouchEnd = useCallback(() => {
     isHovered.current = false;
     targetScale.current = 0;
     startLoop();
@@ -259,10 +301,17 @@ export default function HeroGlitchReveal({
   return (
     <div
       ref={containerRef}
-      onPointerMove={onMove}
-      onPointerEnter={onEnter}
-      onPointerLeave={onLeave}
-      className={`relative h-full w-full select-none overflow-hidden md:cursor-none ${className}`}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerEnter={onPointerMove}
+      onPointerLeave={onPointerUp}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchEnd}
+      className={`relative h-full w-full select-none overflow-hidden touch-pan-y md:cursor-none ${className}`}
     >
       {/* ── Hidden SVG Liquid Spline ClipPath Definition ── */}
       <svg className="pointer-events-none absolute h-0 w-0" aria-hidden="true">
