@@ -13,8 +13,6 @@ export default function Home() {
       <HeroVideo />
       <PipesSection />
       <AboutSection />
-      {/* Mobile-only prizes section in normal document flow right above Sponsors */}
-      <PrizesMobileSection />
       <SponsorsSection />
       <FAQSection />
       <ContactSection />

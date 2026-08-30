@@ -8,6 +8,7 @@ import milesImg from "../../public/about/miles.png";
 import bigTrainTightImg from "../../public/trainwithdeets.png";
 import TimelineSection from "./timeline-section";
 import PrizesSection from "./prizes-section";
+import PrizesMobileSection from "./prizes-mobile-section";
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -43,10 +44,10 @@ export default function AboutSection() {
           gsap.set(aboutRoomRef.current, { opacity: 1, force3D: true });
         }
         if (prizesContainerRef.current) {
-          gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible", force3D: true });
+          gsap.set(prizesContainerRef.current, { y: () => window.innerHeight, opacity: 0, pointerEvents: "none", visibility: "visible", force3D: true });
         }
         if (timelineContainerRef.current) {
-          gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none", force3D: true });
+          gsap.set(timelineContainerRef.current, { y: 0, opacity: 0, pointerEvents: "none", force3D: true });
         }
         if (withCutRef.current) {
           gsap.set(withCutRef.current, { scale: 1.0, y: 0, x: 0, force3D: true });
@@ -111,7 +112,7 @@ export default function AboutSection() {
           0.26
         );
 
-        // 4. Timeline scrolls completely down through ALL events (0.26 -> 1.00)
+        // 4. Timeline scrolls completely down through ALL events (0.26 -> 0.60)
         tl.to(
           timelineScrollRef.current,
           {
@@ -122,9 +123,60 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.74,
+            duration: 0.34,
           },
           0.26
+        );
+
+        // 5. Pull up the Prizes section perfectly in sync with the Timeline (0.60 -> 0.72)
+        // Instead of shrinking the web (which breaks the sync due to percentage math on a huge element),
+        // we physically pull BOTH containers up by exactly 85vh. They stay perfectly locked!
+        tl.set(prizesContainerRef.current, { opacity: 1 }, 0.59);
+        tl.to(
+          timelineContainerRef.current,
+          { y: () => -window.innerHeight * 0.85, ease: "power2.out", duration: 0.12, force3D: true },
+          0.60
+        );
+
+        tl.to(
+          prizesContainerRef.current,
+          { y: () => window.innerHeight * 0.15, ease: "power2.out", duration: 0.12, force3D: true },
+          0.60
+        );
+
+        if (timelineContainerRef.current && prizesContainerRef.current) {
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.72);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.72);
+        }
+
+        // 6. Scroll Prizes up along with the Web to simulate native scrolling (0.72 -> 1.00)
+        tl.to(
+          timelineContainerRef.current,
+          {
+            y: () => {
+              const el = prizesContainerRef.current;
+              if (!el) return 0;
+              return -el.offsetHeight; // Perfect mathematical lock with the prizes container
+            },
+            ease: "none",
+            duration: 0.28
+          },
+          0.72
+        );
+
+        tl.to(
+          prizesContainerRef.current,
+          {
+            y: () => {
+              const el = prizesContainerRef.current;
+              if (!el) return 0;
+              const diff = el.offsetHeight - window.innerHeight;
+              return diff > 0 ? -diff : 0;
+            },
+            ease: "none",
+            duration: 0.28,
+          },
+          0.72
         );
       });
 
@@ -309,7 +361,7 @@ export default function AboutSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative h-[800vh] md:h-[1100vh] w-full bg-black -mt-px -mb-px"
+      className="relative h-[1100vh] w-full bg-black -mt-px -mb-px"
     >
       <h2 className="sr-only">About Us, Timeline & Prizes</h2>
 
@@ -454,9 +506,14 @@ export default function AboutSection() {
         {/* LAYER 3: The Prizes Stage (Slides Up Over Timeline Silky Smooth) */}
         <div
           ref={prizesContainerRef}
-          className="absolute inset-0 z-30 h-full w-full pointer-events-auto will-change-transform hidden md:block"
+          className="absolute top-0 left-0 z-30 min-h-screen h-auto w-full pointer-events-auto will-change-transform"
         >
-          <PrizesSection />
+          <div className="hidden md:block w-full h-screen">
+            <PrizesSection />
+          </div>
+          <div className="md:hidden w-full h-auto bg-black pb-16">
+            <PrizesMobileSection />
+          </div>
         </div>
 
       </div>
