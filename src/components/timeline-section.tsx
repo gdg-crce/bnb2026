@@ -73,13 +73,13 @@ export default function TimelineSection() {
 
       {/* Foreground Container */}
       <div className="relative z-10 w-full pt-[28vw] sm:pt-[22vw] md:pt-[18vw] lg:pt-[15vw] pb-36 sm:pb-44 md:pb-52 px-3 sm:px-6">
-        {/* Pavitr Prabhakar (Positioned at top left) */}
+        {/* Pavitr Prabhakar (Positioned safely below TIMELINE logo at top left) */}
         <motion.div
           initial={{ opacity: 0, x: -40, y: 40 }}
           whileInView={{ opacity: 1, x: 0, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="absolute top-[20vw] sm:top-[16vw] md:top-[12vw] lg:top-[10vw] -left-[1%] sm:-left-[1%] md:-left-[0.5%] w-[38%] sm:w-[32%] md:w-[26%] lg:w-[21%] pointer-events-auto z-10 select-none transform-gpu will-change-transform"
+          className="absolute top-[32vw] sm:top-[22vw] md:top-[16vw] lg:top-[12vw] left-[1%] sm:left-[0%] w-[34%] sm:w-[28%] md:w-[24%] lg:w-[20%] pointer-events-auto z-10 select-none transform-gpu will-change-transform"
         >
           <img
             src="/images/Timeline/PavitrPrabhakr.png"
@@ -88,8 +88,8 @@ export default function TimelineSection() {
           />
         </motion.div>
 
-        {/* Web Strand — Continuous silk line shooting directly from Pavitr's wrist down the full height */}
-        <div className="timeline-web-strand absolute top-[44vw] sm:top-[35vw] md:top-[28vw] lg:top-[22vw] bottom-0 left-[8%] sm:left-[12%] md:left-[14%] lg:left-[12.5%] w-[12%] sm:w-[9.5%] md:w-[8%] lg:w-[6%] pointer-events-none z-[5] transform-gpu">
+        {/* Web Strand — Silk line shooting directly out of Pavitr's hanging right wrist */}
+        <div className="timeline-web-strand absolute top-[66vw] sm:top-[50vw] md:top-[40vw] lg:top-[32vw] bottom-0 left-[4.5%] min-[400px]:left-[5%] sm:left-[6.5%] md:left-[7.5%] lg:left-[6.5%] w-[16%] min-[420px]:w-[14%] sm:w-[8.5%] md:w-[7.5%] lg:w-[5.5%] pointer-events-none z-[15] transform-gpu">
           {/* Scroll-driven height container */}
           <div
             className="timeline-web-clip relative w-full h-full overflow-hidden will-change-[height]"
@@ -100,7 +100,7 @@ export default function TimelineSection() {
             <div
               className="w-full flex flex-col items-center transform-gpu"
               style={{
-                mixBlendMode: "screen",
+                filter: "drop-shadow(0 0 8px rgba(255,255,255,0.95)) drop-shadow(0 0 18px rgba(0,240,255,0.8)) brightness(1.6) contrast(1.4)",
               }}
             >
               {Array.from({ length: 80 }).map((_, i) => (
@@ -108,9 +108,8 @@ export default function TimelineSection() {
                   key={i}
                   src="/images/Timeline/web.png"
                   alt=""
-                  loading="lazy"
                   decoding="async"
-                  className="w-full block select-none pointer-events-none scale-140 sm:scale-150"
+                  className="w-full block select-none pointer-events-none scale-150 sm:scale-150"
                   style={{
                     transform: i % 2 === 1 ? "scaleY(-1) scaleX(1.4)" : "scaleX(1.4)",
                     marginTop: i === 0 ? "0" : "-4px",
@@ -130,8 +129,8 @@ export default function TimelineSection() {
           </div>
         </div>
 
-        {/* Timeline Events Container — Larger text sizes and generous spacing */}
-        <div className="relative mt-32 sm:mt-40 md:mt-48 lg:mt-56 left-[22%] sm:left-[24%] md:left-[24%] lg:left-[22%] w-[76%] sm:w-[74%] md:w-[74%] flex flex-col gap-12 sm:gap-14 md:gap-18 lg:gap-22 pointer-events-auto z-20">
+        {/* Timeline Events Container — Clear of Spiderman with generous spacing */}
+        <div className="relative mt-64 sm:mt-56 md:mt-60 lg:mt-64 left-[22%] sm:left-[24%] md:left-[24%] lg:left-[22%] w-[76%] sm:w-[74%] md:w-[74%] flex flex-col gap-12 sm:gap-14 md:gap-18 lg:gap-22 pointer-events-auto z-20">
           {events.map((event, index) => (
             <motion.div
               key={index}

@@ -749,99 +749,117 @@ export default function PrizesSection() {
   return (
     <section id="prizes" ref={sectionRef} className="prizes-experience-section">
       {/* ============================================================== */}
-      {/* MOBILE-ONLY PRIZES VIEW (md:hidden): Title + All 3 Prizes on one screen */}
+      {/* MOBILE-ONLY PRIZES VIEW (md:hidden): 100% Visible All 3 Prizes Line by Line */}
       {/* ============================================================== */}
-      <div className="md:hidden relative z-20 w-full h-screen bg-black flex flex-col items-center justify-between pt-14 pb-8 px-2 select-none overflow-hidden">
-        {/* Spider-Verse Ambient Background Glow */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,48,140,0.25)_0%,rgba(0,240,255,0.1)_50%,transparent_80%)]" />
-
+      <div className="md:hidden relative z-20 w-full h-screen max-h-screen bg-black flex flex-col justify-between items-center pt-8 pb-4 px-3 select-none overflow-hidden">
         {/* High-Resolution Prizes Title Banner */}
-        <div className="relative z-10 w-full max-w-[280px] flex justify-center mt-2 mb-1 shrink-0">
+        <div className="relative z-10 w-full max-w-[200px] flex justify-center shrink-0 mb-1">
           <img
             src="/prizestitle.png"
             alt="PRIZES"
-            className="w-52 sm:w-64 h-auto drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)]"
+            className="w-44 sm:w-48 h-auto drop-shadow-[0_6px_20px_rgba(0,0,0,0.9)]"
             draggable={false}
           />
         </div>
 
-        {/* 3 Prizes Visible Simultaneously in a Podium Layout */}
-        <div className="relative z-10 w-full max-w-md flex-1 flex items-end justify-center gap-1.5 sm:gap-3 px-1 pb-4">
-          {/* ── 2ND PLACE (Left) ── */}
-          <div className="w-[31%] flex flex-col items-center justify-end pb-2">
-            {/* 2nd Place Trophy */}
-            <div className="relative z-10 h-28 sm:h-36 w-full flex items-end justify-center filter drop-shadow-[0_8px_20px_rgba(0,0,0,0.85)] drop-shadow-[0_0_12px_rgba(0,240,255,0.4)] pointer-events-none -mb-3">
+        {/* All 3 Prizes Arranged Line by Line (Horizontal Split Rows with Speech Tails) */}
+        <div className="relative z-10 w-full max-w-sm flex-1 flex flex-col justify-evenly gap-2.5 px-1 py-1">
+          {/* ── 1ST PLACE (Grand Winner - ₹50,000) ── */}
+          <div className="w-full flex items-center justify-between gap-2.5 bg-black">
+            {/* Clean 1st Place Trophy */}
+            <div className="relative h-24 w-20 sm:h-28 sm:w-24 shrink-0 flex items-center justify-center">
               <img
-                src="/assets/trophy-right-straight.png"
-                alt="Runner Up 2nd Place Trophy"
-                className="h-full w-auto object-contain"
-                draggable={false}
-              />
-            </div>
-
-            {/* 2nd Place Comic Card */}
-            <div className="relative z-20 w-full bg-[#110e1c] rounded-xl border-[1.5px] border-[#00f0ff] p-2 flex flex-col items-center text-center shadow-[3px_3px_0px_#000]">
-              <span className="px-1.5 py-0.5 rounded bg-black/80 border border-white/20 font-mono text-[7.5px] sm:text-[9px] font-black uppercase text-[#00f0ff] tracking-wider leading-none">
-                2ND PLACE
-              </span>
-              <span className="font-sans font-black text-lg sm:text-2xl text-white tracking-tight leading-none mt-1">
-                ₹30,000
-              </span>
-              <span className="text-[7px] sm:text-[8px] font-mono text-white/60 uppercase tracking-widest mt-0.5">
-                RUNNER UP
-              </span>
-            </div>
-          </div>
-
-          {/* ── 1ST PLACE (Center - Elevated Grand Winner) ── */}
-          <div className="w-[38%] flex flex-col items-center justify-end pb-4">
-            {/* 1st Place Tallest Center Trophy */}
-            <div className="relative z-10 h-36 sm:h-48 w-full flex items-end justify-center filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.9)] drop-shadow-[0_0_18px_rgba(255,230,0,0.5)] pointer-events-none -mb-4">
-              <img
-                src="/assets/trophy-center-trimmed.png"
+                src="/assets/trophy_04_clean.png"
                 alt="Grand Winner 1st Place Trophy"
-                className="h-full w-auto object-contain"
+                className="h-full w-auto max-w-full object-contain mx-auto transform-gpu select-none filter drop-shadow-[0_8px_18px_rgba(255,230,0,0.75)]"
                 draggable={false}
               />
             </div>
 
-            {/* 1st Place Golden Comic Card */}
-            <div className="relative z-20 w-full bg-[#181308] rounded-xl border-2 border-[#ffe600] p-2.5 flex flex-col items-center text-center shadow-[4px_4px_0px_#000]">
-              <span className="px-2 py-0.5 rounded bg-black/90 border border-[#ffe600]/40 font-mono text-[8.5px] sm:text-[10px] font-black uppercase text-[#ffe600] tracking-wider leading-none">
-                ★ 1ST PLACE ★
+            {/* 1st Place Comic Dialogue Box */}
+            <div className="relative flex-1 bg-[#FFE600] text-black rounded-xl border-[2.5px] border-black p-2 flex flex-col items-center text-center shadow-[4px_4px_0px_#000] -rotate-1">
+              {/* Comic Speech Pointer pointing left to trophy */}
+              <div className="absolute top-1/2 -left-2.5 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[8px] border-r-black" />
+              <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[7px] border-r-[#FFE600]" />
+
+              {/* Ben-Day Halftone Dot Overlay */}
+              <span className="pointer-events-none absolute inset-0 opacity-15 bg-[radial-gradient(#000_1.5px,transparent_1.5px)] [background-size:5px_5px] rounded-xl" />
+
+              <span className="relative z-10 inline-block bg-black text-[#FFE600] font-mono font-black text-[9px] uppercase px-2 py-0.5 rounded tracking-wider leading-tight">
+                ★ 1ST PLACE // GRAND WINNER ★
               </span>
-              <span className="font-sans font-black text-2xl sm:text-3xl text-[#ffe600] tracking-tight leading-none mt-1">
+              <div className="relative z-10 font-sans font-black text-2xl sm:text-3xl text-black tracking-tight leading-none mt-0.5">
                 ₹50,000
-              </span>
-              <span className="text-[7.5px] sm:text-[9px] font-mono text-white/80 uppercase tracking-widest mt-0.5">
-                GRAND WINNER
-              </span>
+              </div>
+              <div className="relative z-10 text-[8.5px] font-mono font-black uppercase text-black/85 mt-0.5 leading-tight">
+                &ldquo;THE ULTIMATE BIT N BUILD CHAMPION!&rdquo;
+              </div>
             </div>
           </div>
 
-          {/* ── 3RD PLACE (Right) ── */}
-          <div className="w-[31%] flex flex-col items-center justify-end pb-1">
-            {/* 3rd Place Trophy */}
-            <div className="relative z-10 h-26 sm:h-34 w-full flex items-end justify-center filter drop-shadow-[0_8px_20px_rgba(0,0,0,0.85)] drop-shadow-[0_0_12px_rgba(255,46,136,0.4)] pointer-events-none -mb-3">
+          {/* ── 2ND PLACE (Runner Up - ₹30,000) ── */}
+          <div className="w-full flex items-center justify-between gap-2.5 bg-black">
+            {/* Clean 2nd Place Trophy */}
+            <div className="relative h-22 w-20 sm:h-26 sm:w-24 shrink-0 flex items-center justify-center">
               <img
-                src="/left.png"
-                alt="Second Runner Up 3rd Place Trophy"
-                className="h-full w-auto object-contain"
+                src="/assets/trophy_05_clean.png"
+                alt="Runner Up 2nd Place Trophy"
+                className="h-full w-auto max-w-full object-contain mx-auto transform-gpu select-none filter drop-shadow-[0_8px_18px_rgba(0,240,255,0.75)]"
                 draggable={false}
               />
             </div>
 
-            {/* 3rd Place Comic Card */}
-            <div className="relative z-20 w-full bg-[#160d18] rounded-xl border-[1.5px] border-[#ff2e88] p-2 flex flex-col items-center text-center shadow-[3px_3px_0px_#000]">
-              <span className="px-1.5 py-0.5 rounded bg-black/80 border border-white/20 font-mono text-[7.5px] sm:text-[9px] font-black uppercase text-[#ff2e88] tracking-wider leading-none">
-                3RD PLACE
+            {/* 2nd Place Comic Dialogue Box */}
+            <div className="relative flex-1 bg-[#00F0FF] text-black rounded-xl border-[2.5px] border-black p-2 flex flex-col items-center text-center shadow-[4px_4px_0px_#000] rotate-1">
+              {/* Comic Speech Pointer pointing left to trophy */}
+              <div className="absolute top-1/2 -left-2.5 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[8px] border-r-black" />
+              <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[7px] border-r-[#00F0FF]" />
+
+              {/* Ben-Day Halftone Dot Overlay */}
+              <span className="pointer-events-none absolute inset-0 opacity-15 bg-[radial-gradient(#000_1.5px,transparent_1.5px)] [background-size:5px_5px] rounded-xl" />
+
+              <span className="relative z-10 inline-block bg-black text-[#00F0FF] font-mono font-black text-[9px] uppercase px-2 py-0.5 rounded tracking-wider leading-tight">
+                ◆ 2ND PLACE // RUNNER UP ◆
               </span>
-              <span className="font-sans font-black text-lg sm:text-2xl text-white tracking-tight leading-none mt-1">
+              <div className="relative z-10 font-sans font-black text-xl sm:text-2xl text-black tracking-tight leading-none mt-0.5">
+                ₹30,000
+              </div>
+              <div className="relative z-10 text-[8.5px] font-mono font-black uppercase text-black/85 mt-0.5 leading-tight">
+                &ldquo;OUTSTANDING MULTIVERSE INNOVATION!&rdquo;
+              </div>
+            </div>
+          </div>
+
+          {/* ── 3RD PLACE (2nd Runner Up - ₹20,000) ── */}
+          <div className="w-full flex items-center justify-between gap-2.5 bg-black">
+            {/* Clean 3rd Place Trophy */}
+            <div className="relative h-22 w-20 sm:h-26 sm:w-24 shrink-0 flex items-center justify-center">
+              <img
+                src="/assets/trophy_03_clean.png"
+                alt="2nd Runner Up 3rd Place Trophy"
+                className="h-full w-auto max-w-full object-contain mx-auto transform-gpu select-none filter drop-shadow-[0_8px_18px_rgba(255,0,85,0.75)]"
+                draggable={false}
+              />
+            </div>
+
+            {/* 3rd Place Comic Dialogue Box */}
+            <div className="relative flex-1 bg-[#FF0055] text-white rounded-xl border-[2.5px] border-black p-2 flex flex-col items-center text-center shadow-[4px_4px_0px_#000] -rotate-1">
+              {/* Comic Speech Pointer pointing left to trophy */}
+              <div className="absolute top-1/2 -left-2.5 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[8px] border-r-black" />
+              <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-r-[7px] border-r-[#FF0055]" />
+
+              {/* Ben-Day Halftone Dot Overlay */}
+              <span className="pointer-events-none absolute inset-0 opacity-15 bg-[radial-gradient(#000_1.5px,transparent_1.5px)] [background-size:5px_5px] rounded-xl" />
+
+              <span className="relative z-10 inline-block bg-black text-[#FF0055] font-mono font-black text-[9px] uppercase px-2 py-0.5 rounded tracking-wider leading-tight">
+                ▲ 3RD PLACE // 2ND RUNNER UP ▲
+              </span>
+              <div className="relative z-10 font-sans font-black text-xl sm:text-2xl text-white tracking-tight leading-none mt-0.5 drop-shadow-[1px_1px_0px_#000]">
                 ₹20,000
-              </span>
-              <span className="text-[7px] sm:text-[8px] font-mono text-white/60 uppercase tracking-widest mt-0.5">
-                2ND RUNNER UP
-              </span>
+              </div>
+              <div className="relative z-10 text-[8.5px] font-mono font-black uppercase text-white/95 mt-0.5 leading-tight">
+                &ldquo;EXCEPTIONAL TECHNICAL CRAFT!&rdquo;
+              </div>
             </div>
           </div>
         </div>

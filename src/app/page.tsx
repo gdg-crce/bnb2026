@@ -1,6 +1,7 @@
 import HeroVideo from "@/components/hero-video";
 import PipesSection from "@/components/pipes-section";
 import AboutSection from "@/components/about-section";
+import PrizesMobileSection from "@/components/prizes-mobile-section";
 import SponsorsSection from "@/components/sponsors-section";
 import FAQSection from "@/components/faq-section";
 import ContactSection from "@/components/contact-section";
@@ -12,6 +13,8 @@ export default function Home() {
       <HeroVideo />
       <PipesSection />
       <AboutSection />
+      {/* Mobile-only prizes section in normal document flow right above Sponsors */}
+      <PrizesMobileSection />
       <SponsorsSection />
       <FAQSection />
       <ContactSection />

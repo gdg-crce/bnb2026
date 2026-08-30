@@ -132,7 +132,7 @@ export default function HeroVideo() {
         <div
           className="pointer-events-none absolute inset-x-0 top-[8vh] z-10 flex justify-center opacity-100 sm:top-[20vh] md:top-[24vh] transform-gpu will-change-transform px-1 sm:px-4"
         >
-          <div className="relative flex max-h-[62vh] w-[min(98vw,920px)] items-center justify-center">
+          <div className="relative flex max-h-[62vh] w-[min(98vw,920px)] scale-[1.18] origin-center items-center justify-center sm:scale-100">
             <Image
               src={logoImg}
               alt="Bit N Build Logo"
@@ -152,7 +152,7 @@ export default function HeroVideo() {
           <div
             className="pointer-events-none absolute inset-x-0 top-[8vh] flex justify-center opacity-100 sm:top-[20vh] md:top-[24vh] transform-gpu will-change-transform px-1 sm:px-4"
           >
-            <div className="relative flex max-h-[62vh] w-[min(98vw,920px)] items-center justify-center">
+            <div className="relative flex max-h-[62vh] w-[min(98vw,920px)] scale-[1.18] origin-center items-center justify-center sm:scale-100">
               <Image
                 src={blackLogoImg}
                 alt="Bit N Build Black Logo"

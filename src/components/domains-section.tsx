@@ -55,11 +55,74 @@ export default function DomainsSection() {
   const cardsRef = useRef<HTMLDivElement>(null);
   const [activeDomain, setActiveDomain] = useState<string | null>(null);
 
-  useGSAP(
+    useGSAP(
     () => {
       const media = gsap.matchMedia();
 
-      media.add("(prefers-reduced-motion: no-preference)", () => {
+      // Mobile Choreography (<768px): Slower, smoother train arrival, hold, and departure
+      media.add("(max-width: 768px)", () => {
+        if (trainRef.current) {
+          gsap.set(trainRef.current, { xPercent: -100, force3D: true });
+        }
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 1.2,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        // 1. Train arrives smoothly from left (0.04 -> 0.32)
+        tl.to(
+          trainRef.current,
+          {
+            xPercent: 0,
+            ease: "power2.out",
+            duration: 0.28,
+          },
+          0.04,
+        );
+
+        // 2. HUD & Track Badges glide in (0.28 -> 0.38)
+        tl.fromTo(
+          hudRef.current,
+          { opacity: 0, y: -20 },
+          { opacity: 1, y: 0, ease: "sine.out", duration: 0.10 },
+          0.28,
+        );
+
+        tl.fromTo(
+          cardsRef.current,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, ease: "sine.out", duration: 0.12 },
+          0.30,
+        );
+
+        // 3. Train holds full-screen during (0.38 -> 0.65) for comfortable exploration
+
+        // 4. Train scrolls away much slower and gradually to the right (0.55 -> 1.00)
+        tl.to(
+          trainRef.current,
+          {
+            xPercent: 100,
+            ease: "power1.inOut",
+            duration: 0.45,
+          },
+          0.55,
+        );
+
+        tl.to(
+          [hudRef.current, cardsRef.current],
+          { opacity: 0, y: -20, duration: 0.20 },
+          0.55,
+        );
+      });
+
+      // Desktop Choreography (>=769px)
+      media.add("(min-width: 769px)", () => {
         if (trainRef.current) {
           gsap.set(trainRef.current, { xPercent: -100, force3D: true });
         }
@@ -127,7 +190,7 @@ export default function DomainsSection() {
     <section
       id="domains"
       ref={sectionRef}
-      className="relative h-[500vh] w-full bg-black"
+      className="relative h-[1000vh] sm:h-[500vh] w-full bg-black"
     >
       <h2 className="sr-only">Domains & Multiverse Tracks</h2>
 
