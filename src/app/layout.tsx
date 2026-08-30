@@ -33,23 +33,21 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://bitnbuild.com"),
-  title: "Bit N Build 2026 | International Hackathon by GDG CRCE",
-  description:
-    "Bit N Build 2026 is an International 24-hour hackathon organized by Google Developer Groups CRCE (GDG CRCE). Join top developers, designers, and innovators to build groundbreaking technology.",
+  metadataBase: new URL("https://bitnbuild.gdgcrce.com"),
+  title: "Bit N Build 2026 | GDG CRCE",
+  description: "Bit N Build 2026 is a hackathon organized by GDG CRCE.",
   keywords: [
     "Bit N Build",
     "Bit N Build 2026",
-    "BNB 2026",
     "GDG CRCE",
-    "Hackathon",
-    "Mumbai Hackathon",
-    "International Hackathon",
-    "Google Developer Groups",
-    "CRCE",
+    "hackathon",
+    "Mumbai hackathon",
   ],
+  alternates: {
+    canonical: "https://bitnbuild.gdgcrce.com/",
+  },
   authors: [{ name: "GDG CRCE", url: "https://gdgcrce.com" }],
-  creator: "Google Developer Groups CRCE",
+  creator: "GDG CRCE",
   publisher: "GDG CRCE",
   applicationName: "Bit N Build 2026",
   icons: {
@@ -61,10 +59,9 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png",
   },
   openGraph: {
-    title: "Bit N Build 2026 | International Hackathon by GDG CRCE",
-    description:
-      "Join developers, designers, and creators from around the world for a 24-hour sprint of coding, learning, and innovation.",
-    url: "https://bitnbuild.com",
+    title: "Bit N Build 2026 | GDG CRCE",
+    description: "Bit N Build 2026, a hackathon by GDG CRCE.",
+    url: "https://bitnbuild.gdgcrce.com/",
     siteName: "Bit N Build 2026",
     images: [
       {
@@ -79,9 +76,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bit N Build 2026 | International Hackathon by GDG CRCE",
-    description:
-      "Join developers, designers, and creators from around the world for a 24-hour sprint of coding, learning, and innovation.",
+    title: "Bit N Build 2026 | GDG CRCE",
+    description: "Bit N Build 2026, a hackathon by GDG CRCE.",
     images: ["/logo.png"],
     creator: "@gdg_crce",
   },
@@ -106,6 +102,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${archivo.variable} ${jetbrains.variable}`}>
       <head>
+        <link rel="canonical" href="https://bitnbuild.gdgcrce.com/" />
         <link rel="icon" href="/logo.png" type="image/png" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>

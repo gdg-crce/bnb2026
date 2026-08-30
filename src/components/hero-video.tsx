@@ -89,6 +89,7 @@ export default function HeroVideo() {
 
   return (
     <section
+      id="hero"
       ref={sectionRef}
       className="relative min-h-screen w-full bg-black"
     >
@@ -135,7 +136,7 @@ export default function HeroVideo() {
           <div className="relative flex max-h-[58vh] w-[min(90vw,920px)] scale-100 origin-center items-center justify-center sm:max-h-[56vh] md:max-h-[58vh] sm:w-[min(90vw,860px)] md:w-[min(92vw,880px)]">
             <Image
               src={logoImg}
-              alt="Bit N Build Logo"
+              alt="Bit N Build 2026 by GDG CRCE"
               priority
               className="h-auto w-full object-contain drop-shadow-[0_20px_60px_rgba(0,0,0,0.95)]"
             />
@@ -155,7 +156,7 @@ export default function HeroVideo() {
             <div className="relative flex max-h-[58vh] w-[min(90vw,920px)] scale-100 origin-center items-center justify-center sm:max-h-[56vh] md:max-h-[58vh] sm:w-[min(90vw,860px)] md:w-[min(92vw,880px)]">
               <Image
                 src={blackLogoImg}
-                alt="Bit N Build Black Logo"
+                alt="Bit N Build 2026 by GDG CRCE"
                 priority
                 className="h-auto w-full object-contain drop-shadow-[0_20px_60px_rgba(0,0,0,0.95)]"
               />

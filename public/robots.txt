@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bitnbuild.gdgcrce.com/sitemap.xml

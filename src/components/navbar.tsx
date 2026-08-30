@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Montserrat } from "next/font/google";
+import { useLenis } from "lenis/react";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ const ALL_LINKS = [...NAV_LEFT, ...NAV_RIGHT];
 export default function Navbar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const lenis = useLenis();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,13 +40,61 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const scrollToPosition = (top: number) => {
+    if (lenis) {
+      lenis.scrollTo(top, { duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    } else {
+      window.scrollTo({ top, behavior: "smooth" });
+    }
+  };
+
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith("#")) {
       e.preventDefault();
       setIsExpanded(false);
-      const target = document.querySelector(href);
+
+      const sectionId = href.replace("#", "");
+
+      if (sectionId === "hero") {
+        scrollToPosition(0);
+        return;
+      }
+
+      const aboutSection = document.getElementById("about");
+
+      if (aboutSection) {
+        const isMobile = window.innerWidth < 769;
+        const aboutTop = aboutSection.getBoundingClientRect().top + window.scrollY;
+        const aboutHeight = aboutSection.offsetHeight;
+
+        if (sectionId === "about") {
+          scrollToPosition(aboutTop);
+          return;
+        }
+
+        if (sectionId === "domains") {
+          const progress = isMobile ? 0.18 : 0.16;
+          scrollToPosition(aboutTop + aboutHeight * progress);
+          return;
+        }
+
+        if (sectionId === "timeline") {
+          const progress = isMobile ? 0.38 : 0.28;
+          scrollToPosition(aboutTop + aboutHeight * progress);
+          return;
+        }
+
+        if (sectionId === "prizes") {
+          const progress = isMobile ? 0.78 : 0.76;
+          scrollToPosition(aboutTop + aboutHeight * progress);
+          return;
+        }
+      }
+
+      const target = document.getElementById(sectionId) || document.querySelector(href);
       if (target) {
-        target.scrollIntoView({ behavior: "smooth" });
+        const targetTop = target.getBoundingClientRect().top + window.scrollY;
+        scrollToPosition(targetTop);
       }
     }
   };
