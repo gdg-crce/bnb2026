@@ -102,7 +102,14 @@ export default function AboutSection() {
         );
 
         tl.set(trainRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.26);
-        gsap.set(".timeline-web-clip", { height: "100%" });
+        gsap.set(".timeline-web-clip", { height: "0%" });
+
+        tl.fromTo(
+          ".timeline-web-clip",
+          { height: "0%" },
+          { height: "100%", ease: "none", duration: 0.36 },
+          0.26
+        );
 
         // 4. Timeline scrolls completely down through ALL events (0.26 -> 0.62)
         tl.to(
