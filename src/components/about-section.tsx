@@ -50,7 +50,10 @@ export default function AboutSection() {
           gsap.set(timelineContainerRef.current, { y: 0, opacity: 0, pointerEvents: "none", force3D: true });
         }
         if (withCutRef.current) {
-          gsap.set(withCutRef.current, { scale: 1.0, y: 0, x: 0, force3D: true });
+          gsap.set(withCutRef.current, { scale: 1.04, y: 0, x: 0, opacity: 1, force3D: true });
+        }
+        if (milesRef.current) {
+          gsap.set(milesRef.current, { scale: 1.0, y: 0, x: 0, opacity: 1, force3D: true });
         }
 
         const tl = gsap.timeline({
@@ -58,8 +61,9 @@ export default function AboutSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1.0,
+            scrub: 0.1, // Optimized for mobile touch (tighter response than desktop's 1.0)
             invalidateOnRefresh: true,
+            fastScrollEnd: true, // Prevents animation overlap on fast swipes
           },
         });
 
@@ -79,10 +83,15 @@ export default function AboutSection() {
           0.01
         );
 
-        // 2. Dissolve About room & Reveal Timeline underneath as train covers screen (0.08 -> 0.16)
+        // 2. Train sweeps across, revealing the parallax hole (0.08 -> 0.16)
         tl.to(
-          aboutRoomRef.current,
-          { opacity: 0, ease: "sine.inOut", duration: 0.08 },
+          withCutRef.current,
+          { scale: 1.0, y: -20, x: -10, ease: "power1.inOut", duration: 0.08 },
+          0.08
+        );
+        tl.to(
+          milesRef.current,
+          { scale: 1.1, y: 15, x: 5, ease: "power1.inOut", duration: 0.08 },
           0.08
         );
 
@@ -94,6 +103,19 @@ export default function AboutSection() {
           );
           tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.16);
         }
+
+        // 3. Dive THROUGH the hole in the wall as the train departs (0.16 -> 0.26)
+        // Mobile uses a larger scale to ensure the hole clears vertical screen edges
+        tl.to(
+          withCutRef.current,
+          { scale: 7.0, y: -400, x: -100, opacity: 0, ease: "power2.in", duration: 0.10 },
+          0.16
+        );
+        tl.to(
+          milesRef.current,
+          { scale: 7.5, y: 200, x: 50, opacity: 0, ease: "power2.in", duration: 0.10 },
+          0.16
+        );
 
         // 3. Train departs smoothly to the right (0.16 -> 0.26)
         tl.to(
@@ -361,7 +383,7 @@ export default function AboutSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative h-[1100vh] w-full bg-black -mt-px -mb-px"
+      className="relative h-[1100vh] w-full bg-black -mt-px -mb-px touch-pan-y"
     >
       <h2 className="sr-only">About Us, Timeline & Prizes</h2>
 
