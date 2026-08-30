@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import SmoothScroll from "@/components/smooth-scroll";
 import Navbar from "@/components/navbar";
 import "./globals.css";
@@ -112,6 +113,7 @@ export default function RootLayout({
         <Navbar />
         <SmoothScroll>{children}</SmoothScroll>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
