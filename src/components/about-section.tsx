@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 import withCutImg from "../../public/about/withcut.png";
@@ -15,6 +15,11 @@ export default function AboutSection() {
   const aboutRoomRef = useRef<HTMLDivElement>(null);
   const withCutRef = useRef<HTMLDivElement>(null);
   const milesRef = useRef<HTMLDivElement>(null);
+  
+  // Inner refs to isolate Gyro/Mouse parallax from ScrollTrigger animations
+  const milesInnerRef = useRef<HTMLDivElement>(null);
+  const withCutInnerRef = useRef<HTMLDivElement>(null);
+
   const trainRef = useRef<HTMLDivElement>(null);
   const headlightsRef = useRef<HTMLDivElement>(null);
   const timelineContainerRef = useRef<HTMLDivElement>(null);
@@ -345,21 +350,27 @@ export default function AboutSection() {
     { scope: sectionRef },
   );
 
-  // Interactive mouse parallax for withcut.png
+  // Interactive mouse parallax for desktop
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!withCutRef.current) return;
+    if (!withCutInnerRef.current || !milesInnerRef.current) return;
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = window;
-    const isMobile = window.innerWidth < 769;
-    const xMultiplier = isMobile ? -150 : -24;
-    const yMultiplier = isMobile ? -4 : -2;
+    // Disable on mobile so gyroscope can take over
+    if (window.innerWidth < 769) return;
 
-    const xOffset = ((clientX / innerWidth) - 0.5) * xMultiplier;
-    const yOffset = ((clientY / innerHeight) - 0.5) * yMultiplier;
+    const xOffset = ((clientX / innerWidth) - 0.5) * -24;
+    const yOffset = ((clientY / innerHeight) - 0.5) * -2;
 
-    gsap.to(withCutRef.current, {
+    gsap.to(withCutInnerRef.current, {
       x: xOffset,
       y: yOffset,
+      duration: 0.8,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+    gsap.to(milesInnerRef.current, {
+      x: -xOffset * 0.3,
+      y: -yOffset * 0.3,
       duration: 0.8,
       ease: "power2.out",
       overwrite: "auto",
@@ -367,15 +378,43 @@ export default function AboutSection() {
   };
 
   const handleMouseLeave = () => {
-    if (!withCutRef.current) return;
-    gsap.to(withCutRef.current, {
-      x: 0,
-      y: 0,
-      duration: 0.9,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
+    if (window.innerWidth < 769) return;
+    if (withCutInnerRef.current) {
+      gsap.to(withCutInnerRef.current, { x: 0, y: 0, duration: 1.2, ease: "power3.out", overwrite: "auto" });
+    }
+    if (milesInnerRef.current) {
+      gsap.to(milesInnerRef.current, { x: 0, y: 0, duration: 1.2, ease: "power3.out", overwrite: "auto" });
+    }
   };
+
+  // Mobile Gyroscope Parallax
+  useEffect(() => {
+    // Only run on mobile clients
+    if (typeof window === "undefined" || window.innerWidth >= 769) return;
+
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      if (event.gamma === null || event.beta === null) return;
+      
+      // gamma is left/right (-90 to 90)
+      // beta is front/back (-180 to 180)
+      const gamma = Math.max(-45, Math.min(45, event.gamma));
+      const beta = Math.max(-45, Math.min(45, event.beta));
+
+      // Translate tilt to pixels
+      const xOffset = (gamma / 45) * -15; 
+      const yOffset = (beta / 45) * -15;
+
+      if (withCutInnerRef.current) {
+        gsap.to(withCutInnerRef.current, { x: xOffset, y: yOffset, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+      }
+      if (milesInnerRef.current) {
+        gsap.to(milesInnerRef.current, { x: -xOffset * 0.5, y: -yOffset * 0.5, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+      }
+    };
+
+    window.addEventListener("deviceorientation", handleOrientation);
+    return () => window.removeEventListener("deviceorientation", handleOrientation);
+  }, []);
 
   return (
     <section
@@ -398,7 +437,7 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* LAYER 1: About Us Room (Framing both Miles and the pink cloud text on mobile) */}
+        {/* LAYER 1: About Us Room */}
         <div
           ref={aboutRoomRef}
           className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform overflow-hidden bg-black"
@@ -407,7 +446,7 @@ export default function AboutSection() {
             ref={withCutRef}
             className="absolute inset-0 z-0 h-full w-full will-change-transform flex items-center justify-center"
           >
-            <div className="relative h-full w-full flex items-center justify-center translate-y-[1.5vh] sm:translate-y-[3vh] md:translate-y-[4.5vh]">
+            <div ref={withCutInnerRef} className="relative h-full w-full flex items-center justify-center translate-y-[1.5vh] sm:translate-y-[3vh] md:translate-y-[4.5vh] will-change-transform transform-gpu">
               <Image
                 src={withCutImg}
                 alt="About Us Subway Station Wall"
@@ -424,7 +463,7 @@ export default function AboutSection() {
             ref={milesRef}
             className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[2vh] sm:translate-y-[8vh] md:translate-y-[14vh]"
           >
-            <div className="relative h-full w-full flex items-end justify-center">
+            <div ref={milesInnerRef} className="relative h-full w-full flex items-end justify-center will-change-transform transform-gpu">
               <Image
                 src={milesImg}
                 alt="Miles Morales on Subway Platform Sofa"
