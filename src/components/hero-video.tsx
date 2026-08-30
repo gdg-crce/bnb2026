@@ -97,9 +97,8 @@ export default function HeroVideo() {
 
       {/* Layer 0: Fullscreen Dedicated Preloader Overlay (Locks viewport, cursor visible) */}
       <div
-        className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black cursor-default transition-opacity duration-1000 ease-out ${
-          isPreloaderActive ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 z-[9999] flex items-center justify-center bg-black cursor-default transition-opacity duration-1000 ease-out ${isPreloaderActive ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
       >
         <div className="relative flex max-h-[45vh] w-[min(72vw,440px)] items-center justify-center overflow-hidden">
           <video
@@ -166,7 +165,7 @@ export default function HeroVideo() {
 
         {/* Layer 2: Spider-Verse Yellow Dialogue Box CTA (Shifted downwards on desktop to avoid overlap) */}
         <div
-          className="pointer-events-none absolute inset-x-0 bottom-[24vh] z-20 flex justify-center opacity-100 sm:bottom-[12vh] md:bottom-[11vh] lg:bottom-[10vh] transform-gpu will-change-transform"
+          className="pointer-events-none absolute inset-x-0 bottom-[30vh] z-20 flex justify-center opacity-100 sm:bottom-[12vh] md:bottom-[11vh] lg:bottom-[10vh] transform-gpu will-change-transform"
         >
           <div className="pointer-events-auto">
             <a
