@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 import withCutImg from "../../public/about/withcut.png";
-import pandcImg from "../../public/about/p+c.png";
 import milesImg from "../../public/about/miles.png";
 import bigTrainTightImg from "../../public/trainwithdeets.png";
 import TimelineSection from "./timeline-section";
@@ -14,14 +13,12 @@ export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const aboutRoomRef = useRef<HTMLDivElement>(null);
   const withCutRef = useRef<HTMLDivElement>(null);
-  const pandcRef = useRef<HTMLDivElement>(null);
   const milesRef = useRef<HTMLDivElement>(null);
   const trainRef = useRef<HTMLDivElement>(null);
   const headlightsRef = useRef<HTMLDivElement>(null);
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const timelineScrollRef = useRef<HTMLDivElement>(null);
   const prizesContainerRef = useRef<HTMLDivElement>(null);
-  const prizesScrollRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -48,9 +45,6 @@ export default function AboutSection() {
         if (prizesContainerRef.current) {
           gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible", force3D: true });
         }
-        if (prizesScrollRef.current) {
-          gsap.set(prizesScrollRef.current, { y: 0, force3D: true });
-        }
         if (timelineContainerRef.current) {
           gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none", force3D: true });
         }
@@ -68,49 +62,56 @@ export default function AboutSection() {
           },
         });
 
-        // 1. Train arrives smoothly as user scrolls (0.02 -> 0.15)
+        // 1. Train arrives immediately as user starts scrolling (0.01 -> 0.15)
         tl.set(trainRef.current, { visibility: "visible" }, 0.01);
 
         tl.fromTo(
           headlightsRef.current,
           { opacity: 0 },
-          { opacity: 0.48, ease: "sine.out", duration: 0.06 },
-          0.02
+          { opacity: 0.48, ease: "sine.out", duration: 0.05 },
+          0.01
         );
 
         tl.to(
           trainRef.current,
-          { x: 0, ease: "power2.out", duration: 0.13 },
-          0.02
+          { x: 0, ease: "power2.out", duration: 0.14 },
+          0.01
         );
 
-        // 2. Dissolve About room & Reveal Timeline underneath as train covers screen (0.10 -> 0.22)
+        // 2. Dissolve About room & Reveal Timeline underneath as train covers screen (0.08 -> 0.16)
         tl.to(
           aboutRoomRef.current,
-          { opacity: 0, ease: "sine.inOut", duration: 0.12 },
-          0.10
+          { opacity: 0, ease: "sine.inOut", duration: 0.08 },
+          0.08
         );
 
         if (timelineContainerRef.current) {
           tl.to(
             timelineContainerRef.current,
-            { opacity: 1, ease: "sine.inOut", duration: 0.12 },
-            0.10
+            { opacity: 1, ease: "sine.inOut", duration: 0.08 },
+            0.08
           );
-          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.22);
+          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.16);
         }
 
-        // 3. Train departs smoothly to the right (0.22 -> 0.55)
+        // 3. Train departs smoothly to the right (0.16 -> 0.26)
         tl.to(
           trainRef.current,
-          { x: () => getTrainOffscreenX(), ease: "power1.inOut", duration: 0.33 },
-          0.22
+          { x: () => getTrainOffscreenX(), ease: "power2.in", duration: 0.10 },
+          0.16
         );
 
-        tl.set(trainRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.55);
-        gsap.set(".timeline-web-clip", { height: "100%" });
+        tl.set(trainRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.26);
+        gsap.set(".timeline-web-clip", { height: "0%" });
 
-        // 4. Timeline scrolls completely down through ALL events (0.55 -> 0.95)
+        tl.fromTo(
+          ".timeline-web-clip",
+          { height: "0%" },
+          { height: "100%", ease: "none", duration: 0.36 },
+          0.26
+        );
+
+        // 4. Timeline scrolls completely down through ALL events (0.26 -> 0.62)
         tl.to(
           timelineScrollRef.current,
           {
@@ -121,12 +122,40 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.40,
+            duration: 0.36,
           },
-          0.55
+          0.26
         );
 
-        // 5. Natural transition out of timeline (0.95 -> 1.00)
+        // 5. Smoothly glide Prizes section up over Timeline (0.62 -> 0.76)
+        tl.to(
+          prizesContainerRef.current,
+          { yPercent: 0, ease: "power2.inOut", duration: 0.14, force3D: true },
+          0.62
+        );
+
+        tl.to(
+          timelineScrollRef.current,
+          {
+            y: () => {
+              const el = timelineScrollRef.current;
+              if (!el) return 0;
+              const diff = el.scrollHeight - window.innerHeight;
+              return diff > 0 ? -diff * 0.15 : 0;
+            },
+            ease: "power2.out",
+            duration: 0.14,
+          },
+          0.62
+        );
+
+        if (timelineContainerRef.current && prizesContainerRef.current) {
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.76);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.76);
+        }
+        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.76);
+
+        // 6. Generous Hold on Prizes Section (0.76 -> 1.00)
       });
 
       // ── Desktop Choreography (>=769px) ────────────────────────────────────────
@@ -272,15 +301,19 @@ export default function AboutSection() {
     { scope: sectionRef },
   );
 
-  // Interactive mouse parallax for withcut.png and p+c.png
+  // Interactive mouse parallax for withcut.png
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!withCutRef.current) return;
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = window;
-    const xOffset = ((clientX / innerWidth) - 0.5) * -24;
-    const yOffset = ((clientY / innerHeight) - 0.5) * -2;
+    const isMobile = window.innerWidth < 769;
+    const xMultiplier = isMobile ? -150 : -24;
+    const yMultiplier = isMobile ? -4 : -2;
 
-    gsap.to([withCutRef.current, pandcRef.current], {
+    const xOffset = ((clientX / innerWidth) - 0.5) * xMultiplier;
+    const yOffset = ((clientY / innerHeight) - 0.5) * yMultiplier;
+
+    gsap.to(withCutRef.current, {
       x: xOffset,
       y: yOffset,
       duration: 0.8,
@@ -291,7 +324,7 @@ export default function AboutSection() {
 
   const handleMouseLeave = () => {
     if (!withCutRef.current) return;
-    gsap.to([withCutRef.current, pandcRef.current], {
+    gsap.to(withCutRef.current, {
       x: 0,
       y: 0,
       duration: 0.9,
@@ -306,7 +339,7 @@ export default function AboutSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative h-[700vh] sm:h-[1100vh] w-full bg-black -mt-px -mb-px"
+      className="relative h-[1100vh] w-full bg-black -mt-px -mb-px"
     >
       <h2 className="sr-only">About Us, Timeline & Prizes</h2>
 
@@ -321,53 +354,31 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* LAYER 1: About Us Room (Layers: withcut.png -> p+c.png -> miles.png) */}
+        {/* LAYER 1: About Us Room (Framing both Miles and the pink cloud text on mobile) */}
         <div
           ref={aboutRoomRef}
           className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform overflow-hidden bg-black"
         >
-          {/* Layer 1a: Wall Background (withcut.png) */}
           <div
             ref={withCutRef}
-            className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-center justify-center"
+            className="absolute inset-0 z-0 h-full w-full will-change-transform flex items-center justify-center"
           >
             <div className="relative h-full w-full flex items-center justify-center translate-y-[1.5vh] sm:translate-y-[3vh] md:translate-y-[4.5vh]">
               <Image
                 src={withCutImg}
                 alt="About Us Subway Station Wall"
-                fill
                 priority
                 unoptimized
-                sizes="100vw"
-                className="h-full w-full object-cover object-[70%_28%] sm:object-center select-none scale-[1.10] sm:scale-100 transform-gpu"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40 sm:from-black/35 sm:to-black/35" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/30" />
-            </div>
-          </div>
-
-          {/* Layer 1b: Peter & Gwen Silhouette Cutout (p+c.png) placed on top of withcut, below miles */}
-          <div
-            ref={pandcRef}
-            className="absolute inset-0 z-10 h-full w-full will-change-transform overflow-hidden flex items-center justify-center pointer-events-none"
-          >
-            <div className="relative h-full w-full flex items-center justify-center translate-y-[1.5vh] sm:translate-y-[3vh] md:translate-y-[4.5vh]">
-              <Image
-                src={pandcImg}
-                alt="Peter and Gwen Character Layer"
-                fill
-                priority
-                unoptimized
-                sizes="100vw"
-                className="h-full w-full object-cover object-[70%_28%] sm:object-center select-none scale-[1.10] sm:scale-100 transform-gpu"
+                className="h-full w-auto max-w-none object-cover select-none scale-[1.0] sm:scale-100 -translate-x-[65vw] md:translate-x-0"
               />
             </div>
           </div>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/35" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
 
-          {/* Layer 1c: Miles Morales on sofa (miles.png) centered on mobile at bottom */}
           <div
             ref={milesRef}
-            className="absolute inset-0 z-20 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[3vh] sm:translate-y-[8vh] md:translate-y-[14vh]"
+            className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[2vh] sm:translate-y-[8vh] md:translate-y-[14vh]"
           >
             <div className="relative h-full w-full flex items-end justify-center">
               <Image
@@ -377,7 +388,7 @@ export default function AboutSection() {
                 priority
                 unoptimized
                 sizes="100vw"
-                className="h-full w-full object-cover object-[33%_bottom] sm:object-bottom select-none scale-[1.12] sm:scale-100 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)] transform-gpu"
+                className="h-full w-full object-cover object-[35%_bottom] sm:object-bottom select-none scale-[1.0] sm:scale-100 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
               />
             </div>
           </div>
@@ -470,10 +481,10 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* LAYER 3: The Prizes Stage (Desktop-only full 3D interactive stage) */}
+        {/* LAYER 3: The Prizes Stage (Slides Up Over Timeline Silky Smooth) */}
         <div
           ref={prizesContainerRef}
-          className="hidden md:block absolute inset-0 z-30 h-full w-full pointer-events-auto will-change-transform"
+          className="absolute inset-0 z-30 h-full w-full pointer-events-auto will-change-transform"
         >
           <PrizesSection />
         </div>
