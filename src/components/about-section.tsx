@@ -111,7 +111,7 @@ export default function AboutSection() {
           0.26
         );
 
-        // 4. Timeline scrolls completely down through ALL events (0.26 -> 0.62)
+        // 4. Timeline scrolls completely down through ALL events (0.26 -> 1.00)
         tl.to(
           timelineScrollRef.current,
           {
@@ -122,40 +122,10 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.36,
+            duration: 0.74,
           },
           0.26
         );
-
-        // 5. Smoothly glide Prizes section up over Timeline (0.62 -> 0.76)
-        tl.to(
-          prizesContainerRef.current,
-          { yPercent: 0, ease: "power2.inOut", duration: 0.14, force3D: true },
-          0.62
-        );
-
-        tl.to(
-          timelineScrollRef.current,
-          {
-            y: () => {
-              const el = timelineScrollRef.current;
-              if (!el) return 0;
-              const diff = el.scrollHeight - window.innerHeight;
-              return diff > 0 ? -diff * 0.15 : 0;
-            },
-            ease: "power2.out",
-            duration: 0.14,
-          },
-          0.62
-        );
-
-        if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.76);
-          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.76);
-        }
-        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.76);
-
-        // 6. Generous Hold on Prizes Section (0.76 -> 1.00)
       });
 
       // ── Desktop Choreography (>=769px) ────────────────────────────────────────
@@ -339,7 +309,7 @@ export default function AboutSection() {
       ref={sectionRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative h-[1100vh] w-full bg-black -mt-px -mb-px"
+      className="relative h-[800vh] md:h-[1100vh] w-full bg-black -mt-px -mb-px"
     >
       <h2 className="sr-only">About Us, Timeline & Prizes</h2>
 
@@ -484,7 +454,7 @@ export default function AboutSection() {
         {/* LAYER 3: The Prizes Stage (Slides Up Over Timeline Silky Smooth) */}
         <div
           ref={prizesContainerRef}
-          className="absolute inset-0 z-30 h-full w-full pointer-events-auto will-change-transform"
+          className="absolute inset-0 z-30 h-full w-full pointer-events-auto will-change-transform hidden md:block"
         >
           <PrizesSection />
         </div>
