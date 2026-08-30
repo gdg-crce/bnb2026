@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { gsap, useGSAP } from "@/lib/gsap";
 import withCutImg from "../../public/about/withcut.png";
@@ -15,6 +15,10 @@ export default function AboutSection() {
   const aboutRoomRef = useRef<HTMLDivElement>(null);
   const withCutRef = useRef<HTMLDivElement>(null);
   const milesRef = useRef<HTMLDivElement>(null);
+  
+  // Gyroscope-specific refs to prevent conflicts with GSAP ScrollTrigger or Desktop Mouse
+  const withCutGyroRef = useRef<HTMLDivElement>(null);
+  const milesGyroRef = useRef<HTMLDivElement>(null);
   const trainRef = useRef<HTMLDivElement>(null);
   const headlightsRef = useRef<HTMLDivElement>(null);
   const timelineContainerRef = useRef<HTMLDivElement>(null);
@@ -107,13 +111,18 @@ export default function AboutSection() {
         // 3. Dive THROUGH the hole in the wall as the train departs (0.16 -> 0.26)
         // Mobile uses a larger scale to ensure the hole clears vertical screen edges
         tl.to(
+          aboutRoomRef.current,
+          { opacity: 0, ease: "power2.in", duration: 0.10 },
+          0.16
+        );
+        tl.to(
           withCutRef.current,
-          { scale: 7.0, y: -400, x: -100, opacity: 0, ease: "power2.in", duration: 0.10 },
+          { scale: 7.0, y: -400, x: -100, ease: "power2.in", duration: 0.10 },
           0.16
         );
         tl.to(
           milesRef.current,
-          { scale: 7.5, y: 200, x: 50, opacity: 0, ease: "power2.in", duration: 0.10 },
+          { scale: 7.5, y: 200, x: 50, ease: "power2.in", duration: 0.10 },
           0.16
         );
 
@@ -377,6 +386,34 @@ export default function AboutSection() {
     });
   };
 
+  // Mobile Gyroscope Parallax
+  useEffect(() => {
+    // Only run on mobile clients
+    if (typeof window === "undefined" || window.innerWidth >= 769) return;
+
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      if (event.gamma === null || event.beta === null) return;
+      
+      // Limit tilt to +/- 45 degrees
+      const gamma = Math.max(-45, Math.min(45, event.gamma));
+      const beta = Math.max(-45, Math.min(45, event.beta));
+
+      // Calculate parallax offset
+      const xOffset = (gamma / 45) * -15; 
+      const yOffset = (beta / 45) * -15;
+
+      if (withCutGyroRef.current) {
+        gsap.to(withCutGyroRef.current, { x: xOffset, y: yOffset, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+      }
+      if (milesGyroRef.current) {
+        gsap.to(milesGyroRef.current, { x: -xOffset * 0.5, y: -yOffset * 0.5, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+      }
+    };
+
+    window.addEventListener("deviceorientation", handleOrientation);
+    return () => window.removeEventListener("deviceorientation", handleOrientation);
+  }, []);
+
   return (
     <section
       id="about"
@@ -407,14 +444,16 @@ export default function AboutSection() {
             ref={withCutRef}
             className="absolute inset-0 z-0 h-full w-full will-change-transform flex items-center justify-center"
           >
-            <div className="relative h-full w-full flex items-center justify-center translate-y-[1.5vh] sm:translate-y-[3vh] md:translate-y-[4.5vh]">
-              <Image
-                src={withCutImg}
-                alt="About Us Subway Station Wall"
-                priority
-                unoptimized
-                className="h-full w-auto max-w-none object-cover select-none scale-[1.0] sm:scale-100 -translate-x-[65vw] md:translate-x-0"
-              />
+            <div ref={withCutGyroRef} className="h-full w-full flex items-center justify-center will-change-transform">
+              <div className="relative h-full w-full flex items-center justify-center translate-y-[1.5vh] sm:translate-y-[3vh] md:translate-y-[4.5vh]">
+                <Image
+                  src={withCutImg}
+                  alt="About Us Subway Station Wall"
+                  priority
+                  unoptimized
+                  className="h-full w-auto max-w-none object-cover select-none scale-[1.0] sm:scale-100 -translate-x-[65vw] md:translate-x-0"
+                />
+              </div>
             </div>
           </div>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/35" />
@@ -424,16 +463,18 @@ export default function AboutSection() {
             ref={milesRef}
             className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[2vh] sm:translate-y-[8vh] md:translate-y-[14vh]"
           >
-            <div className="relative h-full w-full flex items-end justify-center">
-              <Image
-                src={milesImg}
-                alt="Miles Morales on Subway Platform Sofa"
-                fill
-                priority
-                unoptimized
-                sizes="100vw"
-                className="h-full w-full object-cover object-[35%_bottom] sm:object-bottom select-none scale-[1.0] sm:scale-100 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
-              />
+            <div ref={milesGyroRef} className="h-full w-full flex items-end justify-center will-change-transform">
+              <div className="relative h-full w-full flex items-end justify-center">
+                <Image
+                  src={milesImg}
+                  alt="Miles Morales on Subway Platform Sofa"
+                  fill
+                  priority
+                  unoptimized
+                  sizes="100vw"
+                  className="h-full w-full object-cover object-[35%_bottom] sm:object-bottom select-none scale-[1.0] sm:scale-100 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
+                />
+              </div>
             </div>
           </div>
         </div>
