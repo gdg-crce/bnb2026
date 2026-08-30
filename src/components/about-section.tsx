@@ -398,15 +398,17 @@ export default function AboutSection() {
       const gamma = Math.max(-45, Math.min(45, event.gamma));
       const beta = Math.max(-45, Math.min(45, event.beta));
 
-      // Calculate parallax offset
-      const xOffset = (gamma / 45) * -15; 
-      const yOffset = (beta / 45) * -15;
+      // Massive parallax offsets to allow panning across the room to read the text
+      const xOffset = (gamma / 45) * -350; 
+      const yOffset = (beta / 45) * -80;
 
       if (withCutGyroRef.current) {
-        gsap.to(withCutGyroRef.current, { x: xOffset, y: yOffset, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+        gsap.to(withCutGyroRef.current, { x: xOffset, y: yOffset, duration: 0.6, ease: "power2.out", overwrite: "auto" });
       }
       if (milesGyroRef.current) {
-        gsap.to(milesGyroRef.current, { x: -xOffset * 0.5, y: -yOffset * 0.5, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+        // Miles moves almost identically to maintain alignment with the hole, 
+        // but slightly slower (0.9x) to create a premium 3D depth effect.
+        gsap.to(milesGyroRef.current, { x: xOffset * 0.9, y: yOffset * 0.9, duration: 0.6, ease: "power2.out", overwrite: "auto" });
       }
     };
 
