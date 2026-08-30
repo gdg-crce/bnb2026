@@ -38,7 +38,7 @@ const CARDS: CardItem[] = [
   },
   {
     id: "laksh",
-    name: "LAKSH",
+    name: "LAKSH SHIVALKAR",
     role: "JOINT LEAD",
     value: "+91 99872 56773",
     href: "tel:+919987256773",
@@ -107,9 +107,8 @@ export default function ContactSection() {
                 style={{
                   fontFamily: '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
                 }}
-                className={`relative w-full bg-[#faf8f5] rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex flex-col items-center text-center p-2.5 select-none ${
-                  card.id === "email" ? "col-span-2 max-w-[260px] mx-auto" : ""
-                }`}
+                className={`relative w-full bg-[#faf8f5] rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex flex-col items-center text-center p-2.5 select-none ${card.id === "email" ? "col-span-2 max-w-[260px] mx-auto" : ""
+                  }`}
               >
                 {/* 1. Name */}
                 <h4
@@ -223,9 +222,8 @@ export default function ContactSection() {
           {CARDS.map((card) => (
             <div
               key={card.id}
-              className={`relative w-full bg-[#faf8f5] rounded-[10px] sm:rounded-[14px] border-[1.5px] sm:border-[2px] border-black shadow-[2px_2px_0px_#000] sm:shadow-[3px_3px_0px_#000] flex flex-col items-center text-center p-1.5 sm:p-2 md:p-2.5 select-none transition-transform duration-200 hover:scale-[1.02] ${
-                card.id === "email" ? "col-span-2 max-w-[280px] mx-auto" : ""
-              }`}
+              className={`relative w-full bg-[#faf8f5] rounded-[10px] sm:rounded-[14px] border-[1.5px] sm:border-[2px] border-black shadow-[2px_2px_0px_#000] sm:shadow-[3px_3px_0px_#000] flex flex-col items-center text-center p-1.5 sm:p-2 md:p-2.5 select-none transition-transform duration-200 hover:scale-[1.02] ${card.id === "email" ? "col-span-2 max-w-[280px] mx-auto" : ""
+                }`}
             >
               {/* 1. Name */}
               <h3 className="font-black text-black text-[clamp(11px,1.45vw,20px)] uppercase tracking-tight leading-none font-sans mt-0.5">
