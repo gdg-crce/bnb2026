@@ -108,15 +108,15 @@ export default function HeroGlitchReveal({
       for (let i = 0; i < NUM_POINTS; i++) {
         const angle = (i * 2 * Math.PI) / NUM_POINTS;
 
-        // Lively undulating liquid surface harmonic waves (fluid motion, stable center)
+        // Perfectly balanced fluid undulating liquid surface harmonic waves
         const wave =
-          Math.sin(time * 3.2 + i * 1.8) * 20 +
-          Math.cos(time * 2.5 + i * 2.6) * 15 +
-          Math.sin(time * 4.0 + i * 3.2) * 8;
+          Math.sin(time * 2.2 + i * 1.7) * 15 +
+          Math.cos(time * 1.7 + i * 2.3) * 11 +
+          Math.sin(time * 2.7 + i * 2.9) * 6.5;
 
-        // Fluid teardrop stretch along velocity vector
+        // Responsive fluid teardrop stretch along velocity vector
         const dot = Math.cos(angle - moveAngle);
-        const velocityStretch = -dot * Math.min(speed * 0.45, 45);
+        const velocityStretch = -dot * Math.min(speed * 0.34, 34);
 
         const r = Math.max(10, (baseRadius + wave + velocityStretch) * scale);
         pts.push({
@@ -149,18 +149,18 @@ export default function HeroGlitchReveal({
 
   /* ── Liquid Physics & RAF Animation Loop (Buttery Smooth Organic Motion) ── */
   const tick = useCallback(() => {
-    timeRef.current += 0.024;
+    timeRef.current += 0.0185;
 
-    // High-responsiveness smooth liquid lerp (buttery smooth with zero jitter)
-    const k = 0.32;
+    // Snappy, silky smooth liquid lerp
+    const k = 0.31;
     const dx = target.current.x - current.current.x;
     const dy = target.current.y - current.current.y;
     current.current.x += dx * k;
     current.current.y += dy * k;
 
     // Fluid surface tension velocity damping
-    velocity.current.vx = velocity.current.vx * 0.78 + dx * 0.22;
-    velocity.current.vy = velocity.current.vy * 0.78 + dy * 0.22;
+    velocity.current.vx = velocity.current.vx * 0.79 + dx * 0.21;
+    velocity.current.vy = velocity.current.vy * 0.79 + dy * 0.21;
 
     // Smooth expansion & collapse
     const scaleK = 0.14;
@@ -262,7 +262,7 @@ export default function HeroGlitchReveal({
       onPointerMove={onMove}
       onPointerEnter={onEnter}
       onPointerLeave={onLeave}
-      className={`relative h-full w-full select-none overflow-hidden cursor-none ${className}`}
+      className={`relative h-full w-full select-none overflow-hidden md:cursor-none ${className}`}
     >
       {/* ── Hidden SVG Liquid Spline ClipPath Definition ── */}
       <svg className="pointer-events-none absolute h-0 w-0" aria-hidden="true">

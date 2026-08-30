@@ -1,348 +1,283 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import contactBg from "../../public/images/contact-bg.jpg";
+import { Phone, Mail, Copy, Check } from "lucide-react";
 
-const MARK_SIZE =
-  "text-[clamp(3rem,14vw,5.5rem)] md:text-[clamp(3.5rem,8vw,7rem)]";
+interface CardItem {
+  id: string;
+  name: string;
+  role: string;
+  value: string;
+  href: string;
+  type: "phone" | "email";
+  copyLabel: string;
+  accent: string;
+}
 
-const SOCIALS = [
-  { name: "Discord", url: "https://discord.gg", handle: "Official Arena", accent: "#5865F2" },
-  { name: "Instagram", url: "https://instagram.com/gdgcrce", handle: "@gdgcrce", accent: "#E1306C" },
-  { name: "LinkedIn", url: "https://linkedin.com/company/gdg-crce", handle: "GDG CRCE", accent: "#0077B5" },
-  { name: "GitHub", url: "https://github.com/gdg-crce", handle: "gdg-crce", accent: "#f4f2ee" },
-  { name: "X / Twitter", url: "https://x.com/gdg_crce", handle: "@gdg_crce", accent: "#22b6d6" },
-  { name: "Devfolio", url: "https://devfolio.co", handle: "bit-n-build-2026", accent: "#3770FF" },
+const CARDS: CardItem[] = [
+  {
+    id: "kevin",
+    name: "KEVIN SYNET",
+    role: "HEAD OF OPERATIONS",
+    value: "+91 84468 58648",
+    href: "tel:+918446858648",
+    type: "phone",
+    copyLabel: "COPY NUMBER",
+    accent: "#ff2e88",
+  },
+  {
+    id: "laksh",
+    name: "LAKSH",
+    role: "JOINT LEAD",
+    value: "+91 99872 56773",
+    href: "tel:+919987256773",
+    type: "phone",
+    copyLabel: "COPY NUMBER",
+    accent: "#ff2e88",
+  },
+  {
+    id: "abhishek",
+    name: "ABHISHEK JOSE",
+    role: "TECHNICAL LEAD",
+    value: "+91 77389 69557",
+    href: "tel:+917738969557",
+    type: "phone",
+    copyLabel: "COPY NUMBER",
+    accent: "#ff2e88",
+  },
+  {
+    id: "email",
+    name: "EMAIL US",
+    role: "OFFICIAL INQUIRIES",
+    value: "gdgcrce@gmail.com",
+    href: "mailto:gdgcrce@gmail.com",
+    type: "email",
+    copyLabel: "COPY EMAIL",
+    accent: "#ff2e88",
+  },
 ];
 
 export default function ContactSection() {
-  const root = useRef<HTMLElement>(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [formState, setFormState] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formState.name || !formState.email || !formState.message) return;
-    setSubmitted(true);
+  const handleCopy = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
   };
 
-  useGSAP(
-    () => {
-      const media = gsap.matchMedia();
-
-      media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Slow parallax on the contact backdrop
-        gsap.fromTo(
-          ".contact-backdrop",
-          { yPercent: -5 },
-          {
-            yPercent: 5,
-            ease: "none",
-            scrollTrigger: {
-              trigger: root.current,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          },
-        );
-
-        // Chromatic split on header
-        gsap.fromTo(
-          ".contact-ghost",
-          { xPercent: (i: number) => (i === 0 ? -3.5 : 3.5), opacity: 0 },
-          {
-            xPercent: (i: number) => (i === 0 ? -0.4 : 0.4),
-            opacity: 1,
-            duration: 1.5,
-            ease: "power4.out",
-            scrollTrigger: { trigger: ".contact-mark", start: "top 84%" },
-          },
-        );
-
-        const split = new SplitText(".contact-mark-face", { type: "chars" });
-        gsap.from(split.chars, {
-          yPercent: 110,
-          stagger: 0.04,
-          duration: 1.1,
-          ease: "power4.out",
-          scrollTrigger: { trigger: ".contact-mark", start: "top 84%" },
-        });
-
-        gsap.from(".contact-lede", {
-          opacity: 0,
-          y: 24,
-          duration: 0.9,
-          scrollTrigger: { trigger: ".contact-mark", start: "top 84%" },
-        });
-
-        // Form and info cards
-        gsap.from(".contact-grid-item", {
-          opacity: 0,
-          y: 40,
-          stagger: 0.12,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: { trigger: ".contact-grid", start: "top 82%" },
-        });
-
-        return () => split.revert();
-      });
-    },
-    { scope: root },
-  );
-
   return (
-    <footer
+    <section
       id="contact"
-      ref={root}
-      className="halftone relative z-10 overflow-hidden bg-void pt-28 md:pt-36"
+      className="relative w-full overflow-hidden bg-black flex flex-col items-center justify-center select-none py-4 sm:py-6"
     >
-      {/* Real Dimensional Collider Portal Background */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="contact-backdrop absolute -top-[10%] -left-[5%] h-[120%] w-[110%]">
-          <Image
-            src={contactBg}
-            alt="Dimensional Portal Backdrop"
-            fill
-            sizes="100vw"
-            priority={false}
-            className="object-cover object-center opacity-30 brightness-90 contrast-125"
-          />
-        </div>
-        {/* Scrim blending into void */}
-        <div className="absolute inset-0 bg-gradient-to-b from-void via-void/70 to-void" />
-      </div>
+      <h2 className="sr-only">Contact Us</h2>
 
-      <div className="mx-auto max-w-6xl px-6 md:px-10">
-        {/* Section Header */}
-        <div className="contact-mark relative mb-16 flex flex-col items-start md:mb-20">
-          <div className="flex items-center gap-3">
-            <span className="inline-block h-2 w-2 rounded-full bg-red shadow-[0_0_10px_#d6070c]" />
-            <span className="eyebrow text-red">Dimensional Transmission // GDG CRCE</span>
+      {/* ========================================================================= */}
+      {/* 1. MOBILE RESPONSIVE CONTACT VIEW (< 768px)                               */}
+      {/* ========================================================================= */}
+      <div className="md:hidden relative w-full flex flex-col items-center px-3 py-6 z-10">
+        <div className="relative w-full max-w-sm flex flex-col items-center">
+          {/* Header Title */}
+          <div className="w-full flex items-center justify-center mb-5">
+            <h3
+              className="text-3xl font-black text-white uppercase tracking-tight"
+              style={{
+                fontFamily: '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                textShadow: "2px 2px 0px #ff2e88, -2px -2px 0px #00f0ff",
+              }}
+            >
+              CONTACT US
+            </h3>
           </div>
 
-          <div className="relative mt-4">
-            {/* Red Ghost */}
-            <span
-              aria-hidden="true"
-              className={`contact-ghost display absolute inset-0 text-red opacity-0 select-none ${MARK_SIZE}`}
-            >
-              Contact
-            </span>
-            {/* Cyan Ghost */}
-            <span
-              aria-hidden="true"
-              className={`contact-ghost display absolute inset-0 text-[#22b6d6] opacity-0 select-none ${MARK_SIZE}`}
-            >
-              Contact
-            </span>
-            {/* Front Face */}
-            <h2
-              className={`contact-mark-face display relative text-paper ${MARK_SIZE}`}
-            >
-              Contact
-            </h2>
-          </div>
+          {/* 2-Column Responsive Comic Cards Grid */}
+          <div className="grid grid-cols-2 gap-2.5 w-full">
+            {CARDS.map((card) => (
+              <div
+                key={card.id}
+                className="relative w-full bg-[#faf8f5] rounded-xl border-2 border-black shadow-[3px_3px_0px_#000] flex flex-col items-center text-center p-2.5 select-none"
+              >
+                {/* 1. Name */}
+                <h4 className="font-black text-black text-[12px] uppercase tracking-tight leading-tight font-sans mt-0.5">
+                  {card.name}
+                </h4>
 
-          <p className="contact-lede mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-            Have a proposal, sponsorship inquiry, or need squad matchmaking?
-            Reach out to the Google Developer Groups CRCE organizing core directly.
-          </p>
-        </div>
-
-        {/* Contact Grid: Form + Coordinates */}
-        <div className="contact-grid grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
-          {/* Transmission Form */}
-          <div className="contact-grid-item rounded-xl border-2 border-paper/20 bg-ink/90 p-7 backdrop-blur-md md:p-10">
-            <div className="mb-6 flex items-center justify-between">
-              <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#FFE600]">
-                // Transmit Signal
-              </span>
-              <span className="font-mono text-xs text-muted">TRANSMISSION 2026</span>
-            </div>
-
-            {submitted ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-black bg-[#FFE600] font-mono text-xl font-bold text-black shadow-[3px_3px_0px_#000]">
-                  ✓
+                {/* 2. Role Pill */}
+                <div className="mt-1 px-2 py-0.5 rounded-full border border-[#d2d0cc] bg-[#eae8e4] text-[#ff2e88] text-[7.5px] font-bold tracking-widest uppercase leading-none">
+                  {card.role}
                 </div>
-                <h3 className="mt-4 text-xl font-bold text-paper">
-                  Signal Broadcasted!
-                </h3>
-                <p className="mt-2 text-sm text-muted">
-                  Our GDG organizing crew will decode your transmission and reach out
-                  promptly via Email or Discord.
-                </p>
+
+                {/* 3. Pink Underline Bar */}
+                <div className="w-8 h-[2px] bg-[#ff2e88] rounded-full mt-1 mb-1.5" />
+
+                {/* 4. Contact Pill Button */}
+                <a
+                  href={card.href}
+                  className="relative w-full bg-white border-[1.5px] border-black rounded-full py-1 px-2 flex items-center justify-center gap-1 shadow-[1px_1px_0px_#000] hover:bg-gray-50 transition-colors mb-1.5"
+                >
+                  {card.type === "phone" ? (
+                    <Phone className="w-2.5 h-2.5 fill-[#ff2e88] text-[#ff2e88] shrink-0" />
+                  ) : (
+                    <Mail className="w-2.5 h-2.5 text-[#ff2e88] stroke-[2.2] shrink-0" />
+                  )}
+
+                  <span
+                    className="font-bold text-black text-[9px] tracking-tight truncate max-w-[85%]"
+                    style={{
+                      fontFamily:
+                        '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                    }}
+                  >
+                    {card.value}
+                  </span>
+                </a>
+
+                {/* 5. Copy Button */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setSubmitted(false);
-                    setFormState({ name: "", email: "", message: "" });
-                  }}
-                  className="mt-6 font-mono text-xs text-[#22b6d6] hover:underline"
+                  onClick={() => handleCopy(card.value, card.id)}
+                  className="inline-flex items-center gap-1 bg-white hover:bg-gray-50 border border-black rounded-full px-2.5 py-0.5 shadow-[1px_1px_0px_#000] cursor-pointer transition-transform active:scale-95"
                 >
-                  Send another signal ➔
+                  {copiedKey === card.id ? (
+                    <>
+                      <Check className="w-2 h-2 text-green-600 stroke-[2.5]" />
+                      <span
+                        className="font-bold text-green-600 text-[7.5px] tracking-wider uppercase"
+                        style={{
+                          fontFamily:
+                            '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                        }}
+                      >
+                        COPIED!
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-2 h-2 text-black stroke-[2]" />
+                      <span
+                        className="font-bold text-black text-[7.5px] tracking-wider uppercase"
+                        style={{
+                          fontFamily:
+                            '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                        }}
+                      >
+                        {card.copyLabel}
+                      </span>
+                    </>
+                  )}
                 </button>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block font-mono text-xs font-bold uppercase tracking-wider text-paper"
-                  >
-                    Name / Multiverse Alias
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    required
-                    value={formState.name}
-                    onChange={(e) =>
-                      setFormState({ ...formState, name: e.target.value })
-                    }
-                    placeholder="Miles Morales"
-                    className="mt-2 w-full rounded border-2 border-paper/15 bg-void/80 px-4 py-3 font-sans text-sm text-paper placeholder-muted/50 transition-colors focus:border-[#FFE600] focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block font-mono text-xs font-bold uppercase tracking-wider text-paper"
-                  >
-                    Email Address / Discord Tag
-                  </label>
-                  <input
-                    id="email"
-                    type="text"
-                    required
-                    value={formState.email}
-                    onChange={(e) =>
-                      setFormState({ ...formState, email: e.target.value })
-                    }
-                    placeholder="miles@brooklyn.dev or miles#2099"
-                    className="mt-2 w-full rounded border-2 border-paper/15 bg-void/80 px-4 py-3 font-sans text-sm text-paper placeholder-muted/50 transition-colors focus:border-[#FFE600] focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block font-mono text-xs font-bold uppercase tracking-wider text-paper"
-                  >
-                    Transmission Content
-                  </label>
-                  <textarea
-                    id="message"
-                    required
-                    rows={4}
-                    value={formState.message}
-                    onChange={(e) =>
-                      setFormState({ ...formState, message: e.target.value })
-                    }
-                    placeholder="Tell us about your squad, track ideas, or inquiry..."
-                    className="mt-2 w-full rounded border-2 border-paper/15 bg-void/80 px-4 py-3 font-sans text-sm text-paper placeholder-muted/50 transition-colors focus:border-[#FFE600] focus:outline-none"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="group inline-flex w-full items-center justify-center gap-2 border-[2.5px] border-black bg-[#FFE600] py-3.5 font-mono text-sm font-black uppercase tracking-wider text-black shadow-[4px_4px_0px_#000] transition-all hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#000] active:translate-y-0.5 active:shadow-[1px_1px_0px_#000]"
-                >
-                  <span>TRANSMIT MESSAGE</span>
-                  <span className="transition-transform group-hover:translate-x-1">
-                    ➔
-                  </span>
-                </button>
-              </form>
-            )}
-          </div>
-
-          {/* Direct Signals & Coordinates */}
-          <div className="contact-grid-item flex flex-col justify-between space-y-10">
-            <div>
-              <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#22b6d6]">
-                // Ground Coordinates
-              </span>
-              <h3 className="mt-2 text-2xl font-bold text-paper">
-                GDG CRCE // Mumbai
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
-                Fr. Conceicao Rodrigues College of Engineering
-                <br />
-                Father Agnel Ashram, Bandstand Promenade,
-                <br />
-                Bandra (West), Mumbai, Maharashtra 400050
-              </p>
-
-              <div className="mt-6 flex flex-col gap-2">
-                <a
-                  href="mailto:gdg@frcrce.ac.in"
-                  className="inline-flex items-center gap-2 font-mono text-sm font-semibold text-[#FFE600] hover:underline"
-                >
-                  <span>✉ gdg@frcrce.ac.in</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Social Channels */}
-            <div>
-              <span className="font-mono text-xs font-bold uppercase tracking-widest text-muted">
-                // Dimensional Channels
-              </span>
-              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {SOCIALS.map((soc) => (
-                  <a
-                    key={soc.name}
-                    href={soc.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group flex flex-col rounded border border-paper/15 bg-ink/80 p-3 backdrop-blur-sm transition-all hover:border-paper/40 hover:bg-paper/5"
-                  >
-                    <span className="font-mono text-xs font-bold text-paper transition-colors group-hover:text-white">
-                      {soc.name}
-                    </span>
-                    <span className="font-mono text-[0.625rem] text-muted">
-                      {soc.handle}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Comic Footer Bar */}
-        <div className="mt-24 border-t border-paper/10 py-10">
-          <div className="flex flex-col items-center justify-between gap-6 text-center md:flex-row md:text-left">
-            <div className="flex flex-col gap-1">
-              <span className="font-mono text-xs font-black tracking-wider text-paper uppercase">
-                BIT N BUILD // ED. 2026
-              </span>
-              <span className="text-xs text-muted">
-                Organized by Google Developer Groups CRCE. All rights reserved.
-              </span>
-            </div>
-
-            <div className="flex items-center gap-6">
-              <a
-                href="#top"
-                className="font-mono text-xs font-bold uppercase text-[#FFE600] transition-transform hover:-translate-y-0.5 hover:underline"
-              >
-                ▲ BACK TO TOP
-              </a>
-            </div>
+            ))}
           </div>
         </div>
       </div>
-    </footer>
+
+      {/* ========================================================================= */}
+      {/* 2. DESKTOP CONTACT SECTION ARTWORK VIEW (>= 768px)                         */}
+      {/* ========================================================================= */}
+      <div className="hidden md:flex relative w-full aspect-[1366/680] max-w-[1920px] mx-auto overflow-hidden items-center justify-center">
+        {/* Background Graphic */}
+        <Image
+          src="/contactus/contactusbg.png"
+          alt="Contact Us Background"
+          fill
+          priority={false}
+          sizes="100vw"
+          className="w-full h-full object-cover object-top select-none pointer-events-none"
+          draggable={false}
+        />
+
+        {/* 4 Contact Cards arranged 2 boxes per line in a 2x2 grid */}
+        <div
+          className="absolute z-10 grid grid-cols-2 gap-2 sm:gap-3 md:gap-4.5"
+          style={{
+            left: "4%",
+            width: "44%",
+            bottom: "13%",
+          }}
+        >
+          {CARDS.map((card) => (
+            <div
+              key={card.id}
+              className="relative w-full bg-[#faf8f5] rounded-[12px] sm:rounded-[16px] border-[1.5px] sm:border-[2px] border-black shadow-[2.5px_2.5px_0px_#000] sm:shadow-[3.5px_3.5px_0px_#000] flex flex-col items-center text-center p-2 sm:p-2.5 md:p-3 select-none transition-transform duration-200 hover:scale-[1.02]"
+            >
+              {/* 1. Name */}
+              <h3 className="font-black text-black text-[clamp(11px,1.45vw,20px)] uppercase tracking-tight leading-none font-sans mt-0.5">
+                {card.name}
+              </h3>
+
+              {/* 2. Role Pill */}
+              <div className="mt-1 px-2.5 sm:px-3.5 py-0.5 rounded-full border border-[#d2d0cc] bg-[#eae8e4] text-[#ff2e88] text-[clamp(5.5px,0.65vw,9.5px)] font-bold tracking-[0.14em] uppercase leading-none">
+                {card.role}
+              </div>
+
+              {/* 3. Pink Underline Bar */}
+              <div className="w-10 sm:w-14 h-[2px] sm:h-[2.5px] bg-[#ff2e88] rounded-full mt-1 mb-1.5" />
+
+              {/* 4. Contact Pill Button */}
+              <a
+                href={card.href}
+                className="relative w-[94%] sm:w-[90%] bg-white border-[1.5px] sm:border-[2px] border-black rounded-full py-0.5 sm:py-1 px-3 flex items-center justify-center gap-1.5 sm:gap-2 shadow-[1px_1px_0px_#000] hover:bg-gray-50 transition-colors mb-1"
+              >
+                {/* Icon */}
+                {card.type === "phone" ? (
+                  <Phone className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 fill-[#ff2e88] text-[#ff2e88] shrink-0" />
+                ) : (
+                  <Mail className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-[#ff2e88] stroke-[2.2] shrink-0" />
+                )}
+
+                {/* Value in Comic Sans */}
+                <span
+                  className="font-bold text-black text-[clamp(7px,0.92vw,13px)] tracking-tight truncate max-w-full"
+                  style={{
+                    fontFamily:
+                      '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                  }}
+                >
+                  {card.value}
+                </span>
+              </a>
+
+              {/* 5. Copy Pill Button */}
+              <button
+                type="button"
+                onClick={() => handleCopy(card.value, card.id)}
+                className="inline-flex items-center gap-1 sm:gap-1.5 bg-white hover:bg-gray-50 border-[1.5px] border-black rounded-full px-2.5 sm:px-3 py-0.5 shadow-[1px_1px_0px_#000] cursor-pointer transition-transform active:scale-95"
+              >
+                {copiedKey === card.id ? (
+                  <>
+                    <Check className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-green-600 stroke-[2.5]" />
+                    <span
+                      className="font-bold text-green-600 text-[clamp(5.5px,0.65vw,9px)] tracking-wider uppercase"
+                      style={{
+                        fontFamily:
+                          '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                      }}
+                    >
+                      COPIED!
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-black stroke-[2]" />
+                    <span
+                      className="font-bold text-black text-[clamp(5.5px,0.65vw,9px)] tracking-wider uppercase"
+                      style={{
+                        fontFamily:
+                          '"Comic Sans MS", "Comic Sans", "Comic Neue", cursive, sans-serif',
+                      }}
+                    >
+                      {card.copyLabel}
+                    </span>
+                  </>
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

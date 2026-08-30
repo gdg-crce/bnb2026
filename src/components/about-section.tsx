@@ -2,45 +2,54 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import bgAboutUs from "../../public/aboutus.png";
-import milesSofa from "../../public/images/milessofa.png";
-import bigTrainTightImg from "../../public/bigtrain-tight.png";
-import timelineBg from "../../public/images/timeline-bg.jpg";
-import { motion } from "framer-motion";
+import { gsap, useGSAP } from "@/lib/gsap";
+import withCutImg from "../../public/about/withcut.png";
+import milesImg from "../../public/about/miles.png";
+import bigTrainTightImg from "../../public/trainwithdeets.png";
 import TimelineSection from "./timeline-section";
+import PrizesSection from "./prizes-section";
 
-/**
- * About & Timeline Train Wipe Section:
- * 1. Initial State: The About room with stationary Miles on sofa.
- * 2. On Scroll: The Subway Train drives from left to right across the screen.
- * 3. The passing train directly wipes away the About room and unveils the Timeline section underneath.
- * 4. Once the train has completely passed to the right, the Timeline section is right there in place.
- * 5. No awkward domain section scrolling down — the transition is seamless and direct.
- */
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const aboutRoomRef = useRef<HTMLDivElement>(null);
+  const withCutRef = useRef<HTMLDivElement>(null);
+  const milesRef = useRef<HTMLDivElement>(null);
   const trainRef = useRef<HTMLDivElement>(null);
   const headlightsRef = useRef<HTMLDivElement>(null);
+  const timelineContainerRef = useRef<HTMLDivElement>(null);
   const timelineScrollRef = useRef<HTMLDivElement>(null);
+  const prizesContainerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       const media = gsap.matchMedia();
 
-      media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Initialize train completely offscreen to the left and headlights off
+      // ── Mobile Choreography (<768px) ──────────────────────────────────────────
+      media.add("(max-width: 768px)", () => {
+        const getTrainOffscreenX = () => {
+          const w = typeof window !== "undefined" ? window.innerWidth : 390;
+          const h = typeof window !== "undefined" ? window.innerHeight : 844;
+          const trainWidth = h * 1.96 * 2.3;
+          return Math.max(w * 3.0, (trainWidth + w) * 0.75);
+        };
+
         if (trainRef.current) {
-          gsap.set(trainRef.current, { xPercent: -170 });
+          gsap.set(trainRef.current, { x: () => -getTrainOffscreenX(), visibility: "hidden", force3D: true });
         }
-
         if (headlightsRef.current) {
-          gsap.set(headlightsRef.current, { opacity: 0 });
+          gsap.set(headlightsRef.current, { opacity: 0, force3D: true });
         }
-
         if (aboutRoomRef.current) {
-          gsap.set(aboutRoomRef.current, { opacity: 1 });
+          gsap.set(aboutRoomRef.current, { opacity: 1, force3D: true });
+        }
+        if (prizesContainerRef.current) {
+          gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible", force3D: true });
+        }
+        if (timelineContainerRef.current) {
+          gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none", force3D: true });
+        }
+        if (withCutRef.current) {
+          gsap.set(withCutRef.current, { scale: 1.0, y: 0, x: 0, force3D: true });
         }
 
         const tl = gsap.timeline({
@@ -48,47 +57,54 @@ export default function AboutSection() {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 1.6,
+            scrub: 1.0,
+            invalidateOnRefresh: true,
           },
         });
 
-        // 1. Phase 1: Generous hold on About Us room before train enters (0.00 -> 0.04)
+        // 1. Train arrives immediately as user starts scrolling (0.01 -> 0.15)
+        tl.set(trainRef.current, { visibility: "visible" }, 0.01);
+
         tl.fromTo(
           headlightsRef.current,
-          { opacity: 0, scale: 0.8 },
-          { opacity: 1, scale: 1, ease: "power2.out", duration: 0.02 },
-          0.04
+          { opacity: 0 },
+          { opacity: 0.48, ease: "sine.out", duration: 0.05 },
+          0.01
         );
 
-        // Train rolls in smoothly from left to center (0.04 -> 0.12)
         tl.to(
           trainRef.current,
-          { xPercent: 0, ease: "power1.out", duration: 0.08 },
-          0.04
+          { x: 0, ease: "power2.out", duration: 0.14 },
+          0.01
         );
 
-        // 2. Dissolve About room as train covers the scene (0.08 -> 0.12)
+        // 2. Dissolve About room & Reveal Timeline underneath as train covers screen (0.08 -> 0.16)
         tl.to(
           aboutRoomRef.current,
-          { opacity: 0, ease: "power1.inOut", duration: 0.04 },
+          { opacity: 0, ease: "sine.inOut", duration: 0.08 },
           0.08
         );
 
-        // 3. Phase 2: Slow crawl/deceleration when train fits the screen wholly (0.12 -> 0.18)
+        if (timelineContainerRef.current) {
+          tl.to(
+            timelineContainerRef.current,
+            { opacity: 1, ease: "sine.inOut", duration: 0.08 },
+            0.08
+          );
+          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.16);
+        }
+
+        // 3. Train departs smoothly to the right (0.16 -> 0.26)
         tl.to(
           trainRef.current,
-          { xPercent: 14, ease: "none", duration: 0.06 },
-          0.12
+          { x: () => getTrainOffscreenX(), ease: "power2.in", duration: 0.10 },
+          0.16
         );
 
-        // 4. Phase 3: Train smoothly departs OUT to the right (0.18 -> 0.25)
-        tl.to(
-          trainRef.current,
-          { xPercent: 170, ease: "power1.in", duration: 0.07 },
-          0.18
-        );
+        tl.set(trainRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.26);
+        gsap.set(".timeline-web-clip", { height: "100%" });
 
-        // 5. Scroll the timeline dynamically AFTER the train is fully gone (0.25 -> 1.0)
+        // 4. Timeline scrolls completely down through ALL events (0.26 -> 0.62)
         tl.to(
           timelineScrollRef.current,
           {
@@ -99,124 +115,295 @@ export default function AboutSection() {
               return diff > 0 ? -diff : 0;
             },
             ease: "none",
-            duration: 0.75,
+            duration: 0.36,
           },
-          0.25
+          0.26
         );
-        // Pull the web upwards exactly as the next section slides over it
-        // This ensures the web perfectly visually sticks to the PrizesSection without any scrub delay
-        gsap.to(".timeline-web-strand", {
-          y: "-250vh",
-          ease: "power1.in",
+
+        // 5. Smoothly glide Prizes section up over Timeline (0.62 -> 0.76)
+        tl.to(
+          prizesContainerRef.current,
+          { yPercent: 0, ease: "power2.inOut", duration: 0.14, force3D: true },
+          0.62
+        );
+
+        tl.to(
+          timelineScrollRef.current,
+          {
+            y: () => {
+              const el = timelineScrollRef.current;
+              if (!el) return 0;
+              const diff = el.scrollHeight - window.innerHeight;
+              return diff > 0 ? -diff * 0.15 : 0;
+            },
+            ease: "power2.out",
+            duration: 0.14,
+          },
+          0.62
+        );
+
+        if (timelineContainerRef.current && prizesContainerRef.current) {
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.76);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.76);
+        }
+        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.76);
+
+        // 6. Generous Hold on Prizes Section (0.76 -> 1.00)
+      });
+
+      // ── Desktop Choreography (>=769px) ────────────────────────────────────────
+      media.add("(min-width: 769px)", () => {
+        const getTrainOffscreenX = () => {
+          const w = typeof window !== "undefined" ? window.innerWidth : 1920;
+          const h = typeof window !== "undefined" ? window.innerHeight : 1080;
+          const trainWidth = h * 1.96 * 2.3;
+          return Math.max(w * 2.6, (trainWidth + w) * 0.75);
+        };
+
+        if (trainRef.current) {
+          gsap.set(trainRef.current, { x: () => -getTrainOffscreenX(), visibility: "hidden", force3D: true });
+        }
+        if (headlightsRef.current) {
+          gsap.set(headlightsRef.current, { opacity: 0, force3D: true });
+        }
+        if (aboutRoomRef.current) {
+          gsap.set(aboutRoomRef.current, { opacity: 1, force3D: true });
+        }
+        if (prizesContainerRef.current) {
+          gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible", force3D: true });
+        }
+        if (timelineContainerRef.current) {
+          gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none", force3D: true });
+        }
+        if (withCutRef.current) {
+          gsap.set(withCutRef.current, { scale: 1.04, y: 0, x: 0, force3D: true });
+        }
+
+        const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "bottom 200%", // exactly 100vh before the bottom hits the screen
+            start: "top top",
             end: "bottom bottom",
-            scrub: true, // no trailing lag
-          }
+            scrub: 1.0,
+            invalidateOnRefresh: true,
+          },
         });
+
+        // 1. Train arrives earlier with cinematic deceleration (0.02 -> 0.18)
+        tl.set(trainRef.current, { visibility: "visible" }, 0.02);
+
+        tl.fromTo(
+          headlightsRef.current,
+          { opacity: 0 },
+          { opacity: 0.48, ease: "sine.out", duration: 0.08 },
+          0.02
+        );
+
+        tl.to(
+          trainRef.current,
+          { x: 0, ease: "power2.out", duration: 0.16 },
+          0.02
+        );
+
+        // 2. Dissolve About room & Reveal Timeline underneath (0.10 -> 0.18)
+        tl.to(
+          aboutRoomRef.current,
+          { opacity: 0, ease: "sine.inOut", duration: 0.08 },
+          0.10
+        );
+
+        if (timelineContainerRef.current) {
+          tl.to(
+            timelineContainerRef.current,
+            { opacity: 1, ease: "sine.inOut", duration: 0.08 },
+            0.10
+          );
+          tl.set(timelineContainerRef.current, { pointerEvents: "auto" }, 0.18);
+        }
+
+        // 3. Train accelerates away smoothly to the right (0.18 -> 0.28)
+        tl.to(
+          trainRef.current,
+          { x: () => getTrainOffscreenX(), ease: "power2.in", duration: 0.10 },
+          0.18
+        );
+
+        tl.set(trainRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.28);
+        gsap.set(".timeline-web-clip", { height: "0%" });
+
+        // 4. Smooth Timeline Continuous Auto-Scroll (0.28 -> 0.64)
+        tl.to(
+          timelineScrollRef.current,
+          {
+            y: () => {
+              const el = timelineScrollRef.current;
+              if (!el) return 0;
+              const diff = el.scrollHeight - window.innerHeight;
+              return diff > 0 ? -diff : 0;
+            },
+            ease: "none",
+            duration: 0.36,
+          },
+          0.28
+        );
+
+        tl.fromTo(
+          ".timeline-web-clip",
+          { height: "0%" },
+          { height: "100%", ease: "none", duration: 0.36 },
+          0.28
+        );
+
+        // 5. Silky glide of Prizes section up into full view (0.64 -> 0.76)
+        tl.to(
+          prizesContainerRef.current,
+          { yPercent: 0, ease: "power2.inOut", duration: 0.12, force3D: true },
+          0.64
+        );
+
+        tl.to(
+          timelineScrollRef.current,
+          {
+            y: () => {
+              const el = timelineScrollRef.current;
+              if (!el) return 0;
+              const diff = el.scrollHeight - window.innerHeight;
+              return diff > 0 ? -diff * 0.15 : 0;
+            },
+            ease: "power2.out",
+            duration: 0.12,
+          },
+          0.64
+        );
+
+        tl.to(
+          ".timeline-web-clip",
+          { height: "20%", ease: "power2.out", duration: 0.12 },
+          0.64
+        );
+
+        if (timelineContainerRef.current && prizesContainerRef.current) {
+          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.76);
+          tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.76);
+        }
+        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.76);
+
+        // 6. Generous PAUSE on Prizes Section from 0.76 -> 1.00
       });
     },
     { scope: sectionRef },
   );
 
+  // Interactive mouse parallax for withcut.png
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!withCutRef.current) return;
+    const { clientX, clientY } = e;
+    const { innerWidth, innerHeight } = window;
+    const xOffset = ((clientX / innerWidth) - 0.5) * -24;
+    const yOffset = ((clientY / innerHeight) - 0.5) * -2;
+
+    gsap.to(withCutRef.current, {
+      x: xOffset,
+      y: yOffset,
+      duration: 0.8,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    if (!withCutRef.current) return;
+    gsap.to(withCutRef.current, {
+      x: 0,
+      y: 0,
+      duration: 0.9,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
   return (
     <section
       id="about"
       ref={sectionRef}
-      className="relative h-[700vh] w-full bg-black -mt-px -mb-[100vh]"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="relative h-[1100vh] w-full bg-black -mt-px -mb-px"
     >
-      <h2 className="sr-only">About Us & Hackathon Timeline</h2>
+      <h2 className="sr-only">About Us, Timeline & Prizes</h2>
 
       {/* Sticky Stage Container */}
       <div
         className="sticky top-0 h-screen w-full overflow-hidden bg-black flex items-center justify-center"
       >
-        {/* 
-          ══════════════════════════════════════════════════════════════
-          LAYER 0 (Base): The Timeline Section
-          - Revealed in place directly as the train passes from left to right
-          ══════════════════════════════════════════════════════════════
-        */}
-        <div className="absolute inset-0 z-0 h-full w-full pointer-events-auto overflow-hidden bg-[#fcd49b]">
+        {/* LAYER 0: The Timeline Section (Hidden until train enters) */}
+        <div ref={timelineContainerRef} className="absolute inset-0 z-0 h-full w-full pointer-events-none overflow-hidden bg-black opacity-0">
           <div ref={timelineScrollRef} className="relative w-full">
             <TimelineSection />
           </div>
         </div>
 
-        {/* 
-          ══════════════════════════════════════════════════════════════
-          LAYER 1 (Middle): Pristine About Us Room (bg-aboutus.png + milessofa.png)
-          - Starts visible on top of Timeline
-          - Wiped away as the train moves from left to right
-          ══════════════════════════════════════════════════════════════
-        */}
+        {/* LAYER 1: About Us Room (Framing both Miles and the pink cloud text on mobile) */}
         <div
           ref={aboutRoomRef}
-          className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform"
+          className="pointer-events-none absolute inset-0 z-10 h-full w-full will-change-transform overflow-hidden bg-black"
         >
-          {/* Wall with subtle parallax */}
           <div
-            className="absolute inset-0 h-full will-change-transform"
+            ref={withCutRef}
+            className="absolute inset-0 z-0 h-full w-full will-change-transform overflow-hidden flex items-center justify-center"
           >
-            <div className="relative h-full w-full overflow-hidden">
+            <div className="relative h-full w-full flex items-center justify-center translate-y-[1.5vh] sm:translate-y-[3vh] md:translate-y-[4.5vh]">
               <Image
-                src={bgAboutUs}
-                alt="About Us Room Background"
+                src={withCutImg}
+                alt="About Us Subway Station Wall"
                 fill
                 priority
+                unoptimized
                 sizes="100vw"
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full object-cover object-[52%_center] sm:object-center select-none scale-[1.0] sm:scale-100"
               />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(0,0,0,0.45)_100%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/35" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
             </div>
           </div>
 
-          {/* Stationary Miles on Sofa */}
-          <div className="absolute inset-x-0 -bottom-10 sm:-bottom-14 md:-bottom-20 z-10 flex w-full justify-center items-end px-2 pb-0">
-            <div className="relative flex max-h-[82vh] md:max-h-[88vh] w-[min(96vw,1320px)] scale-95 md:scale-105 origin-bottom items-end justify-center">
+          <div
+            ref={milesRef}
+            className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-end justify-center pointer-events-none select-none translate-y-[2vh] sm:translate-y-[8vh] md:translate-y-[14vh]"
+          >
+            <div className="relative h-full w-full flex items-end justify-center">
               <Image
-                src={milesSofa}
-                alt="Miles Morales on Sofa"
+                src={milesImg}
+                alt="Miles Morales on Subway Platform Sofa"
+                fill
                 priority
-                sizes="(max-width: 768px) 96vw, 1320px"
-                className="h-auto w-full object-contain drop-shadow-[0_30px_70px_rgba(0,0,0,0.95)]"
+                unoptimized
+                sizes="100vw"
+                className="h-full w-full object-cover object-[52%_bottom] sm:object-bottom select-none scale-[1.0] sm:scale-100 drop-shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
               />
             </div>
           </div>
         </div>
 
-        {/* 
-          ══════════════════════════════════════════════════════════════
-          LAYER 2 (Top): Subway Train (bigtrain-tight.png)
-          - Drives from left to right on scroll, wiping from About into Timeline
-          - Top roof & lights fully visible; wheels pushed cleanly below viewport
-          ══════════════════════════════════════════════════════════════
-        */}
+        {/* LAYER 2: Subway Train */}
         <div
           ref={trainRef}
-          className="pointer-events-none absolute inset-0 z-20 flex h-full w-full items-center justify-center will-change-transform"
+          className="pointer-events-none absolute inset-0 z-20 flex h-full w-full items-center justify-center will-change-transform transform-gpu [backface-visibility:hidden]"
         >
-          <div className="relative flex h-[100vh] sm:h-[104vh] md:h-[108vh] lg:h-[112vh] w-auto max-w-none items-center justify-center scale-100 sm:scale-[1.02] md:scale-[1.04] translate-y-[7vh] sm:translate-y-[8vh] md:translate-y-[9vh] lg:translate-y-[10vh]">
+          <div className="relative flex h-[184vh] sm:h-[188vh] md:h-[192vh] lg:h-[196vh] w-auto max-w-none items-center justify-center scale-100 translate-y-[5.5vh] sm:translate-y-[6vh] md:translate-y-[6.5vh] transform-gpu [backface-visibility:hidden]">
             <Image
               src={bigTrainTightImg}
               alt="Domains Subway Train"
               priority
-              className="h-full w-auto max-w-none object-contain drop-shadow-[0_50px_140px_rgba(0,0,0,0.98)]"
+              unoptimized
+              className="h-full w-auto max-w-none object-contain select-none [image-rendering:high-quality] [image-rendering:-webkit-optimize-contrast]"
             />
 
-            {/* Exactly 2 Real Looking Headlights */}
             <div
               ref={headlightsRef}
-              className="pointer-events-none absolute inset-0 h-full w-full will-change-transform"
+              className="pointer-events-none absolute inset-0 h-full w-full will-change-transform opacity-75"
             >
-              {/* --- HEADLIGHT 1 (Bottom Left / Inner Lamp: left: 87.5%, top: 59.5%) --- */}
-              <div
-                className="absolute"
-                style={{ left: "87.5%", top: "59.5%" }}
-              >
-                {/* Wide Volumetric Forward Beam Cone */}
+              <div className="absolute" style={{ left: "86.4%", top: "56.4%" }}>
                 <div
                   className="absolute pointer-events-none"
                   style={{
@@ -233,8 +420,6 @@ export default function AboutSection() {
                     mixBlendMode: "screen",
                   }}
                 />
-
-                {/* Soft Bulb Glow */}
                 <div
                   className="absolute pointer-events-none rounded-full"
                   style={{
@@ -251,12 +436,7 @@ export default function AboutSection() {
                 />
               </div>
 
-              {/* --- HEADLIGHT 2 (Bottom Right / Outer Lamp: left: 97.2%, top: 59.0%) --- */}
-              <div
-                className="absolute"
-                style={{ left: "97.2%", top: "59.0%" }}
-              >
-                {/* Wide Volumetric Forward Beam Cone */}
+              <div className="absolute" style={{ left: "96.1%", top: "55.9%" }}>
                 <div
                   className="absolute pointer-events-none"
                   style={{
@@ -273,8 +453,6 @@ export default function AboutSection() {
                     mixBlendMode: "screen",
                   }}
                 />
-
-                {/* Soft Bulb Glow */}
                 <div
                   className="absolute pointer-events-none rounded-full"
                   style={{
@@ -292,6 +470,14 @@ export default function AboutSection() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* LAYER 3: The Prizes Stage (Slides Up Over Timeline Silky Smooth) */}
+        <div
+          ref={prizesContainerRef}
+          className="absolute inset-0 z-30 h-full w-full pointer-events-auto will-change-transform"
+        >
+          <PrizesSection />
         </div>
 
       </div>

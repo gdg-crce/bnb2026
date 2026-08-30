@@ -1,264 +1,346 @@
 "use client";
 
-import { useState, useRef } from "react";
-import Image from "next/image";
-import { gsap, SplitText, useGSAP } from "@/lib/gsap";
-import faqBg from "../../public/images/faq-bg.jpg";
+import { useState } from "react";
+import { Squada_One, Montserrat, Orbitron } from "next/font/google";
+import { Plus, Minus, HelpCircle, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const MARK_SIZE =
-  "text-[clamp(3rem,14vw,5.5rem)] md:text-[clamp(3.5rem,8vw,7rem)]";
+const squada = Squada_One({
+  weight: "400",
+  subsets: ["latin"],
+});
 
-const FAQS = [
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  weight: ["700", "900"],
+});
+
+interface BubbleFAQ {
+  id: number;
+  question: string;
+  answer: string;
+  category?: string;
+  accent?: string;
+  left?: string;
+  top?: string;
+  width?: string;
+  height?: string;
+  borderRadius?: string;
+}
+
+const FAQ_BUBBLES: BubbleFAQ[] = [
   {
-    question: "Who is eligible to participate in Bit N Build 2026?",
-    answer:
-      "Bit N Build is open to all enrolled college students, recent graduates, developers, and designers globally. Whether you are a first-year undergraduate or a seasoned builder, you are welcome to participate.",
+    id: 1,
+    question: "WHO CAN JOIN?",
+    answer: "Open to all college students across all disciplines! Coders, designers, innovators and enthusiastic thinkers are welcome.",
     category: "ELIGIBILITY",
-    accent: "#FFE600",
+    accent: "#ff2e88",
+    left: "23.3%",
+    top: "3.4%",
+    width: "18.0%",
+    height: "31.8%",
+    borderRadius: "50%",
   },
   {
-    question: "What is the team size and squad composition?",
-    answer:
-      "Teams can consist of 2 to 4 members. You can register with a pre-formed squad, or register individually and find teammates in our dedicated Discord matchmaking channels prior to Phase 01.",
+    id: 2,
+    question: "TEAM SIZE?",
+    answer: "Teams of 2 to 4 members are required for balanced collaboration across development, UI/UX and presentation.",
     category: "TEAMS",
-    accent: "#22b6d6",
+    accent: "#00f0ff",
+    left: "77.3%",
+    top: "4.9%",
+    width: "18.5%",
+    height: "40.7%",
+    borderRadius: "50%",
   },
   {
-    question: "Is there any registration fee or hidden cost?",
-    answer:
-      "Zero. Bit N Build is 100% free of cost for all participants. For the shortlisted offline grand finale, all meals, energy snacks, high-speed connectivity, and official swag kits are fully sponsored.",
-    category: "COST",
-    accent: "#8fc63d",
+    id: 3,
+    question: "REGISTRATION FEE?",
+    answer: "₹200 per team, which covers mentor support, development APIs, exclusive hackathon swag, and grand prize eligibility.",
+    category: "ENTRY",
+    accent: "#ffd369",
+    left: "0.3%",
+    top: "24.2%",
+    width: "15.7%",
+    height: "34.1%",
+    borderRadius: "50%",
   },
   {
-    question: "Can we use pre-existing code or side projects?",
-    answer:
-      "All code, designs, and prototypes must be authored during the official 36-hour hackathon period. You are freely encouraged to use publicly available open-source libraries, APIs, and starter templates.",
-    category: "RULES",
-    accent: "#e5308c",
+    id: 4,
+    question: "MEALS & FOOD?",
+    answer: "Complimentary hearty meals, midnight snacks, caffeine boosts, and energy drinks provided 24/7 at the venue.",
+    category: "HOSPITALITY",
+    accent: "#ff2e88",
+    left: "16.5%",
+    top: "27.3%",
+    width: "17.5%",
+    height: "34.2%",
+    borderRadius: "50%",
   },
   {
-    question: "What if this is my very first hackathon?",
-    answer:
-      "You are in the right place! We have dedicated beginner-friendly tracks, 1-on-1 mentoring sessions with engineers from Google and industry leaders, and technical workshops to help you ship your dream project.",
-    category: "BEGINNERS",
-    accent: "#FFE600",
+    id: 5,
+    question: "WHAT IS A HACKATHON?",
+    answer: "An intense 24-hour sprint where you collaborate with peers to build real-world software or hardware prototypes from scratch.",
+    category: "EVENT FORMAT",
+    accent: "#00f0ff",
+    left: "53.3%",
+    top: "45.3%",
+    width: "16.8%",
+    height: "34.6%",
+    borderRadius: "50%",
   },
   {
-    question: "What is the hackathon format (Online vs Offline)?",
-    answer:
-      "Round 1 (Ideation & Prototype Screening) is held online globally. The Top 50 shortlisted squads advance to the 36-hour physical hackathon finale hosted on campus at CRCE Bandra, Mumbai.",
-    category: "FORMAT",
-    accent: "#22b6d6",
+    id: 6,
+    question: "WHEN & WHERE?",
+    answer: "October 31 - November 1 in Mumbai (CRCE Bandra West)! 24 hours of non-stop hacking, mentoring, and networking.",
+    category: "LOGISTICS",
+    accent: "#ffd369",
+    left: "69.1%",
+    top: "45.8%",
+    width: "19.4%",
+    height: "43.2%",
+    borderRadius: "50%",
   },
   {
-    question: "How are projects evaluated and judged?",
-    answer:
-      "Projects are evaluated by a panel of industry veterans and VC leaders based on four core criteria: Innovation & Creativity (25%), Technical Complexity & Execution (30%), Design & User Experience (25%), and Real-World Impact (20%).",
-    category: "JUDGING",
-    accent: "#d6070c",
+    id: 7,
+    question: "WHO ARE JUDGES?",
+    answer: "Top industry engineering leaders, seasoned startup founders, and veteran developers judging on innovation and impact.",
+    category: "EVALUATION",
+    accent: "#ff2e88",
+    left: "85.0%",
+    top: "57.0%",
+    width: "14.5%",
+    height: "35.5%",
+    borderRadius: "50%",
   },
 ];
 
 export default function FAQSection() {
-  const root = useRef<HTMLElement>(null);
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [activeBubble, setActiveBubble] = useState<number | null>(null);
+  const [mobileOpenId, setMobileOpenId] = useState<number | null>(1);
 
-  const toggle = (idx: number) => {
-    setOpenIndex((curr) => (curr === idx ? null : idx));
+  const toggleBubble = (id: number) => {
+    setActiveBubble((curr) => (curr === id ? null : id));
   };
 
-  useGSAP(
-    () => {
-      const media = gsap.matchMedia();
-
-      media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Slow parallax on the FAQ backdrop
-        gsap.fromTo(
-          ".faq-backdrop",
-          { yPercent: -5 },
-          {
-            yPercent: 5,
-            ease: "none",
-            scrollTrigger: {
-              trigger: root.current,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: true,
-            },
-          },
-        );
-
-        // Chromatic split on header
-        gsap.fromTo(
-          ".faq-ghost",
-          { xPercent: (i: number) => (i === 0 ? -3.5 : 3.5), opacity: 0 },
-          {
-            xPercent: (i: number) => (i === 0 ? -0.4 : 0.4),
-            opacity: 1,
-            duration: 1.5,
-            ease: "power4.out",
-            scrollTrigger: { trigger: ".faq-mark", start: "top 84%" },
-          },
-        );
-
-        const split = new SplitText(".faq-mark-face", { type: "chars" });
-        gsap.from(split.chars, {
-          yPercent: 110,
-          stagger: 0.04,
-          duration: 1.1,
-          ease: "power4.out",
-          scrollTrigger: { trigger: ".faq-mark", start: "top 84%" },
-        });
-
-        gsap.from(".faq-lede", {
-          opacity: 0,
-          y: 24,
-          duration: 0.9,
-          scrollTrigger: { trigger: ".faq-mark", start: "top 84%" },
-        });
-
-        // FAQ accordion items stagger in
-        gsap.from(".faq-item", {
-          opacity: 0,
-          y: 30,
-          stagger: 0.08,
-          duration: 0.8,
-          ease: "power3.out",
-          scrollTrigger: { trigger: ".faq-accordion", start: "top 82%" },
-        });
-
-        return () => split.revert();
-      });
-    },
-    { scope: root },
-  );
+  const toggleMobileAccordion = (id: number) => {
+    setMobileOpenId((curr) => (curr === id ? null : id));
+  };
 
   return (
     <section
       id="faq"
-      ref={root}
-      className="halftone relative z-10 overflow-hidden bg-void px-6 py-28 md:px-10 md:py-36"
+      className="relative w-full overflow-hidden bg-black flex flex-col items-center justify-center select-none py-10 sm:py-16 md:py-24 px-4 sm:px-6"
     >
-      {/* Real Comic Rooftop Sunset Background */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="faq-backdrop absolute -top-[10%] -left-[5%] h-[120%] w-[110%]">
-          <Image
-            src={faqBg}
-            alt="FAQ Rooftop Sunset Backdrop"
-            fill
-            sizes="100vw"
-            priority={false}
-            className="object-cover object-center opacity-30 brightness-90 contrast-125"
-          />
+      <h2 className="sr-only">Frequently Asked Questions</h2>
+
+      {/* ========================================================================= */}
+      {/* 1. MOBILE-ONLY SPIDER-VERSE COMIC FAQ (visible on screens < 768px)         */}
+      {/* ========================================================================= */}
+      <div className="w-full max-w-lg mx-auto flex flex-col items-center md:hidden z-10">
+        {/* Multiverse Dimension Badge */}
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#161022] border border-[#ff2e88]/40 shadow-[0_0_15px_rgba(255,46,136,0.3)] mb-3">
+          <Sparkles className="w-3.5 h-3.5 text-[#ff2e88] animate-pulse" />
+          <span className={`${orbitron.className} text-[10px] font-black tracking-widest text-[#ff2e88] uppercase`}>
+            DIMENSION // 1610 • INTEL
+          </span>
         </div>
-        {/* Scrim blending into void */}
-        <div className="absolute inset-0 bg-gradient-to-b from-void via-void/75 to-void" />
-      </div>
 
-      <div className="mx-auto max-w-4xl">
-        {/* Section Header */}
-        <div className="faq-mark relative mb-16 flex flex-col items-start md:mb-20">
-          <div className="flex items-center gap-3">
-            <span className="inline-block h-2 w-2 rounded-full bg-red shadow-[0_0_10px_#d6070c]" />
-            <span className="eyebrow text-red">Earth-65 // Mission Briefing</span>
-          </div>
-
-          <div className="relative mt-4">
-            {/* Red Ghost */}
-            <span
-              aria-hidden="true"
-              className={`faq-ghost display absolute inset-0 text-red opacity-0 select-none ${MARK_SIZE}`}
-            >
-              FAQ
-            </span>
-            {/* Cyan Ghost */}
-            <span
-              aria-hidden="true"
-              className={`faq-ghost display absolute inset-0 text-[#22b6d6] opacity-0 select-none ${MARK_SIZE}`}
-            >
-              FAQ
-            </span>
-            {/* Front Face */}
-            <h2
-              className={`faq-mark-face display relative text-paper ${MARK_SIZE}`}
-            >
-              FAQ
-            </h2>
-          </div>
-
-          <p className="faq-lede mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-            Got questions before you take the leap? Here is everything you need
-            to know about the multiverse hackathon.
+        {/* Section Title with Comic Shadow */}
+        <div className="text-center mb-6">
+          <h3
+            className={`${squada.className} text-4xl sm:text-5xl text-white tracking-wider uppercase leading-none drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]`}
+            style={{
+              textShadow: "2px 2px 0px #ff2e88, -2px -2px 0px #00f0ff",
+            }}
+          >
+            FREQUENTLY ASKED
+          </h3>
+          <h4
+            className={`${squada.className} text-3xl sm:text-4xl text-[#ffd369] tracking-wider uppercase leading-none mt-0.5`}
+          >
+            QUESTIONS
+          </h4>
+          <p className={`${montserrat.className} text-xs text-white/60 font-medium mt-2`}>
+            Tap any record to decrypt details
           </p>
         </div>
 
-        {/* Accordion List */}
-        <div className="faq-accordion space-y-4">
-          {FAQS.map((faq, idx) => {
-            const isOpen = openIndex === idx;
+        {/* Comic FAQ Accordion Cards Stack */}
+        <div className="w-full space-y-3.5">
+          {FAQ_BUBBLES.map((item, idx) => {
+            const isOpen = mobileOpenId === item.id;
+            const accentColor = item.accent || "#ff2e88";
 
             return (
-              <div
-                key={faq.question}
-                className={`faq-item overflow-hidden rounded-xl border-2 backdrop-blur-md transition-all duration-300 ${
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ duration: 0.35, delay: idx * 0.05 }}
+                onClick={() => toggleMobileAccordion(item.id)}
+                className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer ${
                   isOpen
-                    ? "border-paper/40 bg-ink shadow-[8px_8px_0px_rgba(0,0,0,0.9)]"
-                    : "border-paper/15 bg-ink/75 hover:border-paper/35 hover:bg-ink"
+                    ? "bg-[#140f20] border-[#ff2e88] shadow-[3px_3px_0px_#ff2e88]"
+                    : "bg-[#0d0a14]/90 border-white/15 hover:border-white/40 shadow-[3px_3px_0px_#000]"
                 }`}
-                style={{
-                  borderLeftColor: isOpen ? faq.accent : undefined,
-                  borderLeftWidth: isOpen ? "4px" : "2px",
-                }}
               >
-                {/* Accordion Toggle Header */}
-                <button
-                  type="button"
-                  onClick={() => toggle(idx)}
-                  className="flex w-full items-center justify-between gap-4 p-6 text-left focus:outline-none md:p-7"
-                >
-                  <div className="flex items-center gap-3">
+                {/* Comic Card Header Row */}
+                <div className="p-3.5 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {/* Index Tag */}
                     <span
-                      className="hidden font-mono text-[0.625rem] font-bold uppercase tracking-wider sm:inline-block"
-                      style={{ color: faq.accent }}
+                      className={`${orbitron.className} text-[10px] font-black px-1.5 py-0.5 rounded bg-black/60 border border-white/20 text-[#00f0ff] shrink-0`}
                     >
-                      [{faq.category}]
+                      0{item.id}
                     </span>
-                    <h3 className="text-base font-bold text-paper transition-colors duration-200 hover:text-white md:text-lg">
-                      {faq.question}
-                    </h3>
+
+                    {/* Question Title */}
+                    <h5
+                      className={`${squada.className} text-lg sm:text-xl text-white tracking-wide uppercase leading-tight truncate`}
+                    >
+                      {item.question}
+                    </h5>
                   </div>
 
-                  {/* Comic Toggle Icon */}
-                  <span
-                    className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded border border-black font-mono text-sm font-black transition-transform duration-300 ${
+                  {/* Toggle Button Icon */}
+                  <div
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border transition-all duration-300 ${
                       isOpen
-                        ? "rotate-45 bg-[#FFE600] text-black shadow-[2px_2px_0px_#000]"
-                        : "bg-paper/10 text-paper"
+                        ? "bg-[#ff2e88] border-black text-black rotate-180 shadow-[1px_1px_0px_#000]"
+                        : "bg-white/10 border-white/20 text-white"
                     }`}
                   >
-                    +
-                  </span>
-                </button>
-
-                {/* Accordion Content */}
-                <div
-                  className={`grid transition-all duration-300 ease-in-out ${
-                    isOpen
-                      ? "grid-rows-[1fr] opacity-100"
-                      : "grid-rows-[0fr] opacity-0"
-                  }`}
-                >
-                  <div className="overflow-hidden">
-                    <div className="border-t border-paper/10 p-6 pt-4 text-sm leading-relaxed text-muted md:p-7 md:pt-4 md:text-base">
-                      {faq.answer}
-                    </div>
+                    {isOpen ? (
+                      <Minus className="w-4 h-4 stroke-[3]" />
+                    ) : (
+                      <Plus className="w-4 h-4 stroke-[3]" />
+                    )}
                   </div>
                 </div>
-              </div>
+
+                {/* Animated Accordion Body */}
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      key="content"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.28, ease: "easeInOut" }}
+                      className="overflow-hidden border-t border-white/10 bg-black/40"
+                    >
+                      <div className="p-3.5 pt-3">
+                        {/* Category Pill */}
+                        <div className="inline-block mb-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold font-mono tracking-widest uppercase bg-white/10 text-[#ffd369]">
+                          {item.category}
+                        </div>
+
+                        {/* Answer Text */}
+                        <p
+                          className={`${montserrat.className} text-xs sm:text-sm text-white/90 leading-relaxed font-normal`}
+                        >
+                          {item.answer}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             );
           })}
         </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. DESKTOP INTERACTIVE THE SPOT FAQ STAGE (visible on md+ screens)          */}
+      {/* ========================================================================= */}
+      <div className="hidden md:flex relative w-full max-w-[1150px] aspect-[1366/768] overflow-hidden items-center justify-center">
+        {/* Background Spot Artwork */}
+        <img
+          src="/spot.png"
+          alt="The Spot FAQ"
+          className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
+          draggable={false}
+        />
+
+        {/* Interactive White Circles / Ovals */}
+        {FAQ_BUBBLES.map((bubble) => {
+          const isActive = activeBubble === bubble.id;
+
+          return (
+            <div
+              key={bubble.id}
+              onClick={() => toggleBubble(bubble.id)}
+              onMouseEnter={() => setActiveBubble(bubble.id)}
+              onMouseLeave={() => setActiveBubble((curr) => (curr === bubble.id ? null : curr))}
+              className="absolute cursor-pointer transition-transform duration-300 transform-gpu overflow-hidden hover:scale-[1.02] flex items-center justify-center"
+              style={{
+                left: bubble.left,
+                top: bubble.top,
+                width: bubble.width,
+                height: bubble.height,
+                borderRadius: bubble.borderRadius || "50%",
+              }}
+            >
+              {/* Halftone RGB Glitch Texture Layer (Clipped to exact oval shape) */}
+              <div
+                className={`absolute inset-0 transition-opacity duration-300 pointer-events-none overflow-hidden ${
+                  isActive ? "opacity-100" : "opacity-0"
+                }`}
+                style={{
+                  backgroundImage: "url('/faq-glitch.png')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  borderRadius: bubble.borderRadius || "50%",
+                }}
+              >
+                {/* Dark Contrast Vignette for pristine text readability */}
+                <div
+                  className="absolute inset-0 bg-black/65 backdrop-blur-[1px]"
+                  style={{
+                    borderRadius: bubble.borderRadius || "50%",
+                  }}
+                />
+              </div>
+
+              {/* Question Text (Straight, Horizontal & Dead-Centered) */}
+              <div
+                className={`absolute inset-0 z-10 w-full h-full transition-all duration-300 flex items-center justify-center text-center p-2 sm:p-3 ${
+                  isActive ? "opacity-0 scale-95 pointer-events-none" : "opacity-100 scale-100"
+                }`}
+              >
+                <span
+                  className={`${squada.className} font-bold text-[10px] min-[400px]:text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-[#0d0410] leading-tight tracking-normal uppercase max-w-[85%]`}
+                >
+                  {bubble.question}
+                </span>
+              </div>
+
+              {/* Answer Text (Straight, Horizontal & Dead-Centered) */}
+              <div
+                className={`absolute inset-0 z-20 w-full h-full flex items-center justify-center p-2 min-[400px]:p-2.5 sm:p-3.5 md:p-4 text-center transition-all duration-300 overflow-hidden ${
+                  isActive ? "opacity-100 scale-100" : "opacity-0 scale-90 pointer-events-none"
+                }`}
+              >
+                <span
+                  className={`${squada.className} font-bold text-[8px] min-[400px]:text-[9px] min-[500px]:text-[10px] sm:text-xs md:text-sm lg:text-[15px] xl:text-base text-white leading-snug tracking-wide uppercase max-w-[82%]`}
+                  style={{
+                    textShadow: "0 2px 8px rgba(0,0,0,1), 0 0 12px rgba(255,255,255,0.4)",
+                  }}
+                >
+                  {bubble.answer}
+                </span>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );

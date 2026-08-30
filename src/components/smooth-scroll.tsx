@@ -29,6 +29,32 @@ export default function SmoothScroll({
     return () => query.removeEventListener("change", sync);
   }, []);
 
+  // Prevent right-click "Open image in new tab", "Save as", and dragging across all images and media
+  useEffect(() => {
+    const preventImageAction = (e: MouseEvent | DragEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "IMG" ||
+          target.tagName === "VIDEO" ||
+          target.tagName === "CANVAS" ||
+          target.closest("img") ||
+          target.closest("video") ||
+          target.closest("canvas"))
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("contextmenu", preventImageAction, { capture: true });
+    document.addEventListener("dragstart", preventImageAction, { capture: true });
+
+    return () => {
+      document.removeEventListener("contextmenu", preventImageAction, { capture: true });
+      document.removeEventListener("dragstart", preventImageAction, { capture: true });
+    };
+  }, []);
+
   const options = useMemo(
     () => ({
       // Frame-rate independent in Lenis 1.3, so this feels identical at 60 and

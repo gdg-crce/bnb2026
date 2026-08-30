@@ -60,67 +60,63 @@ export default function DomainsSection() {
       const media = gsap.matchMedia();
 
       media.add("(prefers-reduced-motion: no-preference)", () => {
+        if (trainRef.current) {
+          gsap.set(trainRef.current, { xPercent: -100, force3D: true });
+        }
+
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.9,
+            scrub: 0.6,
+            invalidateOnRefresh: true,
           },
         });
 
-        // 1. Train rushes in from left and smoothly brakes to cover the entire screen (0 -> 0.35)
-        tl.fromTo(
+        // 1. Train rushes in smoothly from left to cover the screen (0.08 -> 0.44)
+        tl.to(
           trainRef.current,
           {
-            xPercent: -105,
-            scale: 0.96,
-            opacity: 0.8,
-          },
-          {
             xPercent: 0,
-            scale: 1,
-            opacity: 1,
-            ease: "power2.out",
-            duration: 0.35,
+            ease: "sine.out",
+            duration: 0.36,
           },
-          0,
+          0.08,
         );
 
-        // 2. HUD & Track Badges glide in (0.32 -> 0.45)
+        // 2. HUD & Track Badges glide in (0.42 -> 0.52)
         tl.fromTo(
           hudRef.current,
-          { opacity: 0, y: -30 },
-          { opacity: 1, y: 0, ease: "power2.out", duration: 0.15 },
-          0.32,
+          { opacity: 0, y: -20 },
+          { opacity: 1, y: 0, ease: "sine.out", duration: 0.10 },
+          0.42,
         );
 
         tl.fromTo(
           cardsRef.current,
-          { opacity: 0, y: 40 },
-          { opacity: 1, y: 0, ease: "power2.out", duration: 0.18 },
-          0.38,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, ease: "sine.out", duration: 0.12 },
+          0.45,
         );
 
-        // 3. Train holds full-screen during (0.45 -> 0.80) for reading and interaction
+        // 3. Train holds full-screen during (0.52 -> 0.86) for comfortable track exploration
 
-        // 4. Train smoothly accelerates out toward the right into Timeline (0.80 -> 1.0)
+        // 4. Train smoothly accelerates out toward the right (0.86 -> 1.0)
         tl.to(
           trainRef.current,
           {
-            xPercent: 105,
-            scale: 1.04,
-            opacity: 0.6,
-            ease: "power2.in",
-            duration: 0.2,
+            xPercent: 100,
+            ease: "sine.in",
+            duration: 0.14,
           },
-          0.8,
+          0.86,
         );
 
         tl.to(
           [hudRef.current, cardsRef.current],
-          { opacity: 0, y: -20, duration: 0.12 },
-          0.8,
+          { opacity: 0, y: -20, duration: 0.08 },
+          0.86,
         );
       });
     },
@@ -131,7 +127,7 @@ export default function DomainsSection() {
     <section
       id="domains"
       ref={sectionRef}
-      className="relative h-[320vh] w-full bg-black"
+      className="relative h-[500vh] w-full bg-black"
     >
       <h2 className="sr-only">Domains & Multiverse Tracks</h2>
 
@@ -156,21 +152,25 @@ export default function DomainsSection() {
         */}
         <div
           ref={trainRef}
-          className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-center justify-center overflow-hidden"
+          className="absolute inset-0 z-10 h-full w-full will-change-transform flex items-center justify-center overflow-hidden [backface-visibility:hidden] transform-gpu"
         >
-          {/* Full Screen Train Image */}
+          {/* Full Screen Train Image (Unoptimized for pristine crystal-clear native text resolution) */}
           <div className="relative h-full w-full">
             <Image
               src={domainImg}
               alt="Domains Subway Train"
               fill
               priority
+              unoptimized
               sizes="100vw"
-              className="h-full w-full object-cover object-center drop-shadow-[0_25px_80px_rgba(0,0,0,0.95)]"
+              className="h-full w-full object-cover object-center"
+              style={{
+                imageRendering: "auto",
+              }}
             />
             {/* Cinematic Subway Lighting & Vignette */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/35" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/25 via-transparent to-black/25" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-black/25" />
           </div>
 
           {/* Interactive Window Clickable Hotspots */}
