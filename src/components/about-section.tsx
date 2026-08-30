@@ -398,9 +398,9 @@ export default function AboutSection() {
       const gamma = Math.max(-45, Math.min(45, event.gamma));
       const beta = Math.max(-45, Math.min(45, event.beta));
 
-      // Massive parallax offsets to allow panning across the room to read the text
-      const xOffset = (gamma / 45) * -350; 
-      const yOffset = (beta / 45) * -80;
+      // Adjusted parallax offsets to allow panning to read text without feeling overwhelming
+      const xOffset = (gamma / 45) * -200; 
+      const yOffset = (beta / 45) * -50;
 
       if (withCutGyroRef.current) {
         gsap.to(withCutGyroRef.current, { x: xOffset, y: yOffset, duration: 0.6, ease: "power2.out", overwrite: "auto" });
