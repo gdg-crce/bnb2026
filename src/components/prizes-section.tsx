@@ -191,13 +191,11 @@ export default function PrizesSection() {
     }
 
     function sampleArtworkColor(normX: number, normY: number): THREE.Vector3 | null {
-      // Don't spawn bubbles on the outer edge margins (prevents cut-off lines)
-      if (normX < 0.03 || normX > 0.97 || normY < 0.03 || normY > 0.97) {
-        return null;
-      }
+      const clampedX = Math.max(0.0, Math.min(1.0, normX));
+      const clampedY = Math.max(0.0, Math.min(1.0, normY));
 
       const aspect = ((stage?.clientWidth || 1920) / (stage?.clientHeight || 1080));
-      const distFromCenter = Math.hypot((normX - 0.5) * aspect, (1.0 - normY) - 0.5);
+      const distFromCenter = Math.hypot((clampedX - 0.5) * aspect, (1.0 - clampedY) - 0.5);
 
       // Don't bubble in the center (keeps center awards & trophies clean and unobstructed)
       if (distFromCenter < 0.22) {
@@ -507,6 +505,7 @@ export default function PrizesSection() {
       const width = stage.clientWidth;
       const height = stage.clientHeight;
       if (width === 0 || height === 0) return;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(width, height, false);
       material.uniforms.u_resolution.value.set(width, height);
     }
@@ -547,7 +546,6 @@ export default function PrizesSection() {
         const sampledColor = sampleArtworkColor(normX, normY);
         spawnBubbleCluster(mouseSt, normX, 1.0 - normY, sampledColor);
       }
-
     };
 
     const onStageMouseLeave = () => {
@@ -566,7 +564,6 @@ export default function PrizesSection() {
     // -------------------------------------------------------------
     let lastAmbientSpawnTime = 0;
 
-
     function spawnAmbientBubbles(now: number) {
       if (now - lastAmbientSpawnTime < 30) return;
       lastAmbientSpawnTime = now;
@@ -576,17 +573,17 @@ export default function PrizesSection() {
         if (bubbles[i].active) activeCount++;
       }
 
-      // Maintain a rich, continuous baseline of 220+ active ambient & stationary bubbles throughout
-      if (activeCount < 240) {
+      // Maintain a rich, continuous baseline of 240+ active ambient & stationary bubbles throughout
+      if (activeCount < 260) {
         const aspect = ((stage?.clientWidth || 1920) / (stage?.clientHeight || 1080));
         const spawnBatch = 3 + Math.floor(Math.random() * 4); // 3 to 6 bubbles per tick
 
         for (let s = 0; s < spawnBatch; s++) {
-          const ambientNormX = 0.05 + Math.random() * 0.90;
-          const ambientNormY = 0.05 + Math.random() * 0.90;
+          const ambientNormX = 0.005 + Math.random() * 0.99;
+          const ambientNormY = 0.005 + Math.random() * 0.99;
 
           const sampledColor = sampleArtworkColor(ambientNormX, ambientNormY);
-          if (!sampledColor) continue; // Completely skips the center and canvas borders
+          if (!sampledColor) continue; // Skips the center
 
           const ambientSt = new THREE.Vector2((ambientNormX - 0.5) * aspect, ambientNormY - 0.5);
           const sizeRoll = Math.random();
@@ -627,12 +624,12 @@ export default function PrizesSection() {
       }
     }
 
-    // Seed initial ambient & stationary bubbles across the entire artwork
+    // Seed initial ambient & stationary bubbles across the entire artwork including outer edges
     function seedInitialBubbles() {
       const aspect = ((stage?.clientWidth || 1920) / (stage?.clientHeight || 1080));
-      for (let i = 0; i < 180; i++) {
-        const ambientNormX = 0.05 + Math.random() * 0.90;
-        const ambientNormY = 0.05 + Math.random() * 0.90;
+      for (let i = 0; i < 200; i++) {
+        const ambientNormX = 0.005 + Math.random() * 0.99;
+        const ambientNormY = 0.005 + Math.random() * 0.99;
 
         const sampledColor = sampleArtworkColor(ambientNormX, ambientNormY);
         if (!sampledColor) continue;
@@ -752,123 +749,28 @@ export default function PrizesSection() {
   return (
     <section id="prizes" ref={sectionRef} className="prizes-experience-section">
       {/* ============================================================== */}
-      {/* MOBILE-ONLY PRIZES VIEW (md:hidden): Spiky Comic Starbursts & Centered Straight Trophies */}
+      {/* MOBILE-ONLY PRIZES VIEW (md:hidden): Title + All 3 Prizes on one screen */}
       {/* ============================================================== */}
-      <div className="md:hidden relative z-20 w-full min-h-screen bg-black flex flex-col items-center justify-start pt-10 pb-16 px-4 select-none overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
+      <div className="md:hidden relative z-20 w-full h-screen bg-black flex flex-col items-center justify-between pt-14 pb-8 px-2 select-none overflow-hidden">
         {/* Spider-Verse Ambient Background Glow */}
-        <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,48,140,0.22)_0%,rgba(0,240,255,0.08)_50%,transparent_80%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(229,48,140,0.25)_0%,rgba(0,240,255,0.1)_50%,transparent_80%)]" />
 
-        {/* Prizes Title - Moved more downwards with comfortable spacing */}
-        <div className="relative z-10 w-full max-w-[290px] xs:max-w-[330px] flex justify-center mt-4 mb-7">
+        {/* High-Resolution Prizes Title Banner */}
+        <div className="relative z-10 w-full max-w-[280px] flex justify-center mt-2 mb-1 shrink-0">
           <img
-            src="/prizes/title-mobile.png"
+            src="/prizestitle.png"
             alt="PRIZES"
-            className="w-52 sm:w-60 h-auto drop-shadow-[0_6px_20px_rgba(229,48,140,0.7)]"
+            className="w-52 sm:w-64 h-auto drop-shadow-[0_8px_24px_rgba(0,0,0,0.9)]"
             draggable={false}
           />
         </div>
 
-        {/* 3 Prizes Stacked with Trophies Centered Inside Comic Starbursts */}
-        <div className="relative z-10 w-full max-w-sm flex flex-col items-center gap-8">
-          {/* 1. Grand Winner (1st Place) */}
-          <div className="relative w-full max-w-[290px] xs:max-w-[315px] flex flex-col items-center justify-center pt-8">
-            {/* Trophy Much Bigger Than Dialogue Box Towering Above */}
-            <div className="relative z-20 h-44 sm:h-52 -mb-16 sm:-mb-18 flex items-center justify-center filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)] drop-shadow-[0_0_18px_rgba(255,230,0,0.45)] pointer-events-none">
-              <img
-                src="/assets/trophy-center-trimmed.png"
-                alt="Grand Winner 1st Place Trophy"
-                className="h-full w-auto object-contain"
-                draggable={false}
-              />
-            </div>
-
-            {/* SVG Comic Starburst Frame matching Reference Image */}
-            <div className="relative z-10 w-full flex items-center justify-center">
-              <svg
-                viewBox="0 0 360 220"
-                className="w-full h-auto drop-shadow-[5px_5px_0px_#000000] overflow-visible"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Top-Left Action Spark / Lightning Bolt */}
-                <path
-                  d="M 95 38 L 75 10 L 88 28 L 68 20 L 92 48 Z"
-                  fill="#000000"
-                />
-                {/* Top-Right Action Spark / Lightning Bolt */}
-                <path
-                  d="M 265 38 L 285 10 L 272 28 L 292 20 L 268 48 Z"
-                  fill="#000000"
-                />
-
-                {/* Comic Action Starburst Main Body - Sharp Points & Inward Curves */}
-                <path
-                  d="M 85 24 
-                     Q 105 46 128 42 
-                     Q 150 24 172 26 
-                     Q 194 24 216 42 
-                     Q 238 46 260 24 
-                     Q 276 45 290 52 
-                     Q 314 42 334 50 
-                     Q 308 76 302 88 
-                     Q 336 94 350 110 
-                     Q 314 126 300 136 
-                     Q 326 154 336 168 
-                     Q 298 168 280 174 
-                     Q 278 196 262 206 
-                     Q 238 184 222 182 
-                     Q 206 206 195 214 
-                     Q 180 190 170 186 
-                     Q 160 190 145 214 
-                     Q 134 206 118 182 
-                     Q 102 184 78 206 
-                     Q 62 196 60 174 
-                     Q 42 168 4 168 
-                     Q 14 154 40 136 
-                     Q 26 126 -10 110 
-                     Q 24 94 58 88 
-                     Q 52 76 26 50 
-                     Q 46 42 70 52 
-                     Q 84 45 85 24 Z"
-                  fill="#FFFFFF"
-                  stroke="#000000"
-                  strokeWidth="4.5"
-                  strokeLinejoin="miter"
-                  strokeMiterlimit="5"
-                  strokeLinecap="round"
-                />
-
-                {/* Inner Comic Double-Line Action Accents */}
-                <path d="M 88 38 Q 104 54 124 50" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 220 50 Q 240 54 256 38" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 314 62 Q 302 78 296 88" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 330 116 Q 310 126 296 132" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 314 162 Q 292 162 276 166" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 252 194 Q 234 182 220 180" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 120 180 Q 106 182 88 194" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 64 166 Q 48 162 26 162" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 44 132 Q 30 126 10 116" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 44 88 Q 38 78 26 62" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-
-              {/* Comic Tag & Cash Amount Centered in Core of Bubble */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center pt-8 pb-2 px-4 select-none pointer-events-none">
-                <div className="relative z-20 flex flex-col items-center gap-0.5">
-                  <span className="border-[1.5px] border-black bg-black px-2.5 py-0.5 font-mono text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#FFE600] shadow-[2px_2px_0px_rgba(0,0,0,0.4)] whitespace-nowrap">
-                    ★ GRAND WINNER (1ST PLACE) ★
-                  </span>
-                  <span className="font-sans font-black text-2xl sm:text-3xl text-black tracking-tight leading-none mt-0.5">
-                    ₹50,000
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 2. Runner Up (2nd Place) */}
-          <div className="relative w-full max-w-[290px] xs:max-w-[315px] flex flex-col items-center justify-center pt-6">
-            {/* Trophy Much Bigger Than Dialogue Box Towering Above */}
-            <div className="relative z-20 h-40 sm:h-48 -mb-15 sm:-mb-17 flex items-center justify-center filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)] drop-shadow-[0_0_18px_rgba(0,240,255,0.45)] pointer-events-none">
+        {/* 3 Prizes Visible Simultaneously in a Podium Layout */}
+        <div className="relative z-10 w-full max-w-md flex-1 flex items-end justify-center gap-1.5 sm:gap-3 px-1 pb-4">
+          {/* ── 2ND PLACE (Left) ── */}
+          <div className="w-[31%] flex flex-col items-center justify-end pb-2">
+            {/* 2nd Place Trophy */}
+            <div className="relative z-10 h-28 sm:h-36 w-full flex items-end justify-center filter drop-shadow-[0_8px_20px_rgba(0,0,0,0.85)] drop-shadow-[0_0_12px_rgba(0,240,255,0.4)] pointer-events-none -mb-3">
               <img
                 src="/assets/trophy-right-straight.png"
                 alt="Runner Up 2nd Place Trophy"
@@ -877,181 +779,69 @@ export default function PrizesSection() {
               />
             </div>
 
-            {/* SVG Comic Starburst Frame matching Reference Image */}
-            <div className="relative z-10 w-full flex items-center justify-center">
-              <svg
-                viewBox="0 0 360 220"
-                className="w-full h-auto drop-shadow-[5px_5px_0px_#000000] overflow-visible"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Top-Left Action Spark / Lightning Bolt */}
-                <path
-                  d="M 95 38 L 75 10 L 88 28 L 68 20 L 92 48 Z"
-                  fill="#000000"
-                />
-                {/* Top-Right Action Spark / Lightning Bolt */}
-                <path
-                  d="M 265 38 L 285 10 L 272 28 L 292 20 L 268 48 Z"
-                  fill="#000000"
-                />
-
-                {/* Comic Action Starburst Main Body - Sharp Points & Inward Curves */}
-                <path
-                  d="M 85 24 
-                     Q 105 46 128 42 
-                     Q 150 24 172 26 
-                     Q 194 24 216 42 
-                     Q 238 46 260 24 
-                     Q 276 45 290 52 
-                     Q 314 42 334 50 
-                     Q 308 76 302 88 
-                     Q 336 94 350 110 
-                     Q 314 126 300 136 
-                     Q 326 154 336 168 
-                     Q 298 168 280 174 
-                     Q 278 196 262 206 
-                     Q 238 184 222 182 
-                     Q 206 206 195 214 
-                     Q 180 190 170 186 
-                     Q 160 190 145 214 
-                     Q 134 206 118 182 
-                     Q 102 184 78 206 
-                     Q 62 196 60 174 
-                     Q 42 168 4 168 
-                     Q 14 154 40 136 
-                     Q 26 126 -10 110 
-                     Q 24 94 58 88 
-                     Q 52 76 26 50 
-                     Q 46 42 70 52 
-                     Q 84 45 85 24 Z"
-                  fill="#FFFFFF"
-                  stroke="#000000"
-                  strokeWidth="4.5"
-                  strokeLinejoin="miter"
-                  strokeMiterlimit="5"
-                  strokeLinecap="round"
-                />
-
-                {/* Inner Comic Double-Line Action Accents */}
-                <path d="M 88 38 Q 104 54 124 50" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 220 50 Q 240 54 256 38" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 314 62 Q 302 78 296 88" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 330 116 Q 310 126 296 132" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 314 162 Q 292 162 276 166" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 252 194 Q 234 182 220 180" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 120 180 Q 106 182 88 194" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 64 166 Q 48 162 26 162" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 44 132 Q 30 126 10 116" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 44 88 Q 38 78 26 62" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-
-              {/* Comic Tag & Cash Amount Centered in Core of Bubble */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center pt-8 pb-2 px-4 select-none pointer-events-none">
-                <div className="relative z-20 flex flex-col items-center gap-0.5">
-                  <span className="border-[1.5px] border-black bg-black px-2.5 py-0.5 font-mono text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#00F0FF] shadow-[2px_2px_0px_rgba(0,0,0,0.4)] whitespace-nowrap">
-                    ★ RUNNER UP (2ND PLACE) ★
-                  </span>
-                  <span className="font-sans font-black text-2xl sm:text-3xl text-black tracking-tight leading-none mt-0.5">
-                    ₹30,000
-                  </span>
-                </div>
-              </div>
+            {/* 2nd Place Comic Card */}
+            <div className="relative z-20 w-full bg-[#110e1c] rounded-xl border-[1.5px] border-[#00f0ff] p-2 flex flex-col items-center text-center shadow-[3px_3px_0px_#000]">
+              <span className="px-1.5 py-0.5 rounded bg-black/80 border border-white/20 font-mono text-[7.5px] sm:text-[9px] font-black uppercase text-[#00f0ff] tracking-wider leading-none">
+                2ND PLACE
+              </span>
+              <span className="font-sans font-black text-lg sm:text-2xl text-white tracking-tight leading-none mt-1">
+                ₹30,000
+              </span>
+              <span className="text-[7px] sm:text-[8px] font-mono text-white/60 uppercase tracking-widest mt-0.5">
+                RUNNER UP
+              </span>
             </div>
           </div>
 
-          {/* 3. Second Runner Up (3rd Place) */}
-          <div className="relative w-full max-w-[290px] xs:max-w-[315px] flex flex-col items-center justify-center pt-6">
-            {/* Trophy Much Bigger Than Dialogue Box Towering Above */}
-            <div className="relative z-20 h-40 sm:h-48 -mb-15 sm:-mb-17 flex items-center justify-center filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.85)] drop-shadow-[0_0_18px_rgba(255,46,136,0.45)] pointer-events-none">
+          {/* ── 1ST PLACE (Center - Elevated Grand Winner) ── */}
+          <div className="w-[38%] flex flex-col items-center justify-end pb-4">
+            {/* 1st Place Tallest Center Trophy */}
+            <div className="relative z-10 h-36 sm:h-48 w-full flex items-end justify-center filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.9)] drop-shadow-[0_0_18px_rgba(255,230,0,0.5)] pointer-events-none -mb-4">
               <img
-                src="/assets/trophy-left-straight.png"
+                src="/assets/trophy-center-trimmed.png"
+                alt="Grand Winner 1st Place Trophy"
+                className="h-full w-auto object-contain"
+                draggable={false}
+              />
+            </div>
+
+            {/* 1st Place Golden Comic Card */}
+            <div className="relative z-20 w-full bg-[#181308] rounded-xl border-2 border-[#ffe600] p-2.5 flex flex-col items-center text-center shadow-[4px_4px_0px_#000]">
+              <span className="px-2 py-0.5 rounded bg-black/90 border border-[#ffe600]/40 font-mono text-[8.5px] sm:text-[10px] font-black uppercase text-[#ffe600] tracking-wider leading-none">
+                ★ 1ST PLACE ★
+              </span>
+              <span className="font-sans font-black text-2xl sm:text-3xl text-[#ffe600] tracking-tight leading-none mt-1">
+                ₹50,000
+              </span>
+              <span className="text-[7.5px] sm:text-[9px] font-mono text-white/80 uppercase tracking-widest mt-0.5">
+                GRAND WINNER
+              </span>
+            </div>
+          </div>
+
+          {/* ── 3RD PLACE (Right) ── */}
+          <div className="w-[31%] flex flex-col items-center justify-end pb-1">
+            {/* 3rd Place Trophy */}
+            <div className="relative z-10 h-26 sm:h-34 w-full flex items-end justify-center filter drop-shadow-[0_8px_20px_rgba(0,0,0,0.85)] drop-shadow-[0_0_12px_rgba(255,46,136,0.4)] pointer-events-none -mb-3">
+              <img
+                src="/left.png"
                 alt="Second Runner Up 3rd Place Trophy"
                 className="h-full w-auto object-contain"
                 draggable={false}
               />
             </div>
 
-            {/* SVG Comic Starburst Frame matching Reference Image */}
-            <div className="relative z-10 w-full flex items-center justify-center">
-              <svg
-                viewBox="0 0 360 220"
-                className="w-full h-auto drop-shadow-[5px_5px_0px_#000000] overflow-visible"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Top-Left Action Spark / Lightning Bolt */}
-                <path
-                  d="M 95 38 L 75 10 L 88 28 L 68 20 L 92 48 Z"
-                  fill="#000000"
-                />
-                {/* Top-Right Action Spark / Lightning Bolt */}
-                <path
-                  d="M 265 38 L 285 10 L 272 28 L 292 20 L 268 48 Z"
-                  fill="#000000"
-                />
-
-                {/* Comic Action Starburst Main Body - Sharp Points & Inward Curves */}
-                <path
-                  d="M 85 24 
-                     Q 105 46 128 42 
-                     Q 150 24 172 26 
-                     Q 194 24 216 42 
-                     Q 238 46 260 24 
-                     Q 276 45 290 52 
-                     Q 314 42 334 50 
-                     Q 308 76 302 88 
-                     Q 336 94 350 110 
-                     Q 314 126 300 136 
-                     Q 326 154 336 168 
-                     Q 298 168 280 174 
-                     Q 278 196 262 206 
-                     Q 238 184 222 182 
-                     Q 206 206 195 214 
-                     Q 180 190 170 186 
-                     Q 160 190 145 214 
-                     Q 134 206 118 182 
-                     Q 102 184 78 206 
-                     Q 62 196 60 174 
-                     Q 42 168 4 168 
-                     Q 14 154 40 136 
-                     Q 26 126 -10 110 
-                     Q 24 94 58 88 
-                     Q 52 76 26 50 
-                     Q 46 42 70 52 
-                     Q 84 45 85 24 Z"
-                  fill="#FFFFFF"
-                  stroke="#000000"
-                  strokeWidth="4.5"
-                  strokeLinejoin="miter"
-                  strokeMiterlimit="5"
-                  strokeLinecap="round"
-                />
-
-                {/* Inner Comic Double-Line Action Accents */}
-                <path d="M 88 38 Q 104 54 124 50" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 220 50 Q 240 54 256 38" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 314 62 Q 302 78 296 88" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 330 116 Q 310 126 296 132" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 314 162 Q 292 162 276 166" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 252 194 Q 234 182 220 180" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 120 180 Q 106 182 88 194" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 64 166 Q 48 162 26 162" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 44 132 Q 30 126 10 116" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M 44 88 Q 38 78 26 62" stroke="#000000" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-
-              {/* Comic Tag & Cash Amount Centered in Core of Bubble */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center pt-8 pb-2 px-4 select-none pointer-events-none">
-                <div className="relative z-20 flex flex-col items-center gap-0.5">
-                  <span className="border-[1.5px] border-black bg-black px-2.5 py-0.5 font-mono text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-[#FF2E88] shadow-[2px_2px_0px_rgba(0,0,0,0.4)] whitespace-nowrap">
-                    ★ SECOND RUNNER UP (3RD PLACE) ★
-                  </span>
-                  <span className="font-sans font-black text-2xl sm:text-3xl text-black tracking-tight leading-none mt-0.5">
-                    ₹20,000
-                  </span>
-                </div>
-              </div>
+            {/* 3rd Place Comic Card */}
+            <div className="relative z-20 w-full bg-[#160d18] rounded-xl border-[1.5px] border-[#ff2e88] p-2 flex flex-col items-center text-center shadow-[3px_3px_0px_#000]">
+              <span className="px-1.5 py-0.5 rounded bg-black/80 border border-white/20 font-mono text-[7.5px] sm:text-[9px] font-black uppercase text-[#ff2e88] tracking-wider leading-none">
+                3RD PLACE
+              </span>
+              <span className="font-sans font-black text-lg sm:text-2xl text-white tracking-tight leading-none mt-1">
+                ₹20,000
+              </span>
+              <span className="text-[7px] sm:text-[8px] font-mono text-white/60 uppercase tracking-widest mt-0.5">
+                2ND RUNNER UP
+              </span>
             </div>
           </div>
         </div>
@@ -1215,6 +1005,20 @@ export default function PrizesSection() {
           display: flex;
           justify-content: center;
           align-items: center;
+        }
+
+        @media (max-width: 768px) {
+          #prizes-title-layer {
+            top: 30.0%;
+            width: clamp(160px, 44vw, 240px);
+          }
+        }
+
+        @media (max-width: 480px) {
+          #prizes-title-layer {
+            top: 31.5%;
+            width: clamp(145px, 46vw, 210px);
+          }
         }
 
         .prizes-title-img {

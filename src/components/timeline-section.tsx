@@ -58,28 +58,28 @@ export default function TimelineSection() {
         className="absolute inset-0 w-full h-full object-fill z-0 pointer-events-none select-none"
       />
 
-      {/* Timeline Title Logo (Enlarged & Positioned Higher) */}
-      <div className="absolute top-1 sm:top-2 md:top-3 lg:top-4 xl:top-5 left-1/2 -translate-x-1/2 z-30 w-[92%] sm:w-[82%] md:w-[72%] lg:w-[62%] xl:w-[54%] max-w-[920px] pointer-events-none select-none">
+      {/* Timeline Title Logo (Positioned safely below fixed navbar on mobile & desktop) */}
+      <div className="absolute top-16 sm:top-14 md:top-10 lg:top-8 left-1/2 -translate-x-1/2 z-30 w-[90%] sm:w-[80%] md:w-[70%] lg:w-[58%] max-w-[850px] pointer-events-none select-none">
         <motion.img
-          initial={{ opacity: 0, y: -30, scale: 0.9 }}
+          initial={{ opacity: 0, y: -20, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
           src="/timelinelogo.png"
           alt="Timeline"
-          className="w-full h-auto drop-shadow-[0_16px_36px_rgba(0,0,0,0.7)]"
+          className="w-full h-auto drop-shadow-[0_16px_36px_rgba(0,0,0,0.85)]"
         />
       </div>
 
       {/* Foreground Container */}
-      <div className="relative z-10 w-full pt-[18vw] sm:pt-[16vw] md:pt-[14vw] lg:pt-[12vw] pb-28 sm:pb-36 md:pb-44 px-4">
-        {/* Pavitr Prabhakar (Shifted slightly right into arch center) */}
+      <div className="relative z-10 w-full pt-[28vw] sm:pt-[22vw] md:pt-[18vw] lg:pt-[15vw] pb-36 sm:pb-44 md:pb-52 px-3 sm:px-6">
+        {/* Pavitr Prabhakar (Positioned at top left) */}
         <motion.div
-          initial={{ opacity: 0, x: -50, y: 50 }}
+          initial={{ opacity: 0, x: -40, y: 40 }}
           whileInView={{ opacity: 1, x: 0, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="absolute top-[13vw] sm:top-[11vw] md:top-[9vw] lg:top-[7.5vw] xl:top-[6.5vw] -left-[4.5%] sm:-left-[3.2%] md:-left-[2%] lg:-left-[1%] xl:-left-[0.5%] w-[38%] sm:w-[32%] md:w-[26%] lg:w-[21%] xl:w-[19%] pointer-events-auto z-10 select-none transform-gpu will-change-transform"
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="absolute top-[20vw] sm:top-[16vw] md:top-[12vw] lg:top-[10vw] -left-[1%] sm:-left-[1%] md:-left-[0.5%] w-[38%] sm:w-[32%] md:w-[26%] lg:w-[21%] pointer-events-auto z-10 select-none transform-gpu will-change-transform"
         >
           <img
             src="/images/Timeline/PavitrPrabhakr.png"
@@ -88,13 +88,13 @@ export default function TimelineSection() {
           />
         </motion.div>
 
-        {/* Web Strand — continuous silk line shooting directly from Pavitr's wrist down the full height */}
-        <div className="timeline-web-strand absolute top-[33vw] sm:top-[28vw] md:top-[22.8vw] lg:top-[18.6vw] xl:top-[16.5vw] bottom-0 left-[21.5%] sm:left-[18.5%] md:left-[15.5%] lg:left-[13%] xl:left-[12.2%] w-[10%] sm:w-[8.5%] md:w-[7%] lg:w-[5.8%] xl:w-[5.2%] pointer-events-none z-[5] transform-gpu">
-          {/* Scroll-driven height container (Reveals from Pavitr's wrist downwards as user scrolls) */}
+        {/* Web Strand — Continuous silk line shooting directly from Pavitr's wrist down the full height */}
+        <div className="timeline-web-strand absolute top-[44vw] sm:top-[35vw] md:top-[28vw] lg:top-[22vw] bottom-0 left-[8%] sm:left-[12%] md:left-[14%] lg:left-[12.5%] w-[12%] sm:w-[9.5%] md:w-[8%] lg:w-[6%] pointer-events-none z-[5] transform-gpu">
+          {/* Scroll-driven height container */}
           <div
             className="timeline-web-clip relative w-full h-full overflow-hidden will-change-[height]"
             style={{
-              height: "0%",
+              height: "100%",
             }}
           >
             <div
@@ -103,16 +103,16 @@ export default function TimelineSection() {
                 mixBlendMode: "screen",
               }}
             >
-              {Array.from({ length: 70 }).map((_, i) => (
+              {Array.from({ length: 80 }).map((_, i) => (
                 <img
                   key={i}
                   src="/images/Timeline/web.png"
                   alt=""
                   loading="lazy"
                   decoding="async"
-                  className="w-full block select-none pointer-events-none scale-135 sm:scale-145 md:scale-150"
+                  className="w-full block select-none pointer-events-none scale-140 sm:scale-150"
                   style={{
-                    transform: i % 2 === 1 ? "scaleY(-1) scaleX(1.35)" : "scaleX(1.35)",
+                    transform: i % 2 === 1 ? "scaleY(-1) scaleX(1.4)" : "scaleX(1.4)",
                     marginTop: i === 0 ? "0" : "-4px",
                   }}
                 />
@@ -120,7 +120,7 @@ export default function TimelineSection() {
             </div>
 
             {/* Spider-Hand attached directly at the bottom where the webs terminate */}
-            <div className="absolute -bottom-8 sm:-bottom-12 md:-bottom-14 left-1/2 -translate-x-1/2 w-[180%] sm:w-[210%] md:w-[240%] z-20 pointer-events-none select-none flex justify-center">
+            <div className="absolute -bottom-8 sm:-bottom-12 md:-bottom-14 left-1/2 -translate-x-1/2 w-[190%] sm:w-[220%] z-20 pointer-events-none select-none flex justify-center">
               <img
                 src="/spiderhand.png"
                 alt="Spider-Man Web Hand"
@@ -130,22 +130,22 @@ export default function TimelineSection() {
           </div>
         </div>
 
-        {/* Timeline Events Container (Shifted right for clean generous spacing from web) */}
-        <div className="relative mt-24 sm:mt-36 md:mt-44 lg:mt-52 xl:mt-60 left-[38%] sm:left-[33%] md:left-[29%] lg:left-[24.5%] xl:left-[22.5%] w-[58%] sm:w-[65%] md:w-[69%] lg:w-[73%] flex flex-col gap-7 sm:gap-10 md:gap-12 lg:gap-16 pointer-events-auto z-20">
+        {/* Timeline Events Container — Larger text sizes and generous spacing */}
+        <div className="relative mt-32 sm:mt-40 md:mt-48 lg:mt-56 left-[22%] sm:left-[24%] md:left-[24%] lg:left-[22%] w-[76%] sm:w-[74%] md:w-[74%] flex flex-col gap-12 sm:gap-14 md:gap-18 lg:gap-22 pointer-events-auto z-20">
           {events.map((event, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.45, delay: 0.05, ease: "easeOut" }}
-              className="w-full flex flex-col items-start justify-start py-0.5 sm:py-1 transform-gpu"
+              transition={{ duration: 0.4, delay: 0.04, ease: "easeOut" }}
+              className="w-full flex flex-col items-start justify-start py-1 sm:py-2.5 transform-gpu"
             >
               <h3
-                className={`${squada.className} font-bold text-3xl min-[480px]:text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5.5rem] leading-tight sm:leading-none tracking-normal uppercase cursor-default hover:scale-[1.02] transition-transform duration-300 origin-left`}
+                className={`${squada.className} font-bold text-3xl min-[400px]:text-4xl min-[500px]:text-5xl sm:text-6xl md:text-7xl lg:text-[4.8rem] leading-tight sm:leading-none tracking-normal uppercase cursor-default hover:scale-[1.02] transition-transform duration-300 origin-left`}
                 style={{
                   color: "#ffd369",
-                  WebkitTextStroke: "2px #4a154b",
+                  WebkitTextStroke: "1.5px #4a154b",
                   textShadow: `
                     -1px 1px 0 #7b165d,
                     -2px 2px 0 #691765,
@@ -163,10 +163,10 @@ export default function TimelineSection() {
                 {event.title}
               </h3>
 
-              {/* Date Badge Container matching reference design */}
-              <div className="mt-1.5 sm:mt-2 md:mt-2.5 inline-flex items-center gap-2.5 sm:gap-3 px-3.5 py-1 sm:px-4 sm:py-1.5 md:px-5 md:py-2 rounded-[6px] sm:rounded-[7px] bg-[#220a27] border-[1.5px] sm:border-2 border-[#fdb827] shadow-[0_4px_16px_rgba(0,0,0,0.6)] select-none">
+              {/* Date Badge Container */}
+              <div className="mt-2 sm:mt-3 inline-flex items-center gap-2 sm:gap-2.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-[6px] sm:rounded-[7px] bg-[#220a27] border-[1.5px] sm:border-2 border-[#fdb827] shadow-[0_4px_16px_rgba(0,0,0,0.6)] select-none">
                 <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#9f1361] shrink-0" />
-                <span className={`${squada.className} text-base sm:text-lg md:text-xl lg:text-2xl text-[#ffd369] tracking-[0.06em] uppercase leading-none pt-0.5`}>
+                <span className={`${squada.className} text-sm min-[400px]:text-base sm:text-xl md:text-2xl text-[#ffd369] tracking-[0.06em] uppercase leading-none pt-0.5`}>
                   {event.date}
                 </span>
               </div>
@@ -177,4 +177,3 @@ export default function TimelineSection() {
     </section>
   );
 }
-

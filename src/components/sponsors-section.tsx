@@ -2,12 +2,9 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { gsap, SplitText, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP } from "@/lib/gsap";
 
 import GhostFibers from "@/components/GhostFibers";
-
-const MARK_SIZE =
-  "text-[clamp(3rem,14vw,5.5rem)] md:text-[clamp(3.5rem,8vw,7rem)]";
 
 const SponsorCard = ({ sponsor, className = "h-32 sm:h-36", tileClass = "prev-sponsor-tile" }: any) => (
   <div className={`${tileClass} group relative p-1 bg-[#100e18]/85 rounded-2xl border-2 border-red-500/30 hover:border-[#22b6d6] transform-gpu transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,182,214,0.35)] hover:-translate-y-1.5 opacity-0 translate-y-8 will-change-transform`}>
@@ -52,25 +49,12 @@ export default function SponsorsSection() {
       const media = gsap.matchMedia();
 
       media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Chromatic split on header
-        gsap.fromTo(
-          ".sponsors-ghost",
-          { xPercent: (i: number) => (i === 0 ? -3.5 : 3.5), opacity: 0 },
-          {
-            xPercent: (i: number) => (i === 0 ? -0.4 : 0.4),
-            opacity: 1,
-            duration: 1.5,
-            ease: "power4.out",
-            scrollTrigger: { trigger: ".sponsors-mark", start: "top 84%" },
-          },
-        );
-
-        const split = new SplitText(".sponsors-mark-face", { type: "chars" });
-        gsap.from(split.chars, {
-          yPercent: 110,
-          stagger: 0.04,
-          duration: 1.1,
-          ease: "power4.out",
+        // Sponsors title image animation
+        gsap.from(".sponsors-mark", {
+          opacity: 0,
+          y: 30,
+          duration: 1.0,
+          ease: "power3.out",
           scrollTrigger: { trigger: ".sponsors-mark", start: "top 84%" },
         });
 
@@ -98,8 +82,6 @@ export default function SponsorsSection() {
             start: "top 80%",
           },
         });
-
-        return () => split.revert();
       });
     },
     { scope: root }
@@ -142,7 +124,7 @@ export default function SponsorsSection() {
     <section
       id="sponsors"
       ref={root}
-      className="relative z-10 overflow-hidden bg-black py-24 md:py-36 px-6"
+      className="relative z-10 overflow-hidden bg-black pt-10 sm:pt-14 md:pt-18 pb-20 md:pb-28 px-6"
     >
       {/* Spiderverse GhostFibers Multiverse Web Background (Darkened) */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-50">
@@ -181,34 +163,18 @@ export default function SponsorsSection() {
 
       <div className="container mx-auto max-w-6xl relative z-10">
         
-        {/* Section Header with Chromatic Split Typography */}
-        <div className="sponsors-mark relative mb-16 flex flex-col items-start md:mb-20">
-       
-
-          <div className="relative mt-4">
-            {/* Red Ghost */}
-            <span
-              aria-hidden="true"
-              className={`sponsors-ghost display absolute inset-0 text-red opacity-0 select-none ${MARK_SIZE}`}
-            >
-              Sponsors
-            </span>
-            {/* Cyan Ghost */}
-            <span
-              aria-hidden="true"
-              className={`sponsors-ghost display absolute inset-0 text-[#22b6d6] opacity-0 select-none ${MARK_SIZE}`}
-            >
-              Sponsors
-            </span>
-            {/* Front Face */}
-            <h2
-              className={`sponsors-mark-face display relative text-paper ${MARK_SIZE}`}
-            >
-              Sponsors
-            </h2>
+        {/* Section Header with sponsortitle.png */}
+        <div className="sponsors-mark relative mb-6 sm:mb-8 md:mb-10 flex items-center justify-start">
+          <div className="relative w-full max-w-[260px] sm:max-w-[360px] md:max-w-[460px]">
+            <Image
+              src="/sponsortitle.png"
+              alt="Sponsors"
+              width={605}
+              height={400}
+              priority
+              className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]"
+            />
           </div>
-
-         
         </div>
 
         {/* --- Previous Years Sponsors --- */}

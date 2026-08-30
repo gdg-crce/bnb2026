@@ -47,7 +47,7 @@ export default function Footer() {
               BIT N BUILD 2026
             </h3>
             <p className="mt-3 text-xs sm:text-sm text-white/70 leading-relaxed max-w-sm font-normal">
-              An International hackathon by <span className="text-white font-semibold">GDG CRCE</span>. Join with developers for coding, learning, and building amazing projects!
+              An International hackathon by <a href="https://gdgcrce.com" target="_blank" rel="noopener noreferrer" className="text-white font-semibold hover:text-[#ffd369] transition-colors underline decoration-white/30 hover:decoration-[#ffd369]">GDG CRCE</a>. Join with developers for coding, learning, and building amazing projects!
             </p>
           </div>
 
@@ -110,7 +110,7 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="max-w-7xl mx-auto pt-6 flex items-center justify-between text-xs text-white/50 font-normal">
         <div>
-          © 2026 Bit N Build. All rights reserved. <span className="text-[#ffd369] font-medium">GDG CRCE</span>
+          © 2026 Bit N Build. All rights reserved. <a href="https://gdgcrce.com" target="_blank" rel="noopener noreferrer" className="text-[#ffd369] font-medium hover:underline transition-all">GDG CRCE</a>
         </div>
 
         <button
