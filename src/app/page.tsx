@@ -1,7 +1,6 @@
 import HeroVideo from "@/components/hero-video";
 import PipesSection from "@/components/pipes-section";
 import AboutSection from "@/components/about-section";
-import PrizesMobileSection from "@/components/prizes-mobile-section";
 import SponsorsSection from "@/components/sponsors-section";
 import FAQSection from "@/components/faq-section";
 import ContactSection from "@/components/contact-section";

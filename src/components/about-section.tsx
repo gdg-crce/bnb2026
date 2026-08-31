@@ -45,13 +45,13 @@ export default function AboutSection() {
           gsap.set(headlightsRef.current, { opacity: 0, force3D: true });
         }
         if (aboutRoomRef.current) {
-          gsap.set(aboutRoomRef.current, { opacity: 1, force3D: true });
+          gsap.set(aboutRoomRef.current, { opacity: 1, visibility: "visible", force3D: true });
         }
         if (prizesContainerRef.current) {
-          gsap.set(prizesContainerRef.current, { y: () => window.innerHeight, opacity: 0, pointerEvents: "none", visibility: "visible", force3D: true });
+          gsap.set(prizesContainerRef.current, { yPercent: 100, y: 0, opacity: 0, pointerEvents: "none", visibility: "hidden", force3D: true });
         }
         if (timelineContainerRef.current) {
-          gsap.set(timelineContainerRef.current, { y: 0, opacity: 0, pointerEvents: "none", force3D: true });
+          gsap.set(timelineContainerRef.current, { y: 0, opacity: 0, pointerEvents: "none", visibility: "hidden", force3D: true });
         }
         if (withCutRef.current) {
           gsap.set(withCutRef.current, { scale: 1.04, y: 0, x: 0, opacity: 1, force3D: true });
@@ -163,16 +163,25 @@ export default function AboutSection() {
         );
 
         if (prizesContainerRef.current) {
+          tl.set(prizesContainerRef.current, { visibility: "visible" }, 0.64);
           tl.fromTo(
             prizesContainerRef.current,
-            { y: () => window.innerHeight, opacity: 1 },
-            { y: 0, opacity: 1, ease: "power2.out", duration: 0.14, force3D: true },
+            { yPercent: 100, y: 0, opacity: 1 },
+            { yPercent: 0, y: 0, opacity: 1, ease: "power2.out", duration: 0.14, force3D: true, immediateRender: false },
             0.64
           );
         }
 
-        if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.78);
+        if (timelineContainerRef.current) {
+          tl.to(
+            timelineContainerRef.current,
+            { opacity: 0, ease: "power2.inOut", duration: 0.10 },
+            0.64
+          );
+          tl.set(timelineContainerRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.74);
+        }
+
+        if (prizesContainerRef.current) {
           tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.78);
         }
 
@@ -209,10 +218,10 @@ export default function AboutSection() {
           gsap.set(headlightsRef.current, { opacity: 0, force3D: true });
         }
         if (aboutRoomRef.current) {
-          gsap.set(aboutRoomRef.current, { opacity: 1, force3D: true });
+          gsap.set(aboutRoomRef.current, { opacity: 1, visibility: "visible", force3D: true });
         }
         if (prizesContainerRef.current) {
-          gsap.set(prizesContainerRef.current, { yPercent: 100, opacity: 1, pointerEvents: "none", visibility: "visible", force3D: true });
+          gsap.set(prizesContainerRef.current, { yPercent: 100, y: 0, opacity: 0, pointerEvents: "none", visibility: "hidden", force3D: true });
         }
         if (timelineContainerRef.current) {
           gsap.set(timelineContainerRef.current, { yPercent: 0, opacity: 0, pointerEvents: "none", force3D: true });
@@ -297,11 +306,24 @@ export default function AboutSection() {
         );
 
         // 5. Silky glide of Prizes section up into full view (0.64 -> 0.76)
-        tl.to(
-          prizesContainerRef.current,
-          { yPercent: 0, ease: "power2.inOut", duration: 0.12, force3D: true },
-          0.64
-        );
+        if (prizesContainerRef.current) {
+          tl.set(prizesContainerRef.current, { visibility: "visible" }, 0.64);
+          tl.fromTo(
+            prizesContainerRef.current,
+            { yPercent: 100, y: 0, opacity: 1 },
+            { yPercent: 0, y: 0, opacity: 1, ease: "power2.inOut", duration: 0.12, force3D: true, immediateRender: false },
+            0.64
+          );
+        }
+
+        if (timelineContainerRef.current) {
+          tl.to(
+            timelineContainerRef.current,
+            { opacity: 0, ease: "power2.inOut", duration: 0.08 },
+            0.64
+          );
+          tl.set(timelineContainerRef.current, { visibility: "hidden", pointerEvents: "none" }, 0.72);
+        }
 
         tl.to(
           timelineScrollRef.current,
@@ -324,11 +346,10 @@ export default function AboutSection() {
           0.64
         );
 
-        if (timelineContainerRef.current && prizesContainerRef.current) {
-          tl.set(timelineContainerRef.current, { pointerEvents: "none" }, 0.76);
+        if (prizesContainerRef.current) {
           tl.set(prizesContainerRef.current, { pointerEvents: "auto" }, 0.76);
+          tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.76);
         }
-        tl.set(prizesContainerRef.current, { yPercent: 0 }, 0.76);
 
         // 6. Generous PAUSE on Prizes Section from 0.76 -> 1.00
       });
@@ -553,12 +574,13 @@ export default function AboutSection() {
         {/* LAYER 3: The Prizes Stage (Slides Up Over Timeline Silky Smooth) */}
         <div
           ref={prizesContainerRef}
-          className="absolute top-0 left-0 z-30 min-h-screen h-auto w-full pointer-events-auto will-change-transform"
+          style={{ visibility: "hidden", opacity: 0 }}
+          className="absolute top-0 left-0 z-30 min-h-screen h-auto w-full bg-black pointer-events-none will-change-transform"
         >
-          <div className="hidden md:block w-full h-screen">
+          <div className="hidden md:block w-full h-screen bg-black">
             <PrizesSection />
           </div>
-          <div className="md:hidden w-full h-auto bg-black pb-16">
+          <div className="md:hidden w-full h-auto bg-black pb-24">
             <PrizesMobileSection />
           </div>
         </div>
