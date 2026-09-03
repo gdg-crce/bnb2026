@@ -29,7 +29,7 @@ export default function TimelineSection() {
     },
     {
       title: "HACKATHON BEGINS",
-      date: "31ST OCTOBER - 4:00 AM",
+      date: "31ST OCTOBER - 4:00 PM",
     },
     {
       title: "MENTORING SESSION",
@@ -41,7 +41,7 @@ export default function TimelineSection() {
     },
     {
       title: "HACKATHON ENDS",
-      date: "1ST NOVEMBER - 4PM AM",
+      date: "1ST NOVEMBER - 4:00PM ",
     },
     {
       title: "RESULT DECLARATION",
