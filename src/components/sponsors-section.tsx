@@ -13,6 +13,7 @@ const SponsorCard = ({ sponsor, className = "h-32 sm:h-36", tileClass = "prev-sp
         src={sponsor.image}
         alt={sponsor.name}
         fill
+        unoptimized={sponsor.image.startsWith("http")}
         loading="lazy"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         className={`object-contain transition-transform duration-300 ease-out group-hover:scale-108 ${
@@ -70,6 +71,19 @@ export default function SponsorsSection() {
           },
         });
 
+        // This Year's Sponsor cards animation
+        gsap.to(".this-sponsor-tile", {
+          opacity: 1,
+          y: 0,
+          stagger: 0.03,
+          duration: 0.7,
+          ease: "back.out(1.2)",
+          scrollTrigger: {
+            trigger: ".this-sponsors-container",
+            start: "top 85%",
+          },
+        });
+
         // Previous Sponsor cards animation
         gsap.to(".prev-sponsor-tile", {
           opacity: 1,
@@ -82,6 +96,16 @@ export default function SponsorsSection() {
             start: "top 80%",
           },
         });
+      });
+
+      media.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(
+          [".sponsors-mark", ".section-title", ".this-sponsor-tile", ".prev-sponsor-tile"],
+          {
+            opacity: 1,
+            y: 0,
+          }
+        );
       });
     },
     { scope: root }
@@ -119,6 +143,27 @@ export default function SponsorsSection() {
     { name: "Simply Gaming", image: "/sponsors/simplygameing.png" },
     { name: "Ettara", image: "/sponsors/ettara.png" },
   ];
+
+  const thisSponsors = [
+    { name: "IDFC First Bank", image: "/sponsors/idfc.png" },
+    { name: "Unstop", image: "/sponsors/unstop.png" },
+    { name: "NIA", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/image1.png" },
+    { name: "Zensar", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/Zensar_logo_blk_png.png" },
+    { name: "Avanse", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/Avanse%20Logo-01.png?updatedAt=1791911413898" },
+    { name: "fintlatics", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/fintlatics.jpeg?updatedAt=1791911413392" },
+    { name: "Stylish", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/image.png" },
+    { name: "BROCODE", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/BROCODE%20LOGO%20HORIZONTAL.png?updatedAt=1791911334783" },
+    { name: "xhibit", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/xhibit%20black.png" },
+    { name: "bandstand", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/bandstand.jpeg?updatedAt=1791911334483" },
+    { name: "rose lavida", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/rose%20lavida.jpeg?updatedAt=1791911334285" },
+    { name: "TOO YUMM", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/yum.png" },
+    { name: "Wetnjoy", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/wetnjoy.png?updatedAt=1791911334213" },
+    { name: "eazydiner", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/eazydiner.jpg?updatedAt=1791911334188" },
+    { name: "maxprotien", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/maxprotien.png?updatedAt=1791911334182" },
+    { name: "may.i", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/may.i.png?updatedAt=1791911334133" },
+    { name: "mod", image: "https://ik.imagekit.io/9yzb99hnu/gdg-crce/sponsers/f97f67112181693.60100009d9391.webp?updatedAt=1791911334220" },
+  ];
+
 
   return (
     <section
@@ -174,6 +219,23 @@ export default function SponsorsSection() {
               priority
               className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)] mx-auto"
             />
+          </div>
+        </div>
+
+         {/* --- this  Years Sponsors --- */}
+        <div className="this-sponsors-container p-5">
+          <div className="text-center flex flex-col items-center mb-10">
+       
+            <div className="h-0.5 w-24 bg-[#22b6d6]/40 rounded-full mt-2 mb-8 mx-auto"></div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+            {thisSponsors.map((sponsor) => (
+              <SponsorCard
+                key={sponsor.name}
+                sponsor={sponsor}
+                tileClass="this-sponsor-tile"
+              />
+            ))}
           </div>
         </div>
 
